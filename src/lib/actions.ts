@@ -6,18 +6,22 @@ import { ILink, ILink_request } from './types';
 
 export async function CreateNewLinkAction(formData: FormData, pathname?: string): Promise<ILink> {
     const linkReqest: ILink_request = {
-        category: formData.get('category')?.toString() || '',
-        description: formData.get('description')?.toString() || '',
-        imageUrl: formData.get('imageUrl')?.toString() || '',
-        title: formData.get('title')?.toString() || '',
-        url: formData.get('url')?.toString() || ''
+        category: getFormDataName(formData, 'category'),
+        description: getFormDataName(formData, 'description'),
+        imageUrl: getFormDataName(formData, 'imageUrl'),
+        title: getFormDataName(formData, 'title'),
+        url: getFormDataName(formData, 'url'),
     };
     const linkProm = createNewLink(linkReqest);
 
-    // Optionally refresh the URL after a new link is added
+    // Optionally refresh URL after the new link is added
     if (pathname != null) {
         linkProm.then(() => revalidatePath(pathname));
     }
 
     return linkProm;
+}
+
+function getFormDataName(formData: FormData, name: string): string {
+    return formData.get(name)?.toString() || '';
 }
