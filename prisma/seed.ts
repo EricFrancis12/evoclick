@@ -1,5 +1,6 @@
 // Do not use the "@/" syntax when importing prisma here
-// because the seed command "npx prisma db seed" uses ts-node under the hood,
+// because the seed command that runs this file "npx prisma db seed"
+// uses ts-node under the hood,
 // and it's not able to recognize that syntax in the current tsconfig.
 import prisma from '../src/lib/db';
 
