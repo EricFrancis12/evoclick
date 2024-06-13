@@ -9,7 +9,7 @@ export interface ILink {
     url: string;
     imageUrl: string;
     category: string;
-};
+}
 
 // A request for creating a new link
 export interface ILink_createRequest extends Omit<ILink, 'id' | 'createdAt' | 'updatedAt'> { }
