@@ -2,10 +2,10 @@
 
 import { revalidatePath } from 'next/cache';
 import { createNewLink } from './data';
-import { ILink, ILink_request } from './types';
+import { ILink, ILink_createRequest } from './types';
 
 export async function CreateNewLinkAction(formData: FormData, pathname?: string): Promise<ILink> {
-    const linkReqest: ILink_request = {
+    const linkReqest: ILink_createRequest = {
         category: getFormDataName(formData, 'category'),
         description: getFormDataName(formData, 'description'),
         imageUrl: getFormDataName(formData, 'imageUrl'),
