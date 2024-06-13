@@ -15,7 +15,11 @@ export default function Form() {
 
     return (
         <form
-            action={formData => createNewLink(formData, window.location.pathname)}
+            /*
+                Commenting out the server action to prevent production misuse
+                while in early stages of development.
+            */
+            // action={formData => createNewLink(formData, window.location.pathname)}
             className='flex flex-col gap-1'
         >
             {formInputs.map(name => (
