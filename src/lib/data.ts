@@ -17,14 +17,14 @@ export async function createNewAffiliateNetwork(affNetReqest: IAffiliateNetwork_
     });
 }
 
-export async function updateAffiliateNetworkById(id: number, data: IAffiliateNetwork_updateRequest) {
+export async function updateAffiliateNetworkById(id: number, data: IAffiliateNetwork_updateRequest): Promise<IAffiliateNetwork> {
     return prisma.affiliateNetwork.update({
         where: { id },
         data
     });
 }
 
-export async function deleteAffiliateNetworkById(id: number) {
+export async function deleteAffiliateNetworkById(id: number): Promise<IAffiliateNetwork> {
     return prisma.affiliateNetwork.delete({
         where: { id }
     });
