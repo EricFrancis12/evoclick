@@ -1,43 +1,26 @@
-// Do not use the "@/" syntax when importing prisma here
+// Do not use the "@/" syntax when importing here
 // because the seed command that runs this file "npx prisma db seed"
 // uses ts-node under the hood,
 // and it's not able to recognize that syntax in the current tsconfig.
 import prisma from '../src/lib/db';
+import { IAffiliateNetwork_createRequest } from '../src/lib/types';
 
-const links = [
+const affiliateNetworks: IAffiliateNetwork_createRequest[] = [
     {
-        category: 'Open Source',
-        description: 'Fullstack React framework',
-        id: 1,
-        imageUrl: 'https://github.com/vercel.png',
-        title: 'Next.js',
-        url: 'https://nextjs.org',
+        name: 'Max Bounty',
+        tags: [],
+        defaultNewOfferString: ''
     },
     {
-        category: 'Open Source',
-        description: 'Next Generation ORM for TypeScript and JavaScript',
-        id: 2,
-        imageUrl: 'https://github.com/prisma.png',
-
-        title: 'Prisma',
-        url: 'https://prisma.io',
+        name: 'CPA Grip',
+        tags: [],
+        defaultNewOfferString: ''
     },
     {
-        category: 'Open Source',
-        description: 'Utility-fist css framework',
-        id: 3,
-        imageUrl: 'https://github.com/tailwindlabs.png',
-        title: 'TailwindCSS',
-        url: 'https://tailwindcss.com',
-    },
-    {
-        category: 'Open Source',
-        description: 'GraphQL implementation ',
-        id: 4,
-        imageUrl: 'https://www.apollographql.com/apollo-home.jpg',
-        title: 'Apollo GraphQL',
-        url: 'https://apollographql.com',
-    },
+        name: 'Perform CB',
+        tags: [],
+        defaultNewOfferString: ''
+    }
 ];
 
 async function main() {
@@ -45,11 +28,11 @@ async function main() {
         data: {
             email: `testemail@gmail.com`,
             role: 'ADMIN',
-        },
+        }
     });
 
-    await prisma.link.createMany({
-        data: links,
+    await prisma.affiliateNetwork.createMany({
+        data: affiliateNetworks,
     });
 }
 

@@ -15,12 +15,10 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
+  email     String   @unique
+  role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  email     String?  @unique
-  image     String?
-  role      Role     @default(USER)
-  bookmarks Link[]
 }
 
 enum Role {
@@ -28,14 +26,11 @@ enum Role {
   ADMIN
 }
 
-model Link {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  title       String
-  description String
-  url         String
-  imageUrl    String
-  category    String
-  users       User[]
+model AffiliateNetwork {
+  id                    Int      @id @default(autoincrement())
+  name                  String
+  defaultNewOfferString String
+  tags                  String[]
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 }

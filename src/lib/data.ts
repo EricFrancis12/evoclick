@@ -1,31 +1,31 @@
 import prisma from './db';
-import { ILink, ILink_createRequest, ILink_updateRequest } from './types';
+import { IAffiliateNetwork, IAffiliateNetwork_createRequest, IAffiliateNetwork_updateRequest } from './types';
 
-export async function getAllLinks(): Promise<ILink[]> {
-    return prisma.link.findMany();
+export async function getAllAffiliateNetworks(): Promise<IAffiliateNetwork[]> {
+    return prisma.affiliateNetwork.findMany();
 }
 
-export async function getLinkById(id: number) {
-    return prisma.link.findUnique({
+export async function getAffiliateNetworkById(id: number): Promise<IAffiliateNetwork | null> {
+    return prisma.affiliateNetwork.findUnique({
         where: { id }
     });
 }
 
-export async function createNewLink(linkReqest: ILink_createRequest): Promise<ILink> {
-    return prisma.link.create({
-        data: { ...linkReqest }
+export async function createNewAffiliateNetwork(affNetReqest: IAffiliateNetwork_createRequest): Promise<IAffiliateNetwork> {
+    return prisma.affiliateNetwork.create({
+        data: { ...affNetReqest }
     });
 }
 
-export async function updateLinkById(id: number, data: ILink_updateRequest) {
-    return prisma.link.update({
+export async function updateAffiliateNetworkById(id: number, data: IAffiliateNetwork_updateRequest) {
+    return prisma.affiliateNetwork.update({
         where: { id },
         data
     });
 }
 
-export async function deleteLinkById(id: number) {
-    return prisma.link.delete({
+export async function deleteAffiliateNetworkById(id: number) {
+    return prisma.affiliateNetwork.delete({
         where: { id }
     });
 }
