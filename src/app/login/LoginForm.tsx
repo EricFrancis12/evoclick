@@ -5,11 +5,6 @@ import toast from 'react-hot-toast';
 import { loginAction } from '@/lib/actions';
 import { formatErr } from '@/lib/utils';
 
-const formInputs = [
-    'username',
-    'password'
-];
-
 export default function LoginForm() {
     const router = useRouter();
 
@@ -21,7 +16,7 @@ export default function LoginForm() {
                 if (!user) {
                     toast.error('Login error');
                 } else {
-                    router.push('/');
+                    router.push('/dashboard');
                 }
             })
             .catch(err => toast.error(formatErr(err)));
@@ -32,15 +27,8 @@ export default function LoginForm() {
             action={handleLoginAction}
             className='flex flex-col gap-1'
         >
-            {formInputs.map(name => (
-                <input
-                    key={name}
-                    type='text'
-                    name={name}
-                    placeholder={name}
-                    className='border px-2 py-1'
-                />
-            ))}
+            <Input name='username' type='text' />
+            <Input name='password' type='password' />
             <button
                 type='submit'
                 className='mt-2 bg-blue-400 border rounded'
@@ -48,5 +36,20 @@ export default function LoginForm() {
                 Login
             </button>
         </form>
+    )
+}
+
+function Input({ name, type }: {
+    name: string,
+    type: string
+}) {
+    return (
+        <input
+            key={name}
+            type={type}
+            name={name}
+            placeholder={name}
+            className='border px-2 py-1'
+        />
     )
 }

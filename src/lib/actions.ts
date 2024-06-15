@@ -1,8 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers'
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { createNewAffiliateNetwork, getUserByName } from './data';
+import { JWT_EXPIRY, JWT_SECRET } from './constants';
 import { IUser, IAffiliateNetwork, IAffiliateNetwork_createRequest } from './types';
 
 export async function loginAction(formData: FormData): Promise<IUser | null> {
@@ -23,7 +26,11 @@ export async function loginAction(formData: FormData): Promise<IUser | null> {
             return null;
         }
 
-        // TODO: Set JWT
+        // Set JWT
+        const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
+            expiresIn: JWT_EXPIRY
+        });
+        cookies().set('jwt', token);
 
         return user;
     } catch (err) {
