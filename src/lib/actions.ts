@@ -4,8 +4,9 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers'
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { createNewAffiliateNetwork, getUserByName } from './data';
+import { generateRootUser } from './auth';
 import { JWT_EXPIRY, JWT_SECRET } from './constants';
+import { createNewAffiliateNetwork, getUserByName } from './data';
 import { IUser, IAffiliateNetwork, IAffiliateNetwork_createRequest } from './types';
 
 export async function loginAction(formData: FormData): Promise<IUser | null> {
@@ -17,6 +18,19 @@ export async function loginAction(formData: FormData): Promise<IUser | null> {
     }
 
     try {
+        if (username === process.env.ROOT_USERNAME && password === process.env.ROOT_PASSWORD) {
+            const rootUser = generateRootUser();
+            if (rootUser) {
+                // Set JWT
+                const token = jwt.sign({ isRootUser: true }, JWT_SECRET, {
+                    expiresIn: JWT_EXPIRY
+                });
+                cookies().set('jwt', token);
+
+                return rootUser;
+            }
+        }
+
         const user = await getUserByName(username);
         if (!user) {
             return null;

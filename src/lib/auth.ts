@@ -21,7 +21,15 @@ export async function getUserFromJWT(): Promise<IUser | null> {
 
     try {
         const payload = jwt.verify(token, JWT_SECRET);
-        if (typeof payload !== 'string' && 'userId' in payload) {
+        if (typeof payload === 'string') {
+            return null;
+        }
+
+        if ('isRootUser' in payload) {
+            return generateRootUser();
+        }
+
+        if ('userId' in payload) {
             return getUserById(payload.userId);
         }
     } catch (err) {
@@ -29,4 +37,20 @@ export async function getUserFromJWT(): Promise<IUser | null> {
     }
 
     return null;
+}
+
+export function generateRootUser(): IUser | null {
+    if (!process.env.ROOT_USERNAME) {
+        console.error('Unable to genreate Root User because ROOT_USERNAME is not set');
+        return null;
+    }
+
+    const date = new Date();
+    return {
+        id: -1,
+        name: process.env.ROOT_USERNAME,
+        hashedPassword: '',
+        createdAt: date,
+        updatedAt: date
+    };
 }

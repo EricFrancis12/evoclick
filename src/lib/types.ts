@@ -1,10 +1,9 @@
-import { $Enums } from '@prisma/client';
+
 
 export interface IUser {
     id: number;
     name: string;
     hashedPassword: string;
-    role: $Enums.Role;
     createdAt: Date;
     updatedAt: Date;
 }

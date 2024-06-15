@@ -26,17 +26,20 @@ const affiliateNetworks: IAffiliateNetwork_createRequest[] = [
 ];
 
 async function main() {
-    const hashedPassword = await bcrypt.hash('1234', SALT_ROUNDS);
+    if (!process.env.ROOT_USERNAME || !process.env.ROOT_PASSWORD) {
+        throw new Error('ROOT_USERNAME and ROOT_PASSWORD are required');
+    }
+
+    const hashedPassword = await bcrypt.hash(process.env.ROOT_PASSWORD, SALT_ROUNDS);
     await prisma.user.create({
         data: {
-            name: 'root',
-            hashedPassword,
-            role: 'ADMIN',
+            name: process.env.ROOT_USERNAME,
+            hashedPassword
         }
     });
 
     await prisma.affiliateNetwork.createMany({
-        data: affiliateNetworks,
+        data: affiliateNetworks
     });
 }
 
