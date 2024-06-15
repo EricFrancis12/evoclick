@@ -5,6 +5,7 @@
 import prisma from '../src/lib/db';
 import bcrypt from 'bcrypt';
 import { IAffiliateNetwork_createRequest } from '../src/lib/types';
+import { SALT_ROUNDS } from '@/lib/constants';
 
 const affiliateNetworks: IAffiliateNetwork_createRequest[] = [
     {
@@ -25,7 +26,7 @@ const affiliateNetworks: IAffiliateNetwork_createRequest[] = [
 ];
 
 async function main() {
-    const hashedPassword = await bcrypt.hash('1234', 10);
+    const hashedPassword = await bcrypt.hash('1234', SALT_ROUNDS);
     await prisma.user.create({
         data: {
             name: 'root',

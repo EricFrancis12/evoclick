@@ -1,4 +1,4 @@
-import Form from './Form'
+import Form from './Form';
 import AffiliateNetworks from './AffiliateNetworks';
 
 export default async function Home() {
