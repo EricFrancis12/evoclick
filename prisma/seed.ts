@@ -1,11 +1,11 @@
-// Do not use the "@/" syntax when importing here
+// Do not use the "@/" syntax when importing anything into this file
 // because the seed command that runs this file "npx prisma db seed"
 // uses ts-node under the hood,
 // and it's not able to recognize that syntax in the current tsconfig.
 import prisma from '../src/lib/db';
 import bcrypt from 'bcrypt';
 import { IAffiliateNetwork_createRequest } from '../src/lib/types';
-import { SALT_ROUNDS } from '@/lib/constants';
+import { SALT_ROUNDS } from '../src/lib/constants';
 
 const affiliateNetworks: IAffiliateNetwork_createRequest[] = [
     {
