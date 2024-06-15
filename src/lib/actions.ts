@@ -1,25 +1,23 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createNewLink } from './data';
-import { ILink, ILink_createRequest } from './types';
+import { createNewAffiliateNetwork } from './data';
+import { IAffiliateNetwork, IAffiliateNetwork_createRequest } from './types';
 
-export async function CreateNewLinkAction(formData: FormData, pathname?: string): Promise<ILink> {
-    const linkReqest: ILink_createRequest = {
-        category: getFormDataName(formData, 'category'),
-        description: getFormDataName(formData, 'description'),
-        imageUrl: getFormDataName(formData, 'imageUrl'),
-        title: getFormDataName(formData, 'title'),
-        url: getFormDataName(formData, 'url'),
+export async function createNewAffiliateNetworkAction(formData: FormData, pathname?: string): Promise<IAffiliateNetwork> {
+    const affNetReqest: IAffiliateNetwork_createRequest = {
+        name: getFormDataName(formData, 'name'),
+        defaultNewOfferString: getFormDataName(formData, 'defaultNewOfferString'),
+        tags: []
     };
-    const linkProm = createNewLink(linkReqest);
+    const affiliateNetworkProm = createNewAffiliateNetwork(affNetReqest);
 
     // Optionally refresh URL after the new link is added
     if (pathname != null) {
-        linkProm.then(() => revalidatePath(pathname));
+        affiliateNetworkProm.then(() => revalidatePath(pathname));
     }
 
-    return linkProm;
+    return affiliateNetworkProm;
 }
 
 function getFormDataName(formData: FormData, name: string): string {

@@ -1,5 +1,5 @@
-import prisma from './db';
-import { IAffiliateNetwork, IAffiliateNetwork_createRequest, IAffiliateNetwork_updateRequest } from './types';
+import prisma from '../db';
+import { IAffiliateNetwork, IAffiliateNetwork_createRequest, IAffiliateNetwork_updateRequest } from '../types';
 
 export async function getAllAffiliateNetworks(): Promise<IAffiliateNetwork[]> {
     return prisma.affiliateNetwork.findMany();

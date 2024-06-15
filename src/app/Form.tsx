@@ -1,17 +1,15 @@
 'use client';
 
-import { CreateNewLinkAction } from '@/lib/actions';
+import { createNewAffiliateNetworkAction } from '@/lib/actions';
 
 const formInputs = [
-    'category',
-    'description',
-    'imageUrl',
-    'title',
-    'url'
+    'name',
+    'defaultNewOfferString',
+    'tags'
 ];
 
 export default function Form() {
-    const createNewLink = CreateNewLinkAction.bind(null);
+    const createNewAffiliateNetwork = createNewAffiliateNetworkAction.bind(null);
 
     return (
         <form
@@ -19,7 +17,7 @@ export default function Form() {
                 Commenting out the server action to prevent production misuse
                 while in early stages of development.
             */
-            // action={formData => createNewLink(formData, window.location.pathname)}
+            action={formData => createNewAffiliateNetwork(formData, window.location.pathname)}
             className='flex flex-col gap-1'
         >
             {formInputs.map(name => (
