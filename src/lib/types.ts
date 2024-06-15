@@ -1,5 +1,19 @@
 
 
+export enum ERole {
+    ADMIN = 'ADMIN',
+    USER = 'USER'
+}
+
+export interface IUser {
+    id: number;
+    name: string;
+    hashedPassword: string;
+    role: ERole;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 export interface IAffiliateNetwork {
     id: number;
     name: string;

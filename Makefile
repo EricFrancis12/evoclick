@@ -1,8 +1,8 @@
 migrate:
-	npx prisma migrate dev --name init
+	npx prisma migrate dev
 
 seed:
 	npx prisma db seed
 
 db push:
-	npm prisma db push
+	npx prisma db push

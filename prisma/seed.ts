@@ -3,6 +3,7 @@
 // uses ts-node under the hood,
 // and it's not able to recognize that syntax in the current tsconfig.
 import prisma from '../src/lib/db';
+import bcrypt from 'bcrypt';
 import { IAffiliateNetwork_createRequest } from '../src/lib/types';
 
 const affiliateNetworks: IAffiliateNetwork_createRequest[] = [
@@ -24,9 +25,11 @@ const affiliateNetworks: IAffiliateNetwork_createRequest[] = [
 ];
 
 async function main() {
+    const hashedPassword = await bcrypt.hash('1234', 10);
     await prisma.user.create({
         data: {
-            email: `testemail@gmail.com`,
+            name: 'root',
+            hashedPassword,
             role: 'ADMIN',
         }
     });
