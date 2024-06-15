@@ -1,5 +1,6 @@
 'use client';
 
+import toast from 'react-hot-toast';
 import { createNewAffiliateNetworkAction } from '@/lib/actions';
 
 const formInputs = [
@@ -11,13 +12,17 @@ const formInputs = [
 export default function Form() {
     const createNewAffiliateNetwork = createNewAffiliateNetworkAction.bind(null);
 
+    function handleFormAction(formData: FormData): void {
+        try {
+            createNewAffiliateNetwork(formData, window.location.pathname);
+        } catch (err) {
+            toast.error('error... :(');
+        }
+    }
+
     return (
         <form
-            /*
-                Commenting out the server action to prevent production misuse
-                while in early stages of development.
-            */
-            action={formData => createNewAffiliateNetwork(formData, window.location.pathname)}
+            action={handleFormAction}
             className='flex flex-col gap-1'
         >
             {formInputs.map(name => (
