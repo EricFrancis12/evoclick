@@ -1,32 +1,26 @@
-import { z } from 'zod';
-import prisma from '../db';
 import cache from '../cache';
-import { IAffiliateNetwork, IAffiliateNetwork_createRequest, IAffiliateNetwork_updateRequest } from '../types';
+import prisma from '../db';
+import { affiliateNetworkSchema } from '../schemas';
+import { TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest } from '../types';
+import { initMakeRedisKey } from '../utils';
 
-const affiliateNetworkSchema = z.object({
-    id: z.number(),
-    name: z.string(),
-    defaultNewOfferString: z.string(),
-    tags: z.array(z.string()),
-    createdAt: z.date(),
-    updatedAt: z.date()
-});
+const makeKey = initMakeRedisKey('affiliateNetwork');
 
-type TAffiliateNetwork = z.infer<typeof affiliateNetworkSchema>;
-
-export async function getAllAffiliateNetworks(): Promise<IAffiliateNetwork[]> {
+export async function getAllAffiliateNetworks(): Promise<TAffiliateNetwork[]> {
     return prisma.affiliateNetwork.findMany();
 }
 
-export async function getAffiliateNetworkById(id: number): Promise<IAffiliateNetwork | null> {
+export async function getAffiliateNetworkById(id: number): Promise<TAffiliateNetwork | null> {
     // Check redis cache for this affiliate network
-    const key = `affiliateNetwork:${id}`;
+    const key = makeKey(id);
     const cachedResult = await cache?.get(key);
-    console.log(typeof cachedResult === 'string' ? 'hit' : 'miss');
+    console.log(cachedResult != null ? 'hit' : 'miss');
 
     // If found in the cache, parse and return it
-    const { data, success } = affiliateNetworkSchema.safeParse(cachedResult);
-    if (success) return data;
+    if (cachedResult != null) {
+        const { data, success } = await affiliateNetworkSchema.safeParseAsync(cachedResult);
+        if (success) return data;
+    }
 
     // If not in cache, query db for it
     const affiliateNetworkProm = prisma.affiliateNetwork.findUnique({
@@ -45,24 +39,51 @@ export async function getAffiliateNetworkById(id: number): Promise<IAffiliateNet
     return affiliateNetworkProm;
 }
 
-export async function createNewAffiliateNetwork(affNetReqest: IAffiliateNetwork_createRequest): Promise<IAffiliateNetwork> {
-    return prisma.affiliateNetwork.create({
+export async function createNewAffiliateNetwork(affNetReqest: TAffiliateNetwork_createRequest): Promise<TAffiliateNetwork> {
+    const affiliateNetworkProm = prisma.affiliateNetwork.create({
         data: { ...affNetReqest }
     });
-    // if the creation was successful, create a new key for this new affiliate network in the cache
+
+    // If the creation was successful, create a new key for this new affiliate network in the cache
+    affiliateNetworkProm.then(affiliateNetwork => {
+        if (affiliateNetwork && cache) {
+            const key = makeKey(affiliateNetwork.id);
+            cache.set(key, JSON.stringify(affiliateNetwork), {
+                EX: 60 // Exipry time in seconds
+            });
+        }
+    });
+
+    return affiliateNetworkProm;
 }
 
-export async function updateAffiliateNetworkById(id: number, data: IAffiliateNetwork_updateRequest): Promise<IAffiliateNetwork> {
-    return prisma.affiliateNetwork.update({
+export async function updateAffiliateNetworkById(id: number, data: TAffiliateNetwork_updateRequest): Promise<TAffiliateNetwork> {
+    const affiliateNetworkProm = prisma.affiliateNetwork.update({
         where: { id },
         data
     });
-    // if the update was successful, update the corresponding key for this affiliate network in the cache
+
+    // If the update was successful, update the corresponding key for this affiliate network in the cache
+    affiliateNetworkProm.then(affiliateNetwork => {
+        if (affiliateNetwork && cache) {
+            const key = makeKey(affiliateNetwork.id);
+            cache.set(key, JSON.stringify(affiliateNetwork), {
+                EX: 60 // Exipry time in seconds
+            });
+        }
+    });
+
+    return affiliateNetworkProm;
 }
 
-export async function deleteAffiliateNetworkById(id: number): Promise<IAffiliateNetwork> {
+export async function deleteAffiliateNetworkById(id: number): Promise<TAffiliateNetwork> {
+    // Delete the corresponding key for this affiliate network in the cache
+    if (cache) {
+        const key = makeKey(id);
+        cache.del(key);
+    }
+
     return prisma.affiliateNetwork.delete({
         where: { id }
     });
-    // if the deletion was successful, delete the corresponding key for this affiliate network in the cache
 }
