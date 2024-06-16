@@ -7,9 +7,9 @@ import jwt from 'jsonwebtoken';
 import { generateRootUser } from './auth';
 import { JWT_EXPIRY, JWT_SECRET } from './constants';
 import { createNewAffiliateNetwork, getUserByName } from './data';
-import { IUser, TAffiliateNetwork, TAffiliateNetwork_createRequest } from './types';
+import { User, AffiliateNetwork, AffiliateNetwork_createRequest } from './types';
 
-export async function loginAction(formData: FormData): Promise<IUser | null> {
+export async function loginAction(formData: FormData): Promise<User | null> {
     const username = getFormDataName(formData, 'username');
     const password = getFormDataName(formData, 'password');
 
@@ -52,8 +52,8 @@ export async function loginAction(formData: FormData): Promise<IUser | null> {
     }
 }
 
-export async function createNewAffiliateNetworkAction(formData: FormData, pathname?: string): Promise<TAffiliateNetwork> {
-    const affNetReqest: TAffiliateNetwork_createRequest = {
+export async function createNewAffiliateNetworkAction(formData: FormData, pathname?: string): Promise<AffiliateNetwork> {
+    const affNetReqest: AffiliateNetwork_createRequest = {
         name: getFormDataName(formData, 'name'),
         defaultNewOfferString: getFormDataName(formData, 'defaultNewOfferString'),
         tags: []

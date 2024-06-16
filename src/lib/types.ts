@@ -1,21 +1,16 @@
-import type { TAffiliateNetwork } from './schemas';
+import { AffiliateNetwork, LandingPage, User } from '@prisma/client';
 
-export type { TAffiliateNetwork } from './schemas';
-
-export interface IUser {
-    id: number;
-    name: string;
-    hashedPassword: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-// A request for creating a new user
-export interface IUser_createRequest extends Omit<IUser, 'id' | 'createdAt' | 'updatedAt'> { }
-
-// A request for updating one or more properties of an existing user
-export interface IUser_updateRequest extends Omit<Partial<IUser>, 'id' | 'createdAt' | 'updatedAt'> { }
+// Extending User model
+export type { User } from '@prisma/client';
+export type User_createRequest = Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
+export type User_updateRequest = Omit<Partial<User>, 'id' | 'createdAt' | 'updatedAt'>;
 
 // Extending Affiliate Network model
-export type TAffiliateNetwork_createRequest = Omit<TAffiliateNetwork, 'id' | 'createdAt' | 'updatedAt'>;
-export type TAffiliateNetwork_updateRequest = Omit<Partial<TAffiliateNetwork>, 'id' | 'createdAt' | 'updatedAt'>;
+export type { AffiliateNetwork } from '@prisma/client';
+export type AffiliateNetwork_createRequest = Omit<AffiliateNetwork, 'id' | 'createdAt' | 'updatedAt'>;
+export type AffiliateNetwork_updateRequest = Omit<Partial<AffiliateNetwork>, 'id' | 'createdAt' | 'updatedAt'>;
+
+// Extending Landing Page model
+export type { LandingPage } from '@prisma/client';
+export type LandingPage_createRequest = Omit<LandingPage, 'id' | 'createdAt' | 'updatedAt'>;
+export type LandingPage_updateRequest = Omit<Partial<LandingPage>, 'id' | 'createdAt' | 'updatedAt'>;
