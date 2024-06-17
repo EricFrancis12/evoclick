@@ -11,6 +11,9 @@
         "vercel-build": "prisma generate && next build"
     },
     "dependencies": {
+        "@fortawesome/fontawesome-svg-core": "^6.5.2",
+        "@fortawesome/free-solid-svg-icons": "^6.5.2",
+        "@fortawesome/react-fontawesome": "^0.2.2",
         "@prisma/client": "^5.15.0",
         "bcrypt": "^5.1.1",
         "jsonwebtoken": "^9.0.2",

@@ -1,13 +1,17 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { headers } from 'next/headers';
 import { cookies } from 'next/headers'
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { generateRootUser } from './auth';
 import { JWT_EXPIRY, JWT_SECRET } from './constants';
-import { createNewAffiliateNetwork, getUserByName } from './data';
-import { TUser, TAffiliateNetwork, TAffiliateNetwork_createRequest } from './types';
+import {
+    createNewAffiliateNetwork, deleteAffiliateNetworkById, updateAffiliateNetworkById,
+    getUserByName
+} from './data';
+import { TUser, TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest } from './types';
 
 export async function loginAction(formData: FormData): Promise<TUser | null> {
     const username = getFormDataName(formData, 'username');
@@ -52,20 +56,27 @@ export async function loginAction(formData: FormData): Promise<TUser | null> {
     }
 }
 
-export async function createNewAffiliateNetworkAction(formData: FormData, pathname?: string): Promise<TAffiliateNetwork> {
-    const affNetReqest: TAffiliateNetwork_createRequest = {
-        name: getFormDataName(formData, 'name'),
-        defaultNewOfferString: getFormDataName(formData, 'defaultNewOfferString'),
-        tags: []
-    };
-    const affiliateNetworkProm = createNewAffiliateNetwork(affNetReqest);
+export async function createNewAffiliateNetworkAction(creationRequest: TAffiliateNetwork_createRequest, pathname?: string): Promise<TAffiliateNetwork> {
+    const prom = createNewAffiliateNetwork(creationRequest);
+    refreshUrl(prom, pathname);
+    return prom;
+}
 
+export async function updateAffiliateNetworkAction(id: number, updateRequest: TAffiliateNetwork_updateRequest, pathname?: string): Promise<TAffiliateNetwork> {
+    const prom = updateAffiliateNetworkById(id, updateRequest);
+    refreshUrl(prom, pathname);
+    return prom;
+}
+
+export async function deleteAffiliateNetworkAction(id: number, pathname?: string) {
+    const prom = deleteAffiliateNetworkById(id);
+    refreshUrl(prom, pathname);
+    return prom;
+}
+
+function refreshUrl(prom: Promise<any>, pathname?: string): void {
     // Optionally refresh URL after the new link is added
-    if (pathname != null) {
-        affiliateNetworkProm.then(() => revalidatePath(pathname));
-    }
-
-    return affiliateNetworkProm;
+    if (pathname) prom.then(() => revalidatePath(pathname));
 }
 
 function getFormDataName(formData: FormData, name: string): string {

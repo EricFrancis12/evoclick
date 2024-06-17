@@ -1,3 +1,5 @@
+import Creator from './Creator';
+import List from './List';
 import { getAllAffiliateNetworks } from '@/lib/data';
 
 export default async function AffiliateNetworks() {
@@ -5,13 +7,10 @@ export default async function AffiliateNetworks() {
         const affiliateNetworks = await getAllAffiliateNetworks();
 
         return (
-            <div className='p-2 border'>
-                {affiliateNetworks.map(affiliateNetwork => (
-                    <div key={affiliateNetwork.id}>
-                        Link Title: {affiliateNetwork.name}
-                    </div>
-                ))}
-            </div>
+            <>
+                <Creator />
+                <List affiliateNetworks={affiliateNetworks} />
+            </>
         )
     } catch (err) {
         return (
