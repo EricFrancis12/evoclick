@@ -4,10 +4,10 @@
 // and it's not able to recognize that syntax in the current tsconfig.
 import prisma from '../src/lib/db';
 import bcrypt from 'bcrypt';
-import { IAffiliateNetwork_createRequest } from '../src/lib/types';
+import { TAffiliateNetwork_createRequest } from '../src/lib/types';
 import { SALT_ROUNDS } from '../src/lib/constants';
 
-const affiliateNetworks: IAffiliateNetwork_createRequest[] = [
+const affiliateNetworks: TAffiliateNetwork_createRequest[] = [
     {
         name: 'Max Bounty',
         tags: [],
