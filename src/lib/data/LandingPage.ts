@@ -2,16 +2,16 @@
 import cache from '../cache';
 import db from '../db';
 import { landingPageSchema } from '../schemas';
-import { LandingPage, LandingPage_createRequest, LandingPage_updateRequest } from '../types';
+import { TLandingPage, TLandingPage_createRequest, TLandingPage_updateRequest } from '../types';
 import { initMakeRedisKey } from '../utils';
 
 const makeKey = initMakeRedisKey('landingPage');
 
-export async function getAllLandingPages(): Promise<LandingPage[]> {
+export async function getAllLandingPages(): Promise<TLandingPage[]> {
     return db.landingPage.findMany();
 }
 
-export async function getLandingPageById(id: number): Promise<LandingPage | null> {
+export async function getLandingPageById(id: number): Promise<TLandingPage | null> {
     // Check redis cache for this landing page
     const key = makeKey(id);
     const cachedResult = await cache?.get(key);
@@ -39,9 +39,9 @@ export async function getLandingPageById(id: number): Promise<LandingPage | null
     return landingPageProm;
 }
 
-export async function createNewLandingPage(landingPageReqest: LandingPage_createRequest): Promise<LandingPage> {
+export async function createNewLandingPage(creationRequest: TLandingPage_createRequest): Promise<TLandingPage> {
     const landingPageProm = db.landingPage.create({
-        data: { ...landingPageReqest }
+        data: { ...creationRequest }
     });
 
     // If the creation was successful, create a new key for this new landing page in the cache
@@ -57,7 +57,7 @@ export async function createNewLandingPage(landingPageReqest: LandingPage_create
     return landingPageProm;
 }
 
-export async function updateLandingPageById(id: number, data: LandingPage_updateRequest): Promise<LandingPage> {
+export async function updateLandingPageById(id: number, data: TLandingPage_updateRequest): Promise<TLandingPage> {
     const landingPageProm = db.landingPage.update({
         where: { id },
         data
@@ -76,7 +76,7 @@ export async function updateLandingPageById(id: number, data: LandingPage_update
     return landingPageProm;
 }
 
-export async function deleteLandingPageById(id: number): Promise<LandingPage> {
+export async function deleteLandingPageById(id: number): Promise<TLandingPage> {
     // Delete the corresponding key for this landing page in the cache
     if (cache) {
         const key = makeKey(id);

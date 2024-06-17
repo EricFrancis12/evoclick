@@ -1,16 +1,37 @@
-import { AffiliateNetwork, LandingPage, User } from '@prisma/client';
+import { AffiliateNetwork, LandingPage, Offer, TrafficSource, User } from '@prisma/client';
 
-// Extending User model
-export type { User } from '@prisma/client';
-export type User_createRequest = Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
-export type User_updateRequest = Omit<Partial<User>, 'id' | 'createdAt' | 'updatedAt'>;
+type omissions = 'id' | 'createdAt' | 'updatedAt';
 
-// Extending Affiliate Network model
-export type { AffiliateNetwork } from '@prisma/client';
-export type AffiliateNetwork_createRequest = Omit<AffiliateNetwork, 'id' | 'createdAt' | 'updatedAt'>;
-export type AffiliateNetwork_updateRequest = Omit<Partial<AffiliateNetwork>, 'id' | 'createdAt' | 'updatedAt'>;
+// Extending User model for use in the app
+export type TUser = User;
+export type TUser_createRequest = Omit<TUser, omissions>;
+export type TUser_updateRequest = Omit<Partial<TUser>, omissions>;
 
-// Extending Landing Page model
-export type { LandingPage } from '@prisma/client';
-export type LandingPage_createRequest = Omit<LandingPage, 'id' | 'createdAt' | 'updatedAt'>;
-export type LandingPage_updateRequest = Omit<Partial<LandingPage>, 'id' | 'createdAt' | 'updatedAt'>;
+// Extending Affiliate Network model for use in the app
+export type TAffiliateNetwork = AffiliateNetwork;
+export type TAffiliateNetwork_createRequest = Omit<TAffiliateNetwork, omissions>;
+export type TAffiliateNetwork_updateRequest = Omit<Partial<TAffiliateNetwork>, omissions>;
+
+// Extending Landing Page model for use in the app
+export type TLandingPage = LandingPage;
+export type TLandingPage_createRequest = Omit<TLandingPage, omissions>;
+export type TLandingPage_updateRequest = Omit<Partial<TLandingPage>, omissions>;
+
+// Extending Offer model for use in the app
+export type TOffer = Offer;
+export type TOffer_createRequest = Omit<TOffer, omissions>;
+export type TOffer_updateRequest = Omit<Partial<TOffer>, omissions>;
+
+// Extending Traffic Source model for use in the app
+export type TTrafficSource = Omit<TrafficSource, 'defaultTokens' | 'customTokens'> & {
+    defaultTokens: TToken[];
+    customTokens: TToken[];
+};
+export type TTrafficSource_createRequest = Omit<TTrafficSource, omissions>;
+export type TTrafficSource_updateRequest = Omit<Partial<TTrafficSource>, omissions>;
+
+export type TToken = {
+    queryParam: string;
+    value: string;
+    name: string;
+};

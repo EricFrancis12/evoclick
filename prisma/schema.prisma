@@ -24,17 +24,126 @@ model User {
 model AffiliateNetwork {
   id                    Int      @id @default(autoincrement())
   name                  String
-  defaultNewOfferString String
-  tags                  String[]
+  defaultNewOfferString String   @default("")
+  tags                  String[] @default([])
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
+  Offer                 Offer[]
+}
+
+model Campaign {
+  id                  Int                 @id @default(autoincrement())
+  name                String
+  landingPageRotation LandingPageRotation @default(RANDOM)
+  offerRotation       OfferRotation       @default(RANDOM)
+  geoName             GeoName?
+  tags                String[]            @default([])
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  trafficSource       TrafficSource       @relation(fields: [trafficSourceId], references: [id])
+  trafficSourceId     Int
+  flow                Flow                @relation(fields: [flowId], references: [id])
+  flowId              Int
+}
+
+enum LandingPageRotation {
+  RANDOM
+}
+
+enum OfferRotation {
+  RANDOM
+}
+
+model Flow {
+  id       Int        @id @default(autoincrement())
+  // TODO ...
+  Campaign Campaign[]
 }
 
 model LandingPage {
   id        Int      @id @default(autoincrement())
   name      String
   url       String
-  tags      String[]
+  tags      String[] @default([])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Offer {
+  id                 Int              @id @default(autoincrement())
+  name               String
+  url                String
+  payout             Int              @default(0)
+  tags               String[]         @default([])
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  affiliateNetwork   AffiliateNetwork @relation(fields: [affiliateNetworkId], references: [id])
+  affiliateNetworkId Int
+}
+
+model TrafficSource {
+  id            Int        @id @default(autoincrement())
+  name          String
+  postbackUrl   String     @default("")
+  defaultTokens String     @default("[]")
+  customTokens  String     @default("[]")
+  tags          String[]   @default([])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  Campaign      Campaign[]
+}
+
+enum GeoName {
+  AFGHANISTAN
+  ALGERIA
+  ARGENTINA
+  AUSTRALIA
+  BANGLADESH
+  BRAZIL
+  BURMA
+  CAMEROON
+  CANADA
+  CHILE
+  CHINA
+  COLOMBIA
+  COTE_DIVOIRE
+  DEMOCRATIC_REPUBLIC_OF_THE_CONGO
+  EGYPT
+  ETHIOPIA
+  FRANCE
+  GERMANY
+  GHANA
+  INDIA
+  INDONESIA
+  IRAN
+  IRAQ
+  ITALY
+  JAPAN
+  KENYA
+  MADAGASCAR
+  MALAYSIA
+  MEXICO
+  MOROCCO
+  MOZAMBIQUE
+  NEPAL
+  NIGER
+  NIGERIA
+  PAKISTAN
+  PERU
+  PHILIPPINES
+  POLAND
+  RUSSIA
+  SAUDI_ARABIA
+  SOUTH_AFRICA
+  SOUTH_KOREA
+  SPAIN
+  SRI_LANKA
+  SUDAN
+  TANZANIA
+  THAILAND
+  TURKEY
+  UGANDA
+  UNITED_KINGDOM
+  UNITED_STATES
+  VIETNAM
 }

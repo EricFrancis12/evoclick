@@ -1,16 +1,16 @@
 import cache from '../cache';
 import db from '../db';
 import { affiliateNetworkSchema } from '../schemas';
-import { AffiliateNetwork, AffiliateNetwork_createRequest, AffiliateNetwork_updateRequest } from '../types';
+import { TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest } from '../types';
 import { initMakeRedisKey } from '../utils';
 
 const makeKey = initMakeRedisKey('affiliateNetwork');
 
-export async function getAllAffiliateNetworks(): Promise<AffiliateNetwork[]> {
+export async function getAllAffiliateNetworks(): Promise<TAffiliateNetwork[]> {
     return db.affiliateNetwork.findMany();
 }
 
-export async function getAffiliateNetworkById(id: number): Promise<AffiliateNetwork | null> {
+export async function getAffiliateNetworkById(id: number): Promise<TAffiliateNetwork | null> {
     // Check redis cache for this affiliate network
     const key = makeKey(id);
     const cachedResult = await cache?.get(key);
@@ -38,9 +38,9 @@ export async function getAffiliateNetworkById(id: number): Promise<AffiliateNetw
     return affiliateNetworkProm;
 }
 
-export async function createNewAffiliateNetwork(affNetReqest: AffiliateNetwork_createRequest): Promise<AffiliateNetwork> {
+export async function createNewAffiliateNetwork(creationRequest: TAffiliateNetwork_createRequest): Promise<TAffiliateNetwork> {
     const affiliateNetworkProm = db.affiliateNetwork.create({
-        data: { ...affNetReqest }
+        data: { ...creationRequest }
     });
 
     // If the creation was successful, create a new key for this new affiliate network in the cache
@@ -56,7 +56,7 @@ export async function createNewAffiliateNetwork(affNetReqest: AffiliateNetwork_c
     return affiliateNetworkProm;
 }
 
-export async function updateAffiliateNetworkById(id: number, data: AffiliateNetwork_updateRequest): Promise<AffiliateNetwork> {
+export async function updateAffiliateNetworkById(id: number, data: TAffiliateNetwork_updateRequest): Promise<TAffiliateNetwork> {
     const affiliateNetworkProm = db.affiliateNetwork.update({
         where: { id },
         data
@@ -75,7 +75,7 @@ export async function updateAffiliateNetworkById(id: number, data: AffiliateNetw
     return affiliateNetworkProm;
 }
 
-export async function deleteAffiliateNetworkById(id: number): Promise<AffiliateNetwork> {
+export async function deleteAffiliateNetworkById(id: number): Promise<TAffiliateNetwork> {
     // Delete the corresponding key for this affiliate network in the cache
     if (cache) {
         const key = makeKey(id);
