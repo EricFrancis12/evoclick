@@ -73,43 +73,6 @@ enum FlowType {
   URL
 }
 
-// model Route {
-//   id              Int              @id @default(autoincrement())
-//   isDefault       Boolean
-//   isActive        Boolean          @default(true)
-//   logicalRelation LOGICAL_RELATION @default(AND)
-//   rules           Rule[]
-//   paths           Path[]
-//   Flow            Flow             @relation(fields: [flowId], references: [id])
-//   flowId          Int
-// }
-
-// enum LOGICAL_RELATION {
-//   AND
-//   OR
-// }
-
-// model Rule {
-//   id        Int      @id @default(autoincrement())
-//   itemName  String // TODO: Redefine this to include all items (campaigns, affiliate networks, device types, cities, states, etc.)
-//   clickProp String // TODO: Redefine this to refer to the corresponding properties found on the Click model (affiliateNetwork_id, campaign_id, flow_id, etc.)
-//   doesEqual Boolean  @default(true)
-//   data      String[] @default([])
-//   Route     Route    @relation(fields: [routeId], references: [id])
-//   routeId   Int
-// }
-
-// model Path {
-//   id                   Int           @id @default(autoincrement())
-//   isActive             Boolean       @default(true)
-//   weight               Int           @default(100) // Ranges from 0 to 100
-//   landingPages         LandingPage[]
-//   offers               Offer[]
-//   directLinkingEnabled Boolean       @default(false)
-//   Route                Route         @relation(fields: [routeId], references: [id])
-//   routeId              Int
-// }
-
 model LandingPage {
   id        Int      @id @default(autoincrement())
   name      String

@@ -41,7 +41,7 @@ export async function getUserFromJWT(): Promise<TUser | null> {
 
 export function generateRootUser(): TUser | null {
     if (!process.env.ROOT_USERNAME) {
-        console.error('Unable to genreate Root User because ROOT_USERNAME is not set');
+        console.log('Unable to genreate Root User because ROOT_USERNAME is not set');
         return null;
     }
 

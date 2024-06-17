@@ -115,7 +115,7 @@ async function makeClientTrafficSource(dbModel: TrafficSource): Promise<TTraffic
     };
 }
 
-async function parseTokens(tokensJsonStr: string): Promise<TToken[]> {
-    const { success, data } = await z.array(tokenSchema).safeParseAsync(tokensJsonStr);
+async function parseTokens(jsonStr: string): Promise<TToken[]> {
+    const { success, data } = await z.array(tokenSchema).safeParseAsync(jsonStr);
     return success ? data : [];
 }

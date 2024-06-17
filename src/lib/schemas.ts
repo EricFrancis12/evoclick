@@ -1,7 +1,10 @@
-import { $Enums, Campaign } from '@prisma/client';
+import { $Enums } from '@prisma/client';
 import { z } from 'zod';
 import { toZod } from 'tozod';
-import { TAffiliateNetwork, TCampaign, TLandingPage, TOffer, TToken, TTrafficSource, TUser } from './types';
+import {
+    TAffiliateNetwork, TLandingPage, TOffer, TRoute, TToken, TTrafficSource, TUser,
+    TRule, TPath, ELogicalRelation, EItemName, EClickProp
+} from './types';
 
 export const userSchema: toZod<TUser> = z.object({
     id: z.number(),
@@ -31,6 +34,40 @@ export const campaignSchema = z.object({
     updatedAt: z.date(),
     flowId: z.number(),
     trafficSourceId: z.number()
+});
+
+export const ruleSchema = z.object({
+    itemName: z.nativeEnum(EItemName),
+    clickProp: z.nativeEnum(EClickProp),
+    doesEqual: z.boolean(),
+    data: z.array(z.string())
+});
+
+export const pathSchema: toZod<TPath> = z.object({
+    isActive: z.boolean(),
+    weight: z.number(),
+    landingPageIds: z.array(z.number()),
+    offerIds: z.array(z.number()),
+    directLinkingEnabled: z.boolean()
+});
+
+export const routeSchema = z.object({
+    isActive: z.boolean(),
+    logicalRelation: z.nativeEnum(ELogicalRelation),
+    rules: z.array(ruleSchema),
+    paths: z.array(pathSchema)
+});
+
+export const flowSchema = z.object({
+    id: z.number(),
+    type: z.nativeEnum($Enums.FlowType),
+    name: z.string().nullable(),
+    url: z.string().nullable(),
+    mainRoute: routeSchema.nullable(),
+    ruleRoutes: z.array(routeSchema).nullable(),
+    tags: z.array(z.string()),
+    createdAt: z.date(),
+    updatedAt: z.date()
 });
 
 export const landingPageSchema: toZod<TLandingPage> = z.object({
