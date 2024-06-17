@@ -54,3 +54,11 @@ export function generateRootUser(): TUser | null {
         updatedAt: date
     };
 }
+
+export async function useRootUserRoute(redirectUrl = '/login'): Promise<TUser> {
+    const user = await getUserFromJWT();
+    if (user?.name !== process.env.ROOT_USERNAME || user?.id !== -1) {
+        redirect(redirectUrl);
+    }
+    return user;
+}
