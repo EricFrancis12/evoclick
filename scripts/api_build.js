@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 function makeDirIfNotExists(dirPath) {
     if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath);
@@ -10,7 +11,22 @@ function copyFile(filePath, outputPath) {
     fs.writeFileSync(outputPath, outputFileContent);
 }
 
+function clearDirectory(dirPath, rmSelf = false) {
+    const dirContents = fs.readdirSync(dirPath);
+    dirContents.forEach(item => {
+        const itemPath = path.join(dirPath, item);
+        const stats = fs.statSync(itemPath);
+        if (stats.isFile()) {
+            fs.unlinkSync(itemPath);
+        } else {
+            clearDirectory(itemPath, true);
+        }
+    });
+    if (rmSelf === true) fs.rmdirSync(dirPath);
+}
+
 makeDirIfNotExists('./api');
+clearDirectory('./api');
 makeDirIfNotExists('./api/t');
 
 copyFile('./pkg/t.go', './api/t.go');

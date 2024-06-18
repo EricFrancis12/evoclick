@@ -5,10 +5,11 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
+        "api_build": "node scripts/api_build.js",
         "start": "next start",
         "lint": "next lint",
         "test": "jest",
-        "postinstall": "node scripts/postinstall.js",
+        "postinstall": "node scripts/api_build.js",
         "vercel-build": "prisma generate && next build"
     },
     "dependencies": {
