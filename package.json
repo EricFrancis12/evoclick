@@ -5,7 +5,6 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
-        "api_build": "node scripts/api_build.js",
         "start": "next start",
         "lint": "next lint",
         "test": "jest",

@@ -3,6 +3,22 @@
     "buildCommand": "npm run build",
     "rewrites": [
         {
+            "source": "/click",
+            "destination": "/api/click"
+        },
+        {
+            "source": "/click/:path*",
+            "destination": "/api/click/:path*"
+        },
+        {
+            "source": "/postback",
+            "destination": "/api/postback"
+        },
+        {
+            "source": "/postback/:path*",
+            "destination": "/api/postback/:path*"
+        },
+        {
             "source": "/t",
             "destination": "/api/t"
         },

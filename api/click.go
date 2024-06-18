@@ -6,22 +6,22 @@ import (
 	"net/url"
 )
 
-type Response struct {
+type ClickResponse struct {
 	Path         string     `json:"path"`
 	Method       string     `json:"method"`
 	QueryStrings url.Values `json:"query_strings"`
 	Message      string     `json:"message"`
 }
 
-func Handler(w http.ResponseWriter, r *http.Request) {
+func Click(w http.ResponseWriter, r *http.Request) {
 	jsonEncoder := json.NewEncoder(w)
 	jsonEncoder.SetIndent("", "  ")
 
-	debugResponse := &Response{
+	debugResponse := &ClickResponse{
 		Path:         r.URL.Path,
 		QueryStrings: r.URL.Query(),
 		Method:       r.Method,
-		Message:      "Hello from ./api/t/t.go",
+		Message:      "Hello from ./api/click.go",
 	}
 
 	err := jsonEncoder.Encode(debugResponse)

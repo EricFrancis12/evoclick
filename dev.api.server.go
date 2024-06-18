@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -27,29 +26,11 @@ func main() {
 func (s *APIServer) Run() {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/t", makeHTTPHandleFunc(handler.Handler))
+	router.HandleFunc("/click", handler.Click)
+	router.HandleFunc("/postback", handler.Postback)
+	router.HandleFunc("/t", handler.T)
 
 	log.Println("Dev Server running on port: ", s.listenAddr)
 
 	http.ListenAndServe(s.listenAddr, router)
-}
-
-type ApiError struct {
-	Error string `json:"error"`
-}
-
-type apiFunc func(http.ResponseWriter, *http.Request) error
-
-func makeHTTPHandleFunc(f apiFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if err := f(w, r); err != nil {
-			WriteJSON(w, http.StatusBadRequest, ApiError{Error: err.Error()})
-		}
-	}
-}
-
-func WriteJSON(w http.ResponseWriter, status int, v any) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	return json.NewEncoder(w).Encode(v)
 }

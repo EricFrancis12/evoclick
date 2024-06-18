@@ -6,22 +6,22 @@ import (
 	"net/url"
 )
 
-type TResponse struct {
+type PostbackResponse struct {
 	Path         string     `json:"path"`
 	Method       string     `json:"method"`
 	QueryStrings url.Values `json:"query_strings"`
 	Message      string     `json:"message"`
 }
 
-func T(w http.ResponseWriter, r *http.Request) {
+func Postback(w http.ResponseWriter, r *http.Request) {
 	jsonEncoder := json.NewEncoder(w)
 	jsonEncoder.SetIndent("", "  ")
 
-	debugResponse := &TResponse{
+	debugResponse := &PostbackResponse{
 		Path:         r.URL.Path,
 		QueryStrings: r.URL.Query(),
 		Method:       r.Method,
-		Message:      "Hello from ./api/t.go",
+		Message:      "Hello from ./api/postback.go",
 	}
 
 	err := jsonEncoder.Encode(debugResponse)
