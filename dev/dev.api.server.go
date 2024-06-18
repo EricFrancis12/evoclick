@@ -1,4 +1,4 @@
-package main
+package dev
 
 import (
 	"encoding/json"
@@ -19,7 +19,7 @@ func NewAPIServer(listenAddr string) *APIServer {
 	}
 }
 
-func main() {
+func dev() {
 	server := NewAPIServer(":3001")
 	server.Run()
 }
