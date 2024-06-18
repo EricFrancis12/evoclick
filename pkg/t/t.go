@@ -10,6 +10,7 @@ type Request struct {
 	Path         string     `json:"path"`
 	Method       string     `json:"method"`
 	QueryStrings url.Values `json:"query_strings"`
+	Message      string     `json:"message"`
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
@@ -20,6 +21,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		Path:         r.URL.Path,
 		QueryStrings: r.URL.Query(),
 		Method:       r.Method,
+		Message:      "Hello from ./pkg/t/t.go",
 	}
 
 	err := jsonEncoder.Encode(debugRequest)

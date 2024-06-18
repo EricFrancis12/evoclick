@@ -11,7 +11,7 @@ function copyFile(filePath, outputPath) {
 }
 
 makeDirIfNotExists('./api');
-makeDirIfNotExists('./api/users');
+makeDirIfNotExists('./api/t');
 
-copyFile('./pkg/users.go', './api/users.go');
-copyFile('./pkg/users/users.go', './api/users/[id].go');
+copyFile('./pkg/t.go', './api/t.go');
+copyFile('./pkg/t/t.go', './api/t/[id].go');
