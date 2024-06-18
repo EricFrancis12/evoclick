@@ -8,7 +8,7 @@
         "start": "next start",
         "lint": "next lint",
         "test": "jest",
-        "vercel-build": "prisma generate && next build"
+        "vercel-build": "prisma generate && bash deploy.sh && next build"
     },
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^6.5.2",

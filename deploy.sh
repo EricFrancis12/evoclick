@@ -3,6 +3,13 @@
 set -x # Print commands and their arguments as they are executed
 set -e # Exit immediately if a command exits with a non-zero status
 
+make_dir_if_not_exists () {
+    if [ ! -d $1 ]; then
+        # Create the directory
+         mkdir -p $1
+    fi
+}
+
 # Copy the source files to the api folder
 copy_file () {
 
@@ -13,6 +20,9 @@ copy_file () {
     # Append the source file to the destination file
     cat $1 >> $2
 }
+
+make_dir_if_not_exists ./api
+make_dir_if_not_exists ./api/users
 
 copy_file ./pkg/users.go ./api/users.go
 copy_file ./pkg/users/users.go ./api/users/[id].go
