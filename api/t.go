@@ -17,11 +17,11 @@ func T(w http.ResponseWriter, r *http.Request) {
 	jsonEncoder := json.NewEncoder(w)
 	jsonEncoder.SetIndent("", "  ")
 
-	debugResponse := &TResponse{
+	debugResponse := &PostbackResponse{
 		Path:         r.URL.Path,
 		QueryStrings: r.URL.Query(),
 		Method:       r.Method,
-		Message:      "Hello from ./api/t.go",
+		Message:      "Hello from ./api/t.go as a PostbackResponse",
 	}
 
 	err := jsonEncoder.Encode(debugResponse)
