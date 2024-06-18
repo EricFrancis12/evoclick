@@ -7,6 +7,6 @@ seed:
 db push:
 	npx prisma db push
 
-dev api: api build
-	go run dev.api.server.go
+dev api:
+	go run .
 
