@@ -1,4 +1,4 @@
-module github.com/EricFrancis/evoclick
+module github.com/EricFrancis12/evoclick
 
 go 1.22.3
 

@@ -3,21 +3,15 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"net/url"
-)
 
-type ClickResponse struct {
-	Path         string     `json:"path"`
-	Method       string     `json:"method"`
-	QueryStrings url.Values `json:"query_strings"`
-	Message      string     `json:"message"`
-}
+	pkg "github.com/EricFrancis12/evoclick/pkg"
+)
 
 func Click(w http.ResponseWriter, r *http.Request) {
 	jsonEncoder := json.NewEncoder(w)
 	jsonEncoder.SetIndent("", "  ")
 
-	debugResponse := &ClickResponse{
+	debugResponse := &pkg.Response{
 		Path:         r.URL.Path,
 		QueryStrings: r.URL.Query(),
 		Method:       r.Method,

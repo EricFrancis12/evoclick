@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	handler "github.com/EricFrancis/evoclick/api"
+	handler "github.com/EricFrancis12/evoclick/api"
 	"github.com/stretchr/testify/assert"
 )
 

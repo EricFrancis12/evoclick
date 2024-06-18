@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	handler "github.com/EricFrancis/evoclick/api"
+	handler "github.com/EricFrancis12/evoclick/api"
 	"github.com/gorilla/mux"
 )
 
