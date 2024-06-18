@@ -14,6 +14,17 @@
             "source": "/t",
             "destination": "/api/t",
             "permanent": true
+        },
+        {
+            "source": "/t/:path*",
+            "destination": "/api/t/:path*",
+            "permanent": true
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/api/:path*",
+            "destination": "/:path*"
         }
     ]
 }
