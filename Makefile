@@ -9,4 +9,3 @@ db push:
 
 dev api:
 	go run .
-
