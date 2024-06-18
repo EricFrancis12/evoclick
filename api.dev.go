@@ -30,7 +30,7 @@ func (s *APIServer) Run() {
 	router.HandleFunc("/postback", handler.Postback)
 	router.HandleFunc("/t", handler.T)
 
-	log.Println("Dev Server running on port: ", s.listenAddr)
+	log.Println("Dev API running on port", s.listenAddr)
 
 	http.ListenAndServe(s.listenAddr, router)
 }
