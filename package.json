@@ -8,7 +8,7 @@
         "start": "next start",
         "lint": "next lint",
         "test": "jest",
-        "postinstall": "bash deploy.sh",
+        "postinstall": "node scripts/postinstall.js",
         "vercel-build": "prisma generate && next build"
     },
     "dependencies": {
