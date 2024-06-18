@@ -1,0 +1,19 @@
+{
+    "redirects": [
+        {
+            "source": "/users",
+            "destination": "/api/users",
+            "permanent": true
+        },
+        {
+            "source": "/users/:path*",
+            "destination": "/api/users/:path*",
+            "permanent": true
+        },
+        {
+            "source": "/t",
+            "destination": "/api/t",
+            "permanent": true
+        }
+    ]
+}
