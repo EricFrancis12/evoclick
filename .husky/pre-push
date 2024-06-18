@@ -1,1 +1,1 @@
-bash deploy.sh
+bash pre_push.sh
