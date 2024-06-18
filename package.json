@@ -9,7 +9,6 @@
         "start": "next start",
         "lint": "next lint",
         "test": "jest",
-        "postinstall": "node scripts/api_build.js",
         "vercel-build": "prisma generate && next build"
     },
     "dependencies": {
