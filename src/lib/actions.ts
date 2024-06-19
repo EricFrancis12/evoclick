@@ -1,7 +1,6 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { headers } from 'next/headers';
 import { cookies } from 'next/headers'
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';

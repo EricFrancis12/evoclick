@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import cache from '../cache';
 import db from '../db';
 import { campaignSchema } from '../schemas';
@@ -40,7 +41,10 @@ export async function getCampaignById(id: number): Promise<TCampaign | null> {
 
 export async function createNewCampaign(creationRequest: TCampaign_createRequest): Promise<TCampaign> {
     const campaignProm = db.campaign.create({
-        data: { ...creationRequest }
+        data: {
+            ...creationRequest,
+            publicId: crypto.randomUUID()
+        }
     });
 
     // If the creation was successful, create a new key for this new campaign in the cache

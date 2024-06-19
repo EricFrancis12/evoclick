@@ -8,6 +8,7 @@ describe('Testing Schemas', () => {
 
         const boilerplateCampaign: TCampaign = {
             id: 1,
+            publicId: 'e83htr892ujhoo3hnfksl04utynh23873towow',
             name: 'My Campaign',
             landingPageRotation: $Enums.LandingPageRotation.RANDOM,
             offerRotation: $Enums.OfferRotation.RANDOM,

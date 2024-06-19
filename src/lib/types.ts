@@ -14,7 +14,7 @@ export type TAffiliateNetwork_updateRequest = Omit<Partial<TAffiliateNetwork>, o
 
 // Extending Campaign model
 export type TCampaign = Campaign;
-export type TCampaign_createRequest = Omit<TCampaign, omissions>;
+export type TCampaign_createRequest = Omit<TCampaign, omissions | 'publicId'>;
 export type TCampaign_updateRequest = Omit<Partial<TCampaign>, omissions>;
 
 // Extending Flow model

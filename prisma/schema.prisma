@@ -33,6 +33,7 @@ model AffiliateNetwork {
 
 model Campaign {
   id                  Int                 @id @default(autoincrement())
+  publicId            String              @unique
   name                String
   landingPageRotation LandingPageRotation @default(RANDOM)
   offerRotation       OfferRotation       @default(RANDOM)

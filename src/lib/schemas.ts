@@ -25,6 +25,7 @@ export const affiliateNetworkSchema: toZod<TAffiliateNetwork> = z.object({
 
 export const campaignSchema = z.object({
     id: z.number(),
+    publicId: z.string(),
     name: z.string(),
     landingPageRotation: z.nativeEnum($Enums.LandingPageRotation),
     offerRotation: z.nativeEnum($Enums.OfferRotation),
