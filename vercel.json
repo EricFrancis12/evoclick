@@ -1,5 +1,5 @@
 {
-    "installCommand": "run npm vercel-install",
+    "installCommand": "npm vercel-install",
     "buildCommand": "npm run vercel-build",
     "rewrites": [
         {
