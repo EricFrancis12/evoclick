@@ -1,6 +1,6 @@
 {
     "installCommand": "npm install",
-    "buildCommand": "npm run build",
+    "buildCommand": "npm run vercel-build",
     "rewrites": [
         {
             "source": "/click",
