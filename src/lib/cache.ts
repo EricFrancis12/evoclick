@@ -4,7 +4,7 @@ import { createClient, RedisClientType } from 'redis';
 let cache: RedisClientType | undefined;
 
 // If a REDIS_URL is provided, a redis client will be created
-if (process.env.REDIS_URL && process.env.NODE_ENV !== 'test') {
+if (process.env.REDIS_URL && process.env.NODE_ENV !== 'test' && process.env.NEXT_PHASE !== 'phase-production-build') {
     cache = createClient({
         url: process.env.REDIS_URL,
         socket: {
