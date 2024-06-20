@@ -44,13 +44,13 @@ export async function createNewCampaign(creationRequest: TCampaign_createRequest
     const campaignProm = db.campaign.create({
         data: {
             name,
+            publicId: crypto.randomUUID() as string,
             landingPageRotation,
             offerRotation,
             geoName,
             tags,
             flowId,
-            trafficSourceId,
-            publicId: crypto.randomUUID() as string
+            trafficSourceId
         }
     });
 
