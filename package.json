@@ -8,7 +8,7 @@
         "start": "next start",
         "lint": "next lint",
         "test": "jest && @go test ./... -v",
-        "vercel-install": "npm install && yum install golang && ls && echo \"=== build it ===\"",
+        "vercel-install": "npm install && yum install golang -y && ls && echo \"=== build it ===\"",
         "vercel-build": "prisma generate && next build"
     },
     "dependencies": {
