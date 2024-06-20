@@ -40,17 +40,10 @@ export async function getCampaignById(id: number): Promise<TCampaign | null> {
 }
 
 export async function createNewCampaign(creationRequest: TCampaign_createRequest): Promise<TCampaign> {
-    const { name, landingPageRotation, offerRotation, geoName, tags, flowId, trafficSourceId } = creationRequest;
     const campaignProm = db.campaign.create({
         data: {
-            name,
-            publicId: crypto.randomUUID() as string,
-            landingPageRotation,
-            offerRotation,
-            geoName,
-            tags,
-            flowId,
-            trafficSourceId
+            ...creationRequest,
+            publicId: crypto.randomUUID() as string
         }
     });
 
