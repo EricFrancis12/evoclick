@@ -1,3 +1,2 @@
-go.mod
-go.sum
 api.dev.go
+*_test.go
