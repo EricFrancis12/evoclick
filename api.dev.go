@@ -29,6 +29,7 @@ func (s *APIServer) Run() {
 	router.HandleFunc("/click", handler.Click)
 	router.HandleFunc("/postback", handler.Postback)
 	router.HandleFunc("/t", handler.T)
+	router.HandleFunc("/test", handler.Test)
 
 	log.Println("Dev API running on port", s.listenAddr)
 

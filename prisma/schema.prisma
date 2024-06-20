@@ -8,6 +8,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator goClient {
+  provider = "go run github.com/steebchen/prisma-client-go"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("POSTGRES_URL")

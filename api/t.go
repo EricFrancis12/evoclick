@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	pkg "github.com/EricFrancis12/evoclick/pkg"
+	"github.com/EricFrancis12/evoclick/pkg"
 )
 
 func T(w http.ResponseWriter, r *http.Request) {
