@@ -43,7 +43,7 @@ export async function createNewCampaign(creationRequest: TCampaign_createRequest
     const campaignProm = db.campaign.create({
         data: {
             ...creationRequest,
-            publicId: crypto.randomUUID()
+            publicId: crypto.randomUUID() as string
         }
     });
 
