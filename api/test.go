@@ -7,26 +7,12 @@ import (
 	"net/http"
 
 	"github.com/EricFrancis12/evoclick/pkg"
-	// "github.com/EricFrancis12/evoclick/prisma/db"
 )
 
+var storer = pkg.NewStorer()
+
 func Test(w http.ResponseWriter, r *http.Request) {
-	/*
-		Example of how to read & write to db commented out below
-		to avoid abuse on deploy
-	*/
-
-	// client := db.NewClient()
-	// if err := client.Prisma.Connect(); err != nil {
-	// 	fmt.Errorf(err.Error())
-	// 	return
-	// }
-
-	// defer func() {
-	// 	if err := client.Prisma.Disconnect(); err != nil {
-	// 		panic(err)
-	// 	}
-	// }()
+	storer.Renew()
 
 	// ctx := context.Background()
 
@@ -63,6 +49,7 @@ func Test(w http.ResponseWriter, r *http.Request) {
 		QueryStrings: r.URL.Query(),
 		Method:       r.Method,
 		Message:      "Hello from ./api/test.go",
+		Data:         storer,
 	}
 
 	if err := jsonEncoder.Encode(debugResponse); err != nil {
