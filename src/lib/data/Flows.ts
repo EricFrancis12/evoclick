@@ -3,7 +3,7 @@ import { z } from 'zod';
 import cache from '../cache';
 import db from '../db';
 import { flowSchema, routeSchema } from '../schemas';
-import { ELogicalRelation, TFlow, TFlow_createRequest, TFlow_updateRequest, TRoute } from '../types';
+import { TFlow, TFlow_createRequest, TFlow_updateRequest, TRoute } from '../types';
 import { initMakeRedisKey } from '../utils';
 
 const makeKey = initMakeRedisKey('flow');

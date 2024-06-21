@@ -1,9 +1,9 @@
 package handler
 
 import (
-	// "context"
+	"context"
 	"encoding/json"
-	// "fmt"
+	"fmt"
 	"net/http"
 
 	"github.com/EricFrancis12/evoclick/pkg"
@@ -12,11 +12,24 @@ import (
 var storer = pkg.NewStorer()
 
 func Test(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
 	storer.Renew()
 
-	// ctx := context.Background()
+	result, err := storer.GetFlowById(ctx, 2)
+	if err != nil {
+		fmt.Println("error fetching Flows", err)
+		return
+	}
+	fmt.Println("Fetched Flow", result)
 
-	// // create a new affiliate network
+	results, err := storer.GetAllFlows(ctx)
+	if err != nil {
+		fmt.Println("error fetching Flow", err)
+		return
+	}
+	fmt.Println("Fetched Flows", results)
+
+	// // create new:
 	// createdAffiliateNetwork, err := client.AffiliateNetwork.CreateOne(
 	// 	db.AffiliateNetwork.Name.Set("Hi from Prisma!"),
 	// 	db.AffiliateNetwork.DefaultNewOfferString.Set("123"),
@@ -25,21 +38,6 @@ func Test(w http.ResponseWriter, r *http.Request) {
 	// 	fmt.Errorf(err.Error())
 	// 	return
 	// }
-
-	// result, _ := json.MarshalIndent(createdAffiliateNetwork, "", "  ")
-	// fmt.Printf("created affiliateNetwork: %s\n", result)
-
-	// // find a single affiliate network
-	// affiliateNetwork, err := client.AffiliateNetwork.FindUnique(
-	// 	db.AffiliateNetwork.ID.Equals(createdAffiliateNetwork.ID),
-	// ).Exec(ctx)
-	// if err != nil {
-	// 	fmt.Errorf(err.Error())
-	// 	return
-	// }
-
-	// result, _ = json.MarshalIndent(affiliateNetwork, "", "  ")
-	// fmt.Printf("affiliateNetwork: %s\n", result)
 
 	jsonEncoder := json.NewEncoder(w)
 	jsonEncoder.SetIndent("", "  ")

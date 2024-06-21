@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"time"
@@ -8,13 +9,13 @@ import (
 	"github.com/EricFrancis12/evoclick/prisma/db"
 )
 
-type User struct {
-	Id   int
-	Name string
-}
-
-func NewUser() *User {
-	return &User{}
+// Test response for api routes
+type Response struct {
+	Path         string     `json:"path"`
+	Method       string     `json:"method"`
+	QueryStrings url.Values `json:"query_strings"`
+	Message      string     `json:"message"`
+	Data         any        `json:"data"`
 }
 
 type Storer struct {
@@ -42,10 +43,8 @@ func (s *Storer) Renew() error {
 	return nil
 }
 
-type Response struct {
-	Path         string     `json:"path"`
-	Method       string     `json:"method"`
-	QueryStrings url.Values `json:"query_strings"`
-	Message      string     `json:"message"`
-	Data         any        `json:"data"`
+func parseJSON(jsonStr string, v any) {
+	if err := json.Unmarshal([]byte(jsonStr), &v); err != nil {
+		fmt.Printf("Error parsing JSON: %s", err)
+	}
 }
