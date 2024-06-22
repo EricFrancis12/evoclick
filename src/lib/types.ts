@@ -1,4 +1,4 @@
-import { AffiliateNetwork, Campaign, Flow, LandingPage, Offer, TrafficSource, User } from '@prisma/client';
+import { AffiliateNetwork, Campaign, Click, Flow, LandingPage, Offer, TrafficSource, User } from '@prisma/client';
 
 type omissions = 'id' | 'createdAt' | 'updatedAt';
 
@@ -47,6 +47,12 @@ export type TToken = {
     queryParam: string;
     value: string;
     name: string;
+};
+export type TClickToken = Omit<TToken, 'name'>;
+
+// Extending Click model
+export type TClick = Omit<Click, 'tokens'> & {
+    tokens: TClickToken[]
 };
 
 export type TRoute = {

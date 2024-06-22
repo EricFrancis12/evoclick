@@ -2,6 +2,11 @@ package pkg
 
 import "github.com/EricFrancis12/evoclick/prisma/db"
 
+type Click struct {
+	db.InnerClick
+	Tokens []ClickToken
+}
+
 type AffiliateNetwork struct {
 	db.InnerAffiliateNetwork
 }
@@ -31,9 +36,13 @@ type TrafficSource struct {
 }
 
 type Token struct {
+	ClickToken
+	Name string `json:"name"`
+}
+
+type ClickToken struct {
 	QueryParam string `json:"queryParam"`
 	Value      string `json:"value"`
-	Name       string `json:"name"`
 }
 
 type Route struct {

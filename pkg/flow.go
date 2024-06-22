@@ -3,6 +3,7 @@ package pkg
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/EricFrancis12/evoclick/prisma/db"
 )
@@ -16,13 +17,29 @@ func (s *Storer) GetAllFlows(ctx context.Context) ([]Flow, error) {
 }
 
 func (s *Storer) GetFlowById(ctx context.Context, id int) (*Flow, error) {
+	key := InitMakeRedisKey("flow")(strconv.Itoa(id))
+	// Check redis cache for this flow
+	flow, err := CheckRedisForKey[Flow](ctx, s.Cache, key)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		return flow, nil
+	}
+
+	// If not in cache, query db for it
 	model, err := s.Client.Flow.FindUnique(
 		db.Flow.ID.Equals(id),
 	).Exec(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return formatFlow(model), nil
+
+	fl := formatFlow(model)
+
+	// If we fetch from the db successfully, create a new key for this flow in the cache
+	defer SaveKeyToRedis(ctx, s.Cache, key, fl)
+
+	return fl, nil
 }
 
 func formatFlow(model *db.FlowModel) *Flow {

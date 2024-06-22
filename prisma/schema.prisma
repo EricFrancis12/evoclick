@@ -25,30 +25,74 @@ model User {
   updatedAt      DateTime @updatedAt
 }
 
+model Click {
+  id                 Int              @id @default(autoincrement())
+  cost               Int
+  revenue            Int
+  viewTime           DateTime
+  clickTime          DateTime?
+  convTime           DateTime?
+  viewOutputUrl      String
+  clickOutputUrl     String?
+  tokens             String
+  ip                 String
+  isp                String
+  userAgent          String
+  language           String
+  country            String
+  region             String
+  city               String
+  mobileCarrier      String
+  deviceType         String
+  deviceModel        String
+  deviceVendor       String
+  screenResolution   String
+  os                 String
+  osVersion          String
+  browserName        String
+  browserVersion     String
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  affiliateNetwork   AffiliateNetwork @relation(fields: [affiliateNetworkId], references: [id])
+  affiliateNetworkId Int
+  campaign           Campaign         @relation(fields: [campaignId], references: [id])
+  campaignId         Int
+  flow               Flow             @relation(fields: [flowId], references: [id])
+  flowId             Int
+  landingPage        LandingPage      @relation(fields: [landingPageId], references: [id])
+  landingPageId      Int
+  offer              Offer            @relation(fields: [offerId], references: [id])
+  offerId            Int
+  trafficSource      TrafficSource    @relation(fields: [trafficSourceId], references: [id])
+  trafficSourceId    Int
+}
+
 model AffiliateNetwork {
   id                    Int      @id @default(autoincrement())
   name                  String
-  defaultNewOfferString String   @default("")
-  tags                  String[] @default([])
+  defaultNewOfferString String
+  tags                  String[]
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
   Offer                 Offer[]
+  Click                 Click[]
 }
 
 model Campaign {
   id                  Int                 @id @default(autoincrement())
   publicId            String              @unique
   name                String
-  landingPageRotation LandingPageRotation @default(RANDOM)
-  offerRotation       OfferRotation       @default(RANDOM)
+  landingPageRotation LandingPageRotation
+  offerRotation       OfferRotation
   geoName             GeoName
-  tags                String[]            @default([])
+  tags                String[]
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
   flow                Flow                @relation(fields: [flowId], references: [id])
   flowId              Int
   trafficSource       TrafficSource       @relation(fields: [trafficSourceId], references: [id])
   trafficSourceId     Int
+  Click               Click[]
 }
 
 enum LandingPageRotation {
@@ -66,10 +110,11 @@ model Flow {
   url        String?
   mainRoute  String?
   ruleRoutes String?    @default("[]")
-  tags       String[]   @default([])
+  tags       String[]
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   Campaign   Campaign[]
+  Click      Click[]
 }
 
 enum FlowType {
@@ -82,33 +127,36 @@ model LandingPage {
   id        Int      @id @default(autoincrement())
   name      String
   url       String
-  tags      String[] @default([])
+  tags      String[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Click     Click[]
 }
 
 model Offer {
   id                 Int              @id @default(autoincrement())
   name               String
   url                String
-  payout             Int              @default(0)
-  tags               String[]         @default([])
+  payout             Int
+  tags               String[]
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
   affiliateNetwork   AffiliateNetwork @relation(fields: [affiliateNetworkId], references: [id])
   affiliateNetworkId Int
+  Click              Click[]
 }
 
 model TrafficSource {
   id            Int        @id @default(autoincrement())
   name          String
   postbackUrl   String?
-  defaultTokens String     @default("[]")
-  customTokens  String     @default("[]")
-  tags          String[]   @default([])
+  defaultTokens String
+  customTokens  String
+  tags          String[]
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   Campaign      Campaign[]
+  Click         Click[]
 }
 
 enum GeoName {
