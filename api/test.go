@@ -15,19 +15,19 @@ func Test(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	storer.Renew()
 
-	result, err := storer.GetFlowById(ctx, 2)
+	result, err := storer.GetAffiliateNetworkById(ctx, 2)
 	if err != nil {
-		fmt.Println("error fetching Flows", err)
+		fmt.Println("error fetching Affiliate Network", err)
 		return
 	}
-	fmt.Println("Fetched Flow", result)
+	fmt.Println("Fetched Affiliate Network:", result.Name)
 
-	results, err := storer.GetAllFlows(ctx)
-	if err != nil {
-		fmt.Println("error fetching Flow", err)
-		return
-	}
-	fmt.Println("Fetched Flows", results)
+	// results, err := storer.GetAllFlows(ctx)
+	// if err != nil {
+	// 	fmt.Println("error fetching Flow", err)
+	// 	return
+	// }
+	// fmt.Println("Fetched Flows", results)
 
 	// // create new:
 	// createdAffiliateNetwork, err := client.AffiliateNetwork.CreateOne(

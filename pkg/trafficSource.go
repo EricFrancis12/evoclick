@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/EricFrancis12/evoclick/prisma/db"
 )
@@ -25,12 +26,15 @@ func (s *Storer) GetTrafficSourceById(ctx context.Context, id int) (*TrafficSour
 }
 
 func formatTrafficSource(model *db.TrafficSourceModel) *TrafficSource {
-	var ts = &TrafficSource{
+	var (
+		defaultTokens = parseTokens(model.DefaultTokens)
+		customTokens  = parseTokens(model.CustomTokens)
+	)
+	return &TrafficSource{
 		InnerTrafficSource: model.InnerTrafficSource,
+		DefaultTokens:      defaultTokens,
+		CustomTokens:       customTokens,
 	}
-	parseJSON(model.DefaultTokens, ts.DefaultTokens)
-	parseJSON(model.CustomTokens, ts.CustomTokens)
-	return ts
 }
 
 func formatTrafficSources(models []db.TrafficSourceModel) []TrafficSource {
@@ -40,4 +44,13 @@ func formatTrafficSources(models []db.TrafficSourceModel) []TrafficSource {
 		trafficSources = append(trafficSources, *ts)
 	}
 	return trafficSources
+}
+
+func parseTokens(jsonStr string) []Token {
+	tokens, err := parseJSON[[]Token](jsonStr)
+	if err != nil {
+		fmt.Printf("Error parsing Tokens: %s", err)
+		return []Token{}
+	}
+	return tokens
 }

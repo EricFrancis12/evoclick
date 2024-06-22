@@ -27,22 +27,9 @@ func (s *Storer) GetFlowById(ctx context.Context, id int) (*Flow, error) {
 
 func formatFlow(model *db.FlowModel) *Flow {
 	var (
-		mainRoute  Route
-		ruleRoutes []Route
+		mainRoute  = getRoute(model.MainRoute)
+		ruleRoutes = getRoutes(model.RuleRoutes)
 	)
-
-	if mainRouteStr, ok := model.MainRoute(); !ok {
-		fmt.Println("Error parsing Route")
-	} else {
-		parseJSON(mainRouteStr, mainRoute)
-	}
-
-	if ruleRoutesStr, ok := model.RuleRoutes(); !ok {
-		fmt.Println("Error parsing Routes")
-	} else {
-		parseJSON(ruleRoutesStr, ruleRoutes)
-	}
-
 	return &Flow{
 		InnerFlow:  model.InnerFlow,
 		MainRoute:  mainRoute,
@@ -57,4 +44,34 @@ func formatFlows(models []db.FlowModel) []Flow {
 		flows = append(flows, *fl)
 	}
 	return flows
+}
+
+type RouteFunc func() (value string, ok bool)
+
+func getRoute(routeFunc RouteFunc) Route {
+	jsonStr, ok := routeFunc()
+	if !ok {
+		fmt.Println("Error parsing Route")
+		return Route{}
+	}
+	route, err := parseJSON[Route](jsonStr)
+	if err != nil {
+		fmt.Println("Error parsing Route:", err)
+		return Route{}
+	}
+	return route
+}
+
+func getRoutes(routeFunc RouteFunc) []Route {
+	jsonStr, ok := routeFunc()
+	if !ok {
+		fmt.Println("Error parsing Routes")
+		return []Route{}
+	}
+	routes, err := parseJSON[[]Route](jsonStr)
+	if err != nil {
+		fmt.Println("Error parsing Routes:", err)
+		return []Route{}
+	}
+	return routes
 }
