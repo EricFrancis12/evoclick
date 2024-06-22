@@ -9,10 +9,9 @@ import (
 	"github.com/EricFrancis12/evoclick/pkg"
 )
 
-var storer = pkg.NewStorer()
-
 func Test(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
+	storer := pkg.NewStorer()
 	storer.Renew()
 
 	result, err := storer.GetAffiliateNetworkById(ctx, 2)

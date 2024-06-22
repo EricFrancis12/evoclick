@@ -128,7 +128,6 @@ func formatClick(model *db.ClickModel) *Click {
 func parseClickTokens(jsonStr string) []ClickToken {
 	clickTokens, err := parseJSON[[]ClickToken](jsonStr)
 	if err != nil {
-		fmt.Printf("Error parsing Click Tokens: %s", err)
 		return []ClickToken{}
 	}
 	return clickTokens

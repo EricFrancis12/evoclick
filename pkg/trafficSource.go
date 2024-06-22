@@ -66,7 +66,6 @@ func formatTrafficSources(models []db.TrafficSourceModel) []TrafficSource {
 func parseTokens(jsonStr string) []Token {
 	tokens, err := parseJSON[[]Token](jsonStr)
 	if err != nil {
-		fmt.Printf("Error parsing Tokens: %s", err)
 		return []Token{}
 	}
 	return tokens

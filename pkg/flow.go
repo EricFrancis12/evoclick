@@ -68,13 +68,11 @@ type RouteFunc func() (value string, ok bool)
 func getRoute(routeFunc RouteFunc) Route {
 	jsonStr, ok := routeFunc()
 	if !ok {
-		fmt.Println("Error parsing Route")
-		return Route{}
+		return makeInitializedRoute()
 	}
 	route, err := parseJSON[Route](jsonStr)
 	if err != nil {
-		fmt.Println("Error parsing Route:", err)
-		return Route{}
+		return makeInitializedRoute()
 	}
 	return route
 }
@@ -82,13 +80,20 @@ func getRoute(routeFunc RouteFunc) Route {
 func getRoutes(routeFunc RouteFunc) []Route {
 	jsonStr, ok := routeFunc()
 	if !ok {
-		fmt.Println("Error parsing Routes")
 		return []Route{}
 	}
 	routes, err := parseJSON[[]Route](jsonStr)
 	if err != nil {
-		fmt.Println("Error parsing Routes:", err)
 		return []Route{}
 	}
 	return routes
+}
+
+func makeInitializedRoute() Route {
+	return Route{
+		IsActive:        false,
+		LogicalRelation: LogicalRelation.String(0),
+		Rules:           []Rule{},
+		Paths:           []Path{},
+	}
 }

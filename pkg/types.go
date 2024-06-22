@@ -66,3 +66,14 @@ type Path struct {
 	OfferIds             []int `json:"offerIds"`
 	DirectLinkingEnabled bool  `json:"directLinkingEnabled"`
 }
+
+type LogicalRelation int
+
+const (
+	And LogicalRelation = iota
+	Or
+)
+
+func (d LogicalRelation) String() string {
+	return [...]string{"AND", "OR"}[d]
+}

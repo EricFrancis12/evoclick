@@ -98,7 +98,6 @@ func SaveKeyToRedis(ctx context.Context, cache *redis.Client, key string, v any)
 }
 
 func parseJSON[T any](jsonStr string) (T, error) {
-	fmt.Println("jsonStr: ", jsonStr)
 	var v T
 	if err := json.Unmarshal([]byte(jsonStr), &v); err != nil {
 		return v, err
@@ -112,4 +111,12 @@ func InitMakeRedisKey(prefix string) RedisKeyFunc {
 	return func(id string) string {
 		return prefix + ":" + id
 	}
+}
+
+func GetCatchAllUrl() string {
+	catchAllUrl := os.Getenv("CATCH_ALL_REDIRECT_URL")
+	if catchAllUrl == "" {
+		return "https://bing.com"
+	}
+	return catchAllUrl
 }
