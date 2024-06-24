@@ -63,15 +63,14 @@ export type TRoute = {
 };
 
 export enum ELogicalRelation {
-    AND = 'AND',
-    OR = 'OR'
+    AND = 'and',
+    OR = 'or'
 };
 
 export type TRule = {
-    itemName: EItemName;
-    clickProp: EClickProp;
-    doesEqual: boolean;
+    ruleName: ERuleName;
     data: string[];
+    includes: boolean;
 };
 
 export type TPath = {
@@ -82,20 +81,19 @@ export type TPath = {
     directLinkingEnabled: boolean;
 };
 
-export enum EItemName {
-    AFFILIATE_NETWORK = 'AFFILIATE_NETWORK',
-    CAMPAIGN = 'CAMPAIGN',
-    FLOW = 'FLOW',
-    LANDING_PAGE = 'LANDING_PAGE',
-    OFFER = 'OFFER',
-    TRAFFIC_SOURCE = 'TRAFFIC_SOURCE'
-};
-
-export enum EClickProp {
-    affiliateNetworkId = 'affiliateNetworkId',
-    campaignId = 'campaignId',
-    flowId = 'flowId',
-    landingPageId = 'landingPageId',
-    offerId = 'offerId',
-    trafficSourceId = 'trafficSourceId'
+export enum ERuleName {
+    IP = 'IP',
+    ISP = 'ISP',
+    USER_AGENT = 'userAgent',
+    LANGUAGE = 'language',
+    COUNTRY = 'country',
+    REGION = 'region',
+    City = 'city',
+    DEVICE_TYPE = 'deviceType',
+    DEVICE = 'device',
+    SCREEN_RESOLUTION = 'screenResolution',
+    OS = 'OS',
+    OS_VERSION = 'OSVersion',
+    BROWSER_NAME = 'browserName',
+    BROWSER_VERSION = 'browserVersion'
 };

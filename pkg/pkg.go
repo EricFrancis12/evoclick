@@ -4,24 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/url"
+	"io"
+	"net/http"
 	"os"
 	"time"
 
 	"github.com/EricFrancis12/evoclick/prisma/db"
+	"github.com/mileusna/useragent"
 	"github.com/redis/go-redis/v9"
 )
-
-const redisExpiry = 6_000_000_000 // Number of nanoseconds Redis keys are saved for
-
-// Test response for api routes
-type Response struct {
-	Path         string     `json:"path"`
-	Method       string     `json:"method"`
-	QueryStrings url.Values `json:"query_strings"`
-	Message      string     `json:"message"`
-	Data         any        `json:"data"`
-}
 
 type Storer struct {
 	Client        *db.PrismaClient
@@ -77,7 +68,7 @@ func CheckRedisForKey[T any](ctx context.Context, cache *redis.Client, key strin
 	}
 
 	// If found in the cache, parse and return it
-	t, err := parseJSON[T](cachedResult)
+	t, err := ParseJSON[T](cachedResult)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing JSON: " + err.Error())
 	}
@@ -90,14 +81,75 @@ func SaveKeyToRedis(ctx context.Context, cache *redis.Client, key string, v any)
 	if err != nil {
 		return fmt.Errorf("error marshalling to JSON: %s", err)
 	}
-	_, err = cache.Set(ctx, key, string(jsonData), redisExpiry).Result()
+	_, err = cache.Set(ctx, key, string(jsonData), time.Millisecond*1000*60).Result()
 	if err != nil {
 		return fmt.Errorf("error saving to Redis cache: %s", err)
 	}
 	return nil
 }
 
-func parseJSON[T any](jsonStr string) (T, error) {
+var ipBlacklist = []string{
+	"",
+	"[::1]*",
+}
+
+func FetchIpInfo(ipAddr string, ipInfoToken string) (*IPInfoData, error) {
+	if ipInfoToken == "" {
+		return nil, fmt.Errorf(ipInfoTokenMissingErr)
+	}
+	isMatch, err := matchValAgainstRegexSlice(ipBlacklist, ipAddr)
+	if err != nil {
+		return nil, err
+	}
+	if isMatch {
+		return nil, fmt.Errorf(makeBlacklistErr(ipAddr))
+	}
+
+	endpoint := "https://ipinfo.io/" + ipAddr + "?token=" + ipInfoToken
+	resp, err := http.Get(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	ipInfoData, err := ParseJSON[IPInfoData](string(body))
+	if err != nil {
+		return nil, err
+	}
+
+	return &ipInfoData, nil
+}
+
+const ipInfoTokenMissingErr = "IP Info Token cannot be empty"
+
+func makeBlacklistErr(ipAddr string) string {
+	return "ip address: \"" + ipAddr + "\" found on blacklist"
+}
+
+func GetDeviceType(ua useragent.UserAgent) DeviceType {
+	if ua.Desktop {
+		return DeviceTypeDesktop
+	} else if ua.Tablet {
+		return DeviceTypeTablet
+	} else if ua.Mobile {
+		return DeviceTypeMobile
+	}
+	return DeviceTypeUnknown
+}
+
+func GetLanguage(r *http.Request) string {
+	return r.Header.Get("Accept-Language")
+}
+
+func GetScreenRes(r *http.Request) string {
+	return r.Header.Get("Viewport-Width")
+}
+
+func ParseJSON[T any](jsonStr string) (T, error) {
 	var v T
 	if err := json.Unmarshal([]byte(jsonStr), &v); err != nil {
 		return v, err

@@ -26,7 +26,8 @@ model User {
 }
 
 model Click {
-  id                 Int              @id @default(autoincrement())
+  id                 Int               @id @default(autoincrement())
+  publicId           String            @unique
   cost               Int
   revenue            Int
   viewTime           DateTime
@@ -42,28 +43,26 @@ model Click {
   country            String
   region             String
   city               String
-  mobileCarrier      String
   deviceType         String
-  deviceModel        String
-  deviceVendor       String
+  device             String
   screenResolution   String
   os                 String
   osVersion          String
   browserName        String
   browserVersion     String
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
-  affiliateNetwork   AffiliateNetwork @relation(fields: [affiliateNetworkId], references: [id])
-  affiliateNetworkId Int
-  campaign           Campaign         @relation(fields: [campaignId], references: [id])
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  affiliateNetwork   AffiliateNetwork? @relation(fields: [affiliateNetworkId], references: [id])
+  affiliateNetworkId Int?
+  campaign           Campaign          @relation(fields: [campaignId], references: [id])
   campaignId         Int
-  flow               Flow             @relation(fields: [flowId], references: [id])
+  flow               Flow              @relation(fields: [flowId], references: [id])
   flowId             Int
-  landingPage        LandingPage      @relation(fields: [landingPageId], references: [id])
-  landingPageId      Int
-  offer              Offer            @relation(fields: [offerId], references: [id])
-  offerId            Int
-  trafficSource      TrafficSource    @relation(fields: [trafficSourceId], references: [id])
+  landingPage        LandingPage?      @relation(fields: [landingPageId], references: [id])
+  landingPageId      Int?
+  offer              Offer?            @relation(fields: [offerId], references: [id])
+  offerId            Int?
+  trafficSource      TrafficSource     @relation(fields: [trafficSourceId], references: [id])
   trafficSourceId    Int
 }
 
@@ -79,28 +78,25 @@ model AffiliateNetwork {
 }
 
 model Campaign {
-  id                  Int                 @id @default(autoincrement())
-  publicId            String              @unique
-  name                String
-  landingPageRotation LandingPageRotation
-  offerRotation       OfferRotation
-  geoName             GeoName
-  tags                String[]
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
-  flow                Flow                @relation(fields: [flowId], references: [id])
-  flowId              Int
-  trafficSource       TrafficSource       @relation(fields: [trafficSourceId], references: [id])
-  trafficSourceId     Int
-  Click               Click[]
+  id                      Int           @id @default(autoincrement())
+  publicId                String        @unique
+  name                    String
+  landingPageRotationType RotationType
+  offerRotationType       RotationType
+  geoName                 GeoName
+  tags                    String[]
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+  flow                    Flow          @relation(fields: [flowId], references: [id])
+  flowId                  Int
+  trafficSource           TrafficSource @relation(fields: [trafficSourceId], references: [id])
+  trafficSourceId         Int
+  Click                   Click[]
 }
 
-enum LandingPageRotation {
+enum RotationType {
   RANDOM
-}
-
-enum OfferRotation {
-  RANDOM
+  // TODO: Expand rotation types to include: "fixed", "smart", etc.
 }
 
 model Flow {

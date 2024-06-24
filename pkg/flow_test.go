@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetRoute(t *testing.T) {
-	flowModel := &db.FlowModel{}
+	flowModel := db.FlowModel{}
 	route := getRoute(flowModel.MainRoute)
 
 	assert.False(t, route.IsActive)
@@ -23,7 +23,7 @@ func TestGetRoute(t *testing.T) {
 }
 
 func TestGetRoutes(t *testing.T) {
-	flowModel := &db.FlowModel{}
+	flowModel := db.FlowModel{}
 	routes := getRoutes(flowModel.RuleRoutes)
 
 	assert.NotNil(t, routes)

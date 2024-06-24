@@ -2,8 +2,8 @@ import { $Enums } from '@prisma/client';
 import { z } from 'zod';
 import { toZod } from 'tozod';
 import {
-    TAffiliateNetwork, TLandingPage, TOffer, TRoute, TToken, TTrafficSource, TUser,
-    TRule, TPath, ELogicalRelation, EItemName, EClickProp
+    TAffiliateNetwork, TLandingPage, TOffer, TToken, TTrafficSource, TUser,
+    TPath, ELogicalRelation, ERuleName
 } from './types';
 
 export const userSchema: toZod<TUser> = z.object({
@@ -27,8 +27,8 @@ export const campaignSchema = z.object({
     id: z.number(),
     publicId: z.string(),
     name: z.string(),
-    landingPageRotation: z.nativeEnum($Enums.LandingPageRotation),
-    offerRotation: z.nativeEnum($Enums.OfferRotation),
+    landingPageRotationType: z.nativeEnum($Enums.RotationType),
+    offerRotationType: z.nativeEnum($Enums.RotationType),
     geoName: z.nativeEnum($Enums.GeoName),
     tags: z.array(z.string()),
     createdAt: z.date(),
@@ -38,9 +38,8 @@ export const campaignSchema = z.object({
 });
 
 export const ruleSchema = z.object({
-    itemName: z.nativeEnum(EItemName),
-    clickProp: z.nativeEnum(EClickProp),
-    doesEqual: z.boolean(),
+    ruleName: z.nativeEnum(ERuleName),
+    includes: z.boolean(),
     data: z.array(z.string())
 });
 

@@ -16,14 +16,14 @@ func (s *Storer) GetAllOffers(ctx context.Context) ([]Offer, error) {
 	return formatOffers(models), nil
 }
 
-func (s *Storer) GetOfferById(ctx context.Context, id int) (*Offer, error) {
+func (s *Storer) GetOfferById(ctx context.Context, id int) (Offer, error) {
 	key := InitMakeRedisKey("offer")(strconv.Itoa(id))
 	// Check redis cache for this offer
 	offer, err := CheckRedisForKey[Offer](ctx, s.Cache, key)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		return offer, nil
+		return *offer, nil
 	}
 
 	// If not in cache, query db for it
@@ -31,7 +31,7 @@ func (s *Storer) GetOfferById(ctx context.Context, id int) (*Offer, error) {
 		db.Offer.ID.Equals(id),
 	).Exec(ctx)
 	if err != nil {
-		return nil, err
+		return Offer{}, err
 	}
 
 	o := formatOffer(model)
@@ -42,8 +42,8 @@ func (s *Storer) GetOfferById(ctx context.Context, id int) (*Offer, error) {
 	return o, nil
 }
 
-func formatOffer(model *db.OfferModel) *Offer {
-	return &Offer{
+func formatOffer(model *db.OfferModel) Offer {
+	return Offer{
 		InnerOffer: model.InnerOffer,
 	}
 }
@@ -52,7 +52,7 @@ func formatOffers(models []db.OfferModel) []Offer {
 	var offers []Offer
 	for _, model := range models {
 		o := formatOffer(&model)
-		offers = append(offers, *o)
+		offers = append(offers, o)
 	}
 	return offers
 }

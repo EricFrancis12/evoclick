@@ -1,25 +1,31 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
-
-	"github.com/EricFrancis12/evoclick/pkg"
+	"net/url"
 )
 
-func Test(w http.ResponseWriter, r *http.Request) {
-	ctx := context.Background()
-	storer := pkg.NewStorer()
-	storer.Renew()
+// Test response for api routes
+type Response struct {
+	Path         string     `json:"path"`
+	Method       string     `json:"method"`
+	QueryStrings url.Values `json:"query_strings"`
+	Message      string     `json:"message"`
+	Data         any        `json:"data"`
+}
 
-	result, err := storer.GetAffiliateNetworkById(ctx, 2)
-	if err != nil {
-		fmt.Println("error fetching Affiliate Network", err)
-		return
-	}
-	fmt.Println("Fetched Affiliate Network:", result.Name)
+func Test(w http.ResponseWriter, r *http.Request) {
+	// ctx := context.Background()
+	// storer := pkg.NewStorer()
+	// storer.Renew()
+
+	// result, err := storer.GetAffiliateNetworkById(ctx, 2)
+	// if err != nil {
+	// 	fmt.Println("error fetching Affiliate Network", err)
+	// 	return
+	// }
+	// fmt.Println("Fetched Affiliate Network:", result.Name)
 
 	// results, err := storer.GetAllFlows(ctx)
 	// if err != nil {
@@ -41,12 +47,12 @@ func Test(w http.ResponseWriter, r *http.Request) {
 	jsonEncoder := json.NewEncoder(w)
 	jsonEncoder.SetIndent("", "  ")
 
-	debugResponse := &pkg.Response{
+	debugResponse := &Response{
 		Path:         r.URL.Path,
 		QueryStrings: r.URL.Query(),
 		Method:       r.Method,
 		Message:      "Hello from ./api/test.go",
-		Data:         storer,
+		Data:         r.URL,
 	}
 
 	if err := jsonEncoder.Encode(debugResponse); err != nil {

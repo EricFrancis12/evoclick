@@ -16,14 +16,14 @@ func (s *Storer) GetAllFlows(ctx context.Context) ([]Flow, error) {
 	return formatFlows(models), nil
 }
 
-func (s *Storer) GetFlowById(ctx context.Context, id int) (*Flow, error) {
+func (s *Storer) GetFlowById(ctx context.Context, id int) (Flow, error) {
 	key := InitMakeRedisKey("flow")(strconv.Itoa(id))
 	// Check redis cache for this flow
 	flow, err := CheckRedisForKey[Flow](ctx, s.Cache, key)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		return flow, nil
+		return *flow, nil
 	}
 
 	// If not in cache, query db for it
@@ -31,7 +31,7 @@ func (s *Storer) GetFlowById(ctx context.Context, id int) (*Flow, error) {
 		db.Flow.ID.Equals(id),
 	).Exec(ctx)
 	if err != nil {
-		return nil, err
+		return Flow{}, err
 	}
 
 	fl := formatFlow(model)
@@ -42,12 +42,12 @@ func (s *Storer) GetFlowById(ctx context.Context, id int) (*Flow, error) {
 	return fl, nil
 }
 
-func formatFlow(model *db.FlowModel) *Flow {
+func formatFlow(model *db.FlowModel) Flow {
 	var (
 		mainRoute  = getRoute(model.MainRoute)
 		ruleRoutes = getRoutes(model.RuleRoutes)
 	)
-	return &Flow{
+	return Flow{
 		InnerFlow:  model.InnerFlow,
 		MainRoute:  mainRoute,
 		RuleRoutes: ruleRoutes,
@@ -58,7 +58,7 @@ func formatFlows(models []db.FlowModel) []Flow {
 	var flows []Flow
 	for _, model := range models {
 		fl := formatFlow(&model)
-		flows = append(flows, *fl)
+		flows = append(flows, fl)
 	}
 	return flows
 }
@@ -70,7 +70,7 @@ func getRoute(routeFunc RouteFunc) Route {
 	if !ok {
 		return makeInitializedRoute()
 	}
-	route, err := parseJSON[Route](jsonStr)
+	route, err := ParseJSON[Route](jsonStr)
 	if err != nil {
 		return makeInitializedRoute()
 	}
@@ -82,7 +82,7 @@ func getRoutes(routeFunc RouteFunc) []Route {
 	if !ok {
 		return []Route{}
 	}
-	routes, err := parseJSON[[]Route](jsonStr)
+	routes, err := ParseJSON[[]Route](jsonStr)
 	if err != nil {
 		return []Route{}
 	}
@@ -92,7 +92,7 @@ func getRoutes(routeFunc RouteFunc) []Route {
 func makeInitializedRoute() Route {
 	return Route{
 		IsActive:        false,
-		LogicalRelation: LogicalRelation.String(0),
+		LogicalRelation: LogicalRelationAnd,
 		Rules:           []Rule{},
 		Paths:           []Path{},
 	}

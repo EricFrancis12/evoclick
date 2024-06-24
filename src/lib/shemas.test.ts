@@ -1,6 +1,6 @@
 import { $Enums } from '@prisma/client';
-import { campaignSchema, flowSchema, routeSchema, ruleSchema } from './schemas';
-import { EClickProp, EItemName, ELogicalRelation, TCampaign, TFlow, TPath, TRoute, TRule } from './types';
+import { affiliateNetworkSchema, campaignSchema, flowSchema, landingPageSchema, offersSchema, routeSchema, ruleSchema } from './schemas';
+import { ELogicalRelation, ERuleName, TCampaign, TFlow, TPath, TRoute, TRule } from './types';
 
 describe('Testing Schemas', () => {
     test('Campaign Schema aligns with type', () => {
@@ -10,8 +10,8 @@ describe('Testing Schemas', () => {
             id: 1,
             publicId: 'e83htr892ujhoo3hnfksl04utynh23873towow',
             name: 'My Campaign',
-            landingPageRotation: $Enums.LandingPageRotation.RANDOM,
-            offerRotation: $Enums.OfferRotation.RANDOM,
+            landingPageRotationType: $Enums.RotationType.RANDOM,
+            offerRotationType: $Enums.RotationType.RANDOM,
             geoName: $Enums.GeoName.UNITED_STATES,
             tags: ['my', 'campaign'],
             createdAt: new Date(),
@@ -39,16 +39,14 @@ describe('Testing Schemas', () => {
     };
 
     const boilerplateRule1: TRule = {
-        itemName: EItemName.CAMPAIGN,
-        clickProp: EClickProp.campaignId,
-        doesEqual: true,
+        ruleName: ERuleName.IP,
+        includes: true,
         data: ['1', '4', '7']
     };
 
     const boilerplateRule2: TRule = {
-        itemName: EItemName.LANDING_PAGE,
-        clickProp: EClickProp.offerId,
-        doesEqual: false,
+        ruleName: ERuleName.ISP,
+        includes: false,
         data: []
     };
 
@@ -119,5 +117,20 @@ describe('Testing Schemas', () => {
             updatedAt: new Date()
         };
         expect(flowSchema.safeParse(boilerplateUrlFlow).success).toEqual(true);
+    });
+
+    test('Affiliate Network Schema aligns with type', () => {
+        expect(affiliateNetworkSchema.safeParse({}).success).toEqual(false);
+        // TODO: ...
+    });
+
+    test('Landing Page Schema aligns with type', () => {
+        expect(landingPageSchema.safeParse({}).success).toEqual(false);
+        // TODO: ...
+    });
+
+    test('Offer aligns with type', () => {
+        expect(offersSchema.safeParse({}).success).toEqual(false);
+        // TODO: ...
     });
 });

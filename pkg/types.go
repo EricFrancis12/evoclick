@@ -46,17 +46,16 @@ type ClickToken struct {
 }
 
 type Route struct {
-	IsActive        bool   `json:"isActive"`
-	LogicalRelation string `json:"logicalRelation"`
-	Rules           []Rule `json:"rules"`
-	Paths           []Path `json:"paths"`
+	IsActive        bool            `json:"isActive"`
+	LogicalRelation LogicalRelation `json:"logicalRelation"`
+	Rules           []Rule          `json:"rules"`
+	Paths           []Path          `json:"paths"`
 }
 
 type Rule struct {
-	ItemName  string   `json:"itemName"`
-	ClickProp string   `json:"clickProp"`
-	DoesEqual bool     `json:"doesEqual"`
-	Data      []string `json:"data"`
+	RuleName RuleName `json:"ruleName"`
+	Data     []string `json:"data"`
+	Includes bool     `json:"includes"`
 }
 
 type Path struct {
@@ -67,13 +66,49 @@ type Path struct {
 	DirectLinkingEnabled bool  `json:"directLinkingEnabled"`
 }
 
-type LogicalRelation int
+type IPInfoData struct {
+	IP       string `json:"ip"`       // example: "12.34.567.8"
+	Hostname string `json:"hostname"` // example: "any.subdomains.hostname.com"
+	City     string `json:"city"`     // example: "Aarhus"
+	Region   string `json:"region"`   // example: "Central Jutland"
+	Country  string `json:"country"`  // example: "DK"
+	Loc      string `json:"loc"`      // example: "95.1567,34.2108"
+	Org      string `json:"org"`      // example: "AS6SB9 Telenor A/S"
+	Postal   string `json:"postal"`   // example: "4883"
+	Timezone string `json:"-"`        // example: "Europe/Copenhagen"
+}
+
+type LogicalRelation string
 
 const (
-	And LogicalRelation = iota
-	Or
+	LogicalRelationAnd LogicalRelation = "and"
+	LogicalRelationOr  LogicalRelation = "or"
 )
 
-func (d LogicalRelation) String() string {
-	return [...]string{"AND", "OR"}[d]
-}
+type RuleName string
+
+const (
+	RuleNameIP               RuleName = "IP"
+	RuleNameISP              RuleName = "ISP"
+	RuleNameUserAgent        RuleName = "userAgent"
+	RuleNameLanguage         RuleName = "language"
+	RuleNameCountry          RuleName = "counry"
+	RuleNameRegion           RuleName = "region"
+	RuleNameCity             RuleName = "city"
+	RuleNameDeviceType       RuleName = "deviceType"
+	RuleNameDevice           RuleName = "device"
+	RuleNameScreenResolution RuleName = "screenResolution"
+	RuleNameOS               RuleName = "OS"
+	RuleNameOSVersion        RuleName = "OSVersion"
+	RuleNameBrowserName      RuleName = "browserName"
+	RuleNameBrowserVersion   RuleName = "browserVersion"
+)
+
+type DeviceType string
+
+const (
+	DeviceTypeDesktop DeviceType = "desktop"
+	DeviceTypeTablet  DeviceType = "tablet"
+	DeviceTypeMobile  DeviceType = "mobile"
+	DeviceTypeUnknown DeviceType = "unknown"
+)

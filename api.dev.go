@@ -6,6 +6,7 @@ import (
 
 	handler "github.com/EricFrancis12/evoclick/api"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 )
 
 type APIServer struct {
@@ -19,6 +20,8 @@ func NewAPIServer(listenAddr string) *APIServer {
 }
 
 func main() {
+	godotenv.Load(".env.local", ".env")
+
 	server := NewAPIServer(":3001")
 	server.Run()
 }

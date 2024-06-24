@@ -16,14 +16,14 @@ func (s *Storer) GetAllAffiliateNetworks(ctx context.Context) ([]AffiliateNetwor
 	return formatAffiliateNetworks(models), nil
 }
 
-func (s *Storer) GetAffiliateNetworkById(ctx context.Context, id int) (*AffiliateNetwork, error) {
+func (s *Storer) GetAffiliateNetworkById(ctx context.Context, id int) (AffiliateNetwork, error) {
 	key := InitMakeRedisKey("affiliateNetwork")(strconv.Itoa(id))
 	// Check redis cache for this affiliate network
 	affiliateNetwork, err := CheckRedisForKey[AffiliateNetwork](ctx, s.Cache, key)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		return affiliateNetwork, nil
+		return *affiliateNetwork, nil
 	}
 
 	// If not in cache, query db for it
@@ -31,7 +31,7 @@ func (s *Storer) GetAffiliateNetworkById(ctx context.Context, id int) (*Affiliat
 		db.AffiliateNetwork.ID.Equals(id),
 	).Exec(ctx)
 	if err != nil {
-		return nil, err
+		return AffiliateNetwork{}, err
 	}
 
 	an := formatAffiliateNetwork(model)
@@ -42,8 +42,8 @@ func (s *Storer) GetAffiliateNetworkById(ctx context.Context, id int) (*Affiliat
 	return an, nil
 }
 
-func formatAffiliateNetwork(model *db.AffiliateNetworkModel) *AffiliateNetwork {
-	return &AffiliateNetwork{
+func formatAffiliateNetwork(model *db.AffiliateNetworkModel) AffiliateNetwork {
+	return AffiliateNetwork{
 		InnerAffiliateNetwork: model.InnerAffiliateNetwork,
 	}
 }
@@ -52,7 +52,7 @@ func formatAffiliateNetworks(models []db.AffiliateNetworkModel) []AffiliateNetwo
 	var affiliateNetwork []AffiliateNetwork
 	for _, model := range models {
 		an := formatAffiliateNetwork(&model)
-		affiliateNetwork = append(affiliateNetwork, *an)
+		affiliateNetwork = append(affiliateNetwork, an)
 	}
 	return affiliateNetwork
 }

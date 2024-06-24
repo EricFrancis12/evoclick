@@ -9,17 +9,28 @@ import (
 	"github.com/EricFrancis12/evoclick/prisma/db"
 )
 
-func (s *Storer) GetClickById(ctx context.Context, id int) (*Click, error) {
+func (s *Storer) GetClickById(ctx context.Context, id int) (Click, error) {
 	model, err := s.Client.Click.FindUnique(
 		db.Click.ID.Equals(id),
 	).Exec(ctx)
 	if err != nil {
-		return nil, err
+		return Click{}, err
+	}
+	return formatClick(model), nil
+}
+
+func (s *Storer) GetClickByPublicId(ctx context.Context, publicId string) (Click, error) {
+	model, err := s.Client.Click.FindUnique(
+		db.Click.PublicID.Equals(publicId),
+	).Exec(ctx)
+	if err != nil {
+		return Click{}, err
 	}
 	return formatClick(model), nil
 }
 
 type ClickCreationReq struct {
+	PublicId           string
 	Cost               int
 	Revenue            int
 	ViewTime           time.Time
@@ -35,10 +46,8 @@ type ClickCreationReq struct {
 	Country            string
 	Region             string
 	City               string
-	MobileCarrier      string
 	DeviceType         string
-	DeviceModel        string
-	DeviceVendor       string
+	Device             string
 	ScreenResolution   string
 	Os                 string
 	OsVersion          string
@@ -52,7 +61,7 @@ type ClickCreationReq struct {
 	TrafficSourceID    int
 }
 
-func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationReq) (*Click, error) {
+func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationReq) (Click, error) {
 	clickTokensStr := "[]"
 	jsonData, err := json.Marshal(creationReq.Tokens)
 	if err != nil {
@@ -61,13 +70,27 @@ func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationRe
 		clickTokensStr = string(jsonData)
 	}
 
+	optionalParams := []db.ClickSetParam{
+		// Optional parameters that CAN accept default values:
+		db.Click.ClickTime.Set(creationReq.ClickTime),
+		db.Click.ConvTime.Set(creationReq.ConvTime),
+		db.Click.ClickOutputURL.Set(creationReq.ClickOutputURL),
+	}
+
+	// Optional parameters that CANNOT accept default values, so they should be ommitted if they are 0
+	appendIfNotZero(optionalParams, db.Click.AffiliateNetwork.Link(db.AffiliateNetwork.ID.Equals(creationReq.AffiliateNetworkID)), creationReq.AffiliateNetworkID)
+	appendIfNotZero(optionalParams, db.Click.LandingPage.Link(db.LandingPage.ID.Equals(creationReq.LandingPageID)), creationReq.LandingPageID)
+	appendIfNotZero(optionalParams, db.Click.Offer.Link(db.Offer.ID.Equals(creationReq.OfferID)), creationReq.OfferID)
+
 	model, err := s.Client.Click.CreateOne(
 		// Mandatory parameters:
+		db.Click.PublicID.Set(creationReq.PublicId),
 		db.Click.Cost.Set(creationReq.Cost),
 		db.Click.Revenue.Set(creationReq.Revenue),
 		db.Click.ViewTime.Set(creationReq.ViewTime),
 		db.Click.ViewOutputURL.Set(creationReq.ViewOutputURL),
 		db.Click.Tokens.Set(clickTokensStr),
+		// TODO: Determine what other parameters below can be optional
 		db.Click.IP.Set(creationReq.IP),
 		db.Click.Isp.Set(creationReq.Isp),
 		db.Click.UserAgent.Set(creationReq.UserAgent),
@@ -75,32 +98,30 @@ func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationRe
 		db.Click.Country.Set(creationReq.Country),
 		db.Click.Region.Set(creationReq.Region),
 		db.Click.City.Set(creationReq.City),
-		db.Click.MobileCarrier.Set(creationReq.MobileCarrier),
 		db.Click.DeviceType.Set(creationReq.DeviceType),
-		db.Click.DeviceModel.Set(creationReq.DeviceModel),
-		db.Click.DeviceVendor.Set(creationReq.DeviceVendor),
+		db.Click.Device.Set(creationReq.Device),
 		db.Click.ScreenResolution.Set(creationReq.ScreenResolution),
 		db.Click.Os.Set(creationReq.Os),
 		db.Click.OsVersion.Set(creationReq.OsVersion),
 		db.Click.BrowserName.Set(creationReq.BrowserName),
 		db.Click.BrowserVersion.Set(creationReq.BrowserVersion),
-		db.Click.AffiliateNetwork.Link(db.AffiliateNetwork.ID.Equals(creationReq.AffiliateNetworkID)),
 		db.Click.Campaign.Link(db.Campaign.ID.Equals(creationReq.CampaignID)),
 		db.Click.Flow.Link(db.Flow.ID.Equals(creationReq.FlowID)),
-		db.Click.LandingPage.Link(db.LandingPage.ID.Equals(creationReq.LandingPageID)),
-		db.Click.Offer.Link(db.Offer.ID.Equals(creationReq.OfferID)),
 		db.Click.TrafficSource.Link(db.TrafficSource.ID.Equals(creationReq.TrafficSourceID)),
-
-		// Optional parameters:
-		db.Click.ClickTime.Set(creationReq.ClickTime),
-		db.Click.ConvTime.Set(creationReq.ConvTime),
-		db.Click.ClickOutputURL.Set(creationReq.ClickOutputURL),
+		optionalParams...,
 	).Exec(ctx)
 	if err != nil {
-		return nil, err
+		return Click{}, err
 	}
 
 	return formatClick(model), nil
+}
+
+func appendIfNotZero(params []db.ClickSetParam, p db.ClickSetParam, i int) []db.ClickSetParam {
+	if i != 0 {
+		params = append(params, p)
+	}
+	return params
 }
 
 // func (s *Storer) UpsertClickById(ctx context.Context, id int, params ...db.ClickSetParam) (*Click, error) {
@@ -117,16 +138,16 @@ func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationRe
 // 	return formatClick(model), nil
 // }
 
-func formatClick(model *db.ClickModel) *Click {
+func formatClick(model *db.ClickModel) Click {
 	clickTokens := parseClickTokens(model.Tokens)
-	return &Click{
+	return Click{
 		InnerClick: model.InnerClick,
 		Tokens:     clickTokens,
 	}
 }
 
 func parseClickTokens(jsonStr string) []ClickToken {
-	clickTokens, err := parseJSON[[]ClickToken](jsonStr)
+	clickTokens, err := ParseJSON[[]ClickToken](jsonStr)
 	if err != nil {
 		return []ClickToken{}
 	}

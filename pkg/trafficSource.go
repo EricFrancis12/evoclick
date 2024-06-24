@@ -16,14 +16,14 @@ func (s *Storer) GetAllTrafficSources(ctx context.Context) ([]TrafficSource, err
 	return formatTrafficSources(models), nil
 }
 
-func (s *Storer) GetTrafficSourceById(ctx context.Context, id int) (*TrafficSource, error) {
+func (s *Storer) GetTrafficSourceById(ctx context.Context, id int) (TrafficSource, error) {
 	key := InitMakeRedisKey("trafficSource")(strconv.Itoa(id))
 	// Check redis cache for this traffic source
 	trafficSource, err := CheckRedisForKey[TrafficSource](ctx, s.Cache, key)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		return trafficSource, nil
+		return *trafficSource, nil
 	}
 
 	// If not in cache, query db for it
@@ -31,7 +31,7 @@ func (s *Storer) GetTrafficSourceById(ctx context.Context, id int) (*TrafficSour
 		db.TrafficSource.ID.Equals(id),
 	).Exec(ctx)
 	if err != nil {
-		return nil, err
+		return TrafficSource{}, err
 	}
 
 	ts := formatTrafficSource(model)
@@ -42,12 +42,12 @@ func (s *Storer) GetTrafficSourceById(ctx context.Context, id int) (*TrafficSour
 	return ts, nil
 }
 
-func formatTrafficSource(model *db.TrafficSourceModel) *TrafficSource {
+func formatTrafficSource(model *db.TrafficSourceModel) TrafficSource {
 	var (
 		defaultTokens = parseTokens(model.DefaultTokens)
 		customTokens  = parseTokens(model.CustomTokens)
 	)
-	return &TrafficSource{
+	return TrafficSource{
 		InnerTrafficSource: model.InnerTrafficSource,
 		DefaultTokens:      defaultTokens,
 		CustomTokens:       customTokens,
@@ -58,13 +58,13 @@ func formatTrafficSources(models []db.TrafficSourceModel) []TrafficSource {
 	var trafficSources []TrafficSource
 	for _, model := range models {
 		ts := formatTrafficSource(&model)
-		trafficSources = append(trafficSources, *ts)
+		trafficSources = append(trafficSources, ts)
 	}
 	return trafficSources
 }
 
 func parseTokens(jsonStr string) []Token {
-	tokens, err := parseJSON[[]Token](jsonStr)
+	tokens, err := ParseJSON[[]Token](jsonStr)
 	if err != nil {
 		return []Token{}
 	}
