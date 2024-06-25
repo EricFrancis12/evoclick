@@ -63,26 +63,8 @@ type ClickCreationReq struct {
 }
 
 func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationReq) (Click, error) {
-	clickTokensStr := "[]"
-	jsonData, err := json.Marshal(creationReq.Tokens)
-	if err != nil {
-		fmt.Printf("error marshalling to JSON: %s", err)
-	} else {
-		clickTokensStr = string(jsonData)
-	}
-
-	optionalParams := []db.ClickSetParam{}
-	// Optional parameters that CANNOT accept default values, so they should be ommitted if they are 0
-	optionalParams = appendIfTrue(optionalParams, db.Click.ClickTime.Set(creationReq.ClickTime), creationReq.ClickTime.IsZero())
-	optionalParams = appendIfTrue(optionalParams, db.Click.ConvTime.Set(creationReq.ConvTime), creationReq.ConvTime.IsZero())
-	optionalParams = appendIfTrue(optionalParams, db.Click.ClickOutputURL.Set(creationReq.ClickOutputURL), creationReq.ClickOutputURL != "")
-	optionalParams = appendIfTrue(optionalParams, db.Click.Isp.Set(creationReq.Isp), creationReq.Isp != "")
-	optionalParams = appendIfTrue(optionalParams, db.Click.Country.Set(creationReq.Country), creationReq.Country != "")
-	optionalParams = appendIfTrue(optionalParams, db.Click.Region.Set(creationReq.Region), creationReq.Region != "")
-	optionalParams = appendIfTrue(optionalParams, db.Click.City.Set(creationReq.City), creationReq.City != "")
-	optionalParams = appendIfTrue(optionalParams, db.Click.AffiliateNetwork.Link(db.AffiliateNetwork.ID.Equals(creationReq.AffiliateNetworkID)), creationReq.AffiliateNetworkID != 0)
-	optionalParams = appendIfTrue(optionalParams, db.Click.LandingPage.Link(db.LandingPage.ID.Equals(creationReq.LandingPageID)), creationReq.LandingPageID != 0)
-	optionalParams = appendIfTrue(optionalParams, db.Click.Offer.Link(db.Offer.ID.Equals(creationReq.OfferID)), creationReq.OfferID != 0)
+	clickTokensStr := marshallTokens(creationReq.Tokens)
+	optParams := makeOptParams(creationReq)
 
 	model, err := s.Client.Click.CreateOne(
 		// Mandatory parameters:
@@ -107,7 +89,7 @@ func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationRe
 		db.Click.Flow.Link(db.Flow.ID.Equals(creationReq.FlowID)),
 		db.Click.TrafficSource.Link(db.TrafficSource.ID.Equals(creationReq.TrafficSourceID)),
 		// Optional parameters:
-		optionalParams...,
+		optParams...,
 	).Exec(ctx)
 	if err != nil {
 		return Click{}, err
@@ -116,26 +98,101 @@ func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationRe
 	return formatClick(model), nil
 }
 
-func appendIfTrue(params []db.ClickSetParam, p db.ClickSetParam, condition bool) []db.ClickSetParam {
-	if condition {
-		params = append(params, p)
+func (s *Storer) UpsertClickById(ctx context.Context, id int, click Click) (Click, error) {
+	clickTokensStr := marshallTokens(click.Tokens)
+	upsertParams := makeUpsertParams(click)
+
+	model, err := s.Client.Click.UpsertOne(
+		db.Click.ID.Equals(id),
+	).Create(
+		// Mandatory parameters:
+		db.Click.PublicID.Set(click.PublicID),
+		db.Click.ExternalID.Set(click.ExternalID),
+		db.Click.Cost.Set(click.Cost),
+		db.Click.Revenue.Set(click.Revenue),
+		db.Click.ViewTime.Set(click.ViewTime),
+		db.Click.ViewOutputURL.Set(click.ViewOutputURL),
+		db.Click.Tokens.Set(clickTokensStr),
+		db.Click.IP.Set(click.IP),
+		db.Click.UserAgent.Set(click.UserAgent),
+		db.Click.Language.Set(click.Language),
+		db.Click.DeviceType.Set(click.DeviceType),
+		db.Click.Device.Set(click.Device),
+		db.Click.ScreenResolution.Set(click.ScreenResolution),
+		db.Click.Os.Set(click.Os),
+		db.Click.OsVersion.Set(click.OsVersion),
+		db.Click.BrowserName.Set(click.BrowserName),
+		db.Click.BrowserVersion.Set(click.BrowserVersion),
+		db.Click.Campaign.Link(db.Campaign.ID.Equals(click.CampaignID)),
+		db.Click.Flow.Link(db.Flow.ID.Equals(click.FlowID)),
+		db.Click.TrafficSource.Link(db.TrafficSource.ID.Equals(click.TrafficSourceID)),
+	).Update(
+		upsertParams...,
+	).Exec(ctx)
+	if err != nil {
+		return Click{}, err
 	}
-	return params
+	return formatClick(model), nil
 }
 
-// func (s *Storer) UpsertClickById(ctx context.Context, id int, params ...db.ClickSetParam) (*Click, error) {
-// 	model, err := s.Client.Click.UpsertOne(
-// 		db.Click.ID.Equals(id),
-// 	).Create(
-// 		params...,
-// 	).Update(
-// 		params...,
-// 	).Exec(ctx)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return formatClick(model), nil
-// }
+func makeOptParams(cp ClickCreationReq) []db.ClickSetParam {
+	optParams := []db.ClickSetParam{}
+	// Optional parameters that CANNOT accept default values, so they should be ommitted if they are 0
+	optParams = appendIfTrue(optParams, db.Click.ClickTime.Set(cp.ClickTime), cp.ClickTime.IsZero())
+	optParams = appendIfTrue(optParams, db.Click.ConvTime.Set(cp.ConvTime), cp.ConvTime.IsZero())
+	optParams = appendIfTrue(optParams, db.Click.ClickOutputURL.Set(cp.ClickOutputURL), cp.ClickOutputURL != "")
+	optParams = appendIfTrue(optParams, db.Click.Isp.Set(cp.Isp), cp.Isp != "")
+	optParams = appendIfTrue(optParams, db.Click.Country.Set(cp.Country), cp.Country != "")
+	optParams = appendIfTrue(optParams, db.Click.Region.Set(cp.Region), cp.Region != "")
+	optParams = appendIfTrue(optParams, db.Click.City.Set(cp.City), cp.City != "")
+	optParams = appendIfTrue(optParams, db.Click.AffiliateNetwork.Link(db.AffiliateNetwork.ID.Equals(cp.AffiliateNetworkID)), cp.AffiliateNetworkID != 0)
+	optParams = appendIfTrue(optParams, db.Click.LandingPage.Link(db.LandingPage.ID.Equals(cp.LandingPageID)), cp.LandingPageID != 0)
+	optParams = appendIfTrue(optParams, db.Click.Offer.Link(db.Offer.ID.Equals(cp.OfferID)), cp.OfferID != 0)
+	return optParams
+}
+
+func makeUpsertParams(click Click) []db.ClickSetParam {
+	clickTokensStr := marshallTokens(click.Tokens)
+	params := []db.ClickSetParam{
+		// Mandatory parameters:
+		db.Click.PublicID.Set(click.PublicID),
+		db.Click.ExternalID.Set(click.ExternalID),
+		db.Click.Cost.Set(click.Cost),
+		db.Click.Revenue.Set(click.Revenue),
+		db.Click.ViewTime.Set(click.ViewTime),
+		db.Click.ViewOutputURL.Set(click.ViewOutputURL),
+		db.Click.Tokens.Set(clickTokensStr),
+		db.Click.IP.Set(click.IP),
+		db.Click.UserAgent.Set(click.UserAgent),
+		db.Click.Language.Set(click.Language),
+		db.Click.DeviceType.Set(click.DeviceType),
+		db.Click.Device.Set(click.Device),
+		db.Click.ScreenResolution.Set(click.ScreenResolution),
+		db.Click.Os.Set(click.Os),
+		db.Click.OsVersion.Set(click.OsVersion),
+		db.Click.BrowserName.Set(click.BrowserName),
+		db.Click.BrowserVersion.Set(click.BrowserVersion),
+		db.Click.Campaign.Link(db.Campaign.ID.Equals(click.CampaignID)),
+		db.Click.Flow.Link(db.Flow.ID.Equals(click.FlowID)),
+		db.Click.TrafficSource.Link(db.TrafficSource.ID.Equals(click.TrafficSourceID)),
+	}
+
+	// Optional parameters:
+	optParams := makeOptParams(ClickCreationReq{
+		ClickTime:          *click.ClickTime,
+		ConvTime:           *click.ConvTime,
+		ClickOutputURL:     *click.ClickOutputURL,
+		Isp:                *click.Isp,
+		Country:            *click.Country,
+		Region:             *click.Region,
+		City:               *click.City,
+		AffiliateNetworkID: *click.AffiliateNetworkID,
+		LandingPageID:      *click.LandingPageID,
+		OfferID:            *click.OfferID,
+	})
+	params = append(params, optParams...)
+	return params
+}
 
 func formatClick(model *db.ClickModel) Click {
 	clickTokens := parseClickTokens(model.Tokens)
@@ -151,4 +208,20 @@ func parseClickTokens(jsonStr string) []Token {
 		return []Token{}
 	}
 	return clickTokens
+}
+
+func marshallTokens(tokens []Token) string {
+	jsonData, err := json.Marshal(tokens)
+	if err != nil {
+		fmt.Printf("error marshalling to JSON: %s", err)
+		return "[]"
+	}
+	return string(jsonData)
+}
+
+func appendIfTrue(params []db.ClickSetParam, p db.ClickSetParam, condition bool) []db.ClickSetParam {
+	if condition {
+		params = append(params, p)
+	}
+	return params
 }

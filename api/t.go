@@ -27,7 +27,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 		// If g is not specifid, we have no way of fetching the campaign,
 		// so redirect to the catch-all url
 		fmt.Println("g not specified")
-		http.Redirect(w, r, pkg.GetCatchAllUrl(), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -35,7 +35,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// If campaign not found, redirect the visitor to the catch-all url
 		fmt.Println("error fetching Campaign by public ID: " + err.Error())
-		http.Redirect(w, r, pkg.GetCatchAllUrl(), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -43,7 +43,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// If flow not found, redirect the visitor to the catch-all url
 		fmt.Println("error fetching Flow: " + err.Error())
-		http.Redirect(w, r, pkg.GetCatchAllUrl(), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -88,13 +88,13 @@ func T(w http.ResponseWriter, r *http.Request) {
 		}
 		determinedDest, err := determineDest(opts)
 		if err != nil {
-			dest = makeCatchAllDest()
+			dest = catchAllDest()
 		} else {
 			dest = determinedDest
 		}
 	} else {
 		// If the flow type is missing, redirect to the catch-all url
-		dest = makeCatchAllDest()
+		dest = catchAllDest()
 	}
 
 	// If we are sending the visitor to a landing page,
@@ -202,7 +202,10 @@ func determineDest(opts DetermineDestOptions) (Destination, error) {
 	// If not, we are going using the main route
 	route := opts.flow.MainRoute
 	for _, ruleRoute := range opts.flow.RuleRoutes {
-		if ruleRoute.DoesTrigger(opts.r, opts.userAgent, opts.ipInfoData) {
+		if !ruleRoute.IsActive {
+			continue
+		}
+		if ruleRoute.ViewDoesTrigger(opts.r, opts.userAgent, opts.ipInfoData) {
 			route = ruleRoute
 			break
 		}
@@ -217,18 +220,18 @@ func determineDest(opts DetermineDestOptions) (Destination, error) {
 	// factoring in the weight of each one
 	path, err := weightedSelectPath(activePaths)
 	if err != nil {
-		return makeCatchAllDest(), err
+		return catchAllDest(), err
 	}
 
 	if !path.DirectLinkingEnabled {
 		lpID, err := selectIdUsingRotType[pkg.LandingPage](path.LandingPageIds, opts.campaign.LandingPageRotationType)
 		if err != nil {
-			return makeCatchAllDest(), err
+			return catchAllDest(), err
 		}
 
 		lp, err := opts.storer.GetLandingPageById(opts.ctx, lpID)
 		if err != nil {
-			return makeCatchAllDest(), err
+			return catchAllDest(), err
 		}
 
 		return Destination{
@@ -239,12 +242,12 @@ func determineDest(opts DetermineDestOptions) (Destination, error) {
 	} else {
 		oID, err := selectIdUsingRotType[pkg.Offer](path.OfferIds, opts.campaign.OfferRotationType)
 		if err != nil {
-			return makeCatchAllDest(), err
+			return catchAllDest(), err
 		}
 
 		o, err := opts.storer.GetOfferById(opts.ctx, oID)
 		if err != nil {
-			return makeCatchAllDest(), err
+			return catchAllDest(), err
 		}
 
 		return Destination{
@@ -314,10 +317,10 @@ func setCookie(w http.ResponseWriter, name pkg.CookieName, value string) {
 	http.SetCookie(w, cookie)
 }
 
-func makeCatchAllDest() Destination {
+func catchAllDest() Destination {
 	return Destination{
 		Type: DestTypeCatchAll,
-		URL:  pkg.GetCatchAllUrl(),
+		URL:  pkg.CatchAllUrl(),
 	}
 }
 

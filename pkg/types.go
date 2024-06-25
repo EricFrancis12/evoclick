@@ -2,6 +2,7 @@ package pkg
 
 import "github.com/EricFrancis12/evoclick/prisma/db"
 
+// TODO: Change Click model so that none of it's properties are pointers:
 type Click struct {
 	db.InnerClick
 	Tokens []Token
@@ -15,6 +16,7 @@ type Campaign struct {
 	db.InnerCampaign
 }
 
+// TODO: Change Flow model so that none of it's properties are pointers:
 type Flow struct {
 	db.InnerFlow
 	MainRoute  Route   `json:"mainRoute"`
@@ -29,6 +31,7 @@ type Offer struct {
 	db.InnerOffer
 }
 
+// TODO: Change Traffic Source model so that none of it's properties are pointers:
 type TrafficSource struct {
 	db.InnerTrafficSource
 	ExternalIdToken Token        `json:"externalIdToken"`
