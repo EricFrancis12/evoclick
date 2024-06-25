@@ -50,8 +50,8 @@ func T(w http.ResponseWriter, r *http.Request) {
 	publicClickId := uuid.New().String()
 
 	// Set cookies for campaign public ID and click public ID
-	setCookie(w, "campaign.publicId", campaign.PublicID)
-	setCookie(w, "click.publicId", publicClickId)
+	setCookie(w, pkg.CookieNameCampaignPublicId, campaign.PublicID)
+	setCookie(w, pkg.CookieNameClickPublicId, publicClickId)
 
 	var (
 		ipInfoData     pkg.IPInfoData
@@ -297,9 +297,9 @@ func getGValue(r *http.Request) string {
 	return g
 }
 
-func setCookie(w http.ResponseWriter, name string, value string) {
+func setCookie(w http.ResponseWriter, name pkg.CookieName, value string) {
 	cookie := &http.Cookie{
-		Name:     name,
+		Name:     string(name),
 		Value:    value,
 		Path:     "/",
 		MaxAge:   0, // No max age

@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '@/lib/constants';
 import { getUserById } from '@/lib/data';
-import { TUser } from '@/lib/types';
+import { TUser, ECookieName } from '@/lib/types';
 
 export async function useProtectedRoute(redirectUrl = '/login'): Promise<TUser> {
     const user = await getUserFromJWT();
@@ -14,7 +14,7 @@ export async function useProtectedRoute(redirectUrl = '/login'): Promise<TUser> 
 }
 
 export async function getUserFromJWT(): Promise<TUser | null> {
-    const token = cookies().get('jwt')?.value;
+    const token = cookies().get(ECookieName.JWT)?.value;
     if (!token) {
         return null;
     }

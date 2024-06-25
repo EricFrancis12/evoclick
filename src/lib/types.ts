@@ -99,3 +99,7 @@ export enum ERuleName {
     BROWSER_NAME = 'browserName',
     BROWSER_VERSION = 'browserVersion'
 };
+
+export enum ECookieName {
+    JWT = 'jwt'
+}

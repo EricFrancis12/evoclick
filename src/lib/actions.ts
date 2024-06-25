@@ -10,7 +10,7 @@ import {
     createNewAffiliateNetwork, deleteAffiliateNetworkById, updateAffiliateNetworkById,
     getUserByName
 } from './data';
-import { TUser, TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest } from './types';
+import { TUser, TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest, ECookieName } from './types';
 
 export async function loginAction(formData: FormData): Promise<TUser | null> {
     const username = getFormDataName(formData, 'username');
@@ -28,7 +28,7 @@ export async function loginAction(formData: FormData): Promise<TUser | null> {
                 const token = jwt.sign({ isRootUser: true }, JWT_SECRET, {
                     expiresIn: JWT_EXPIRY
                 });
-                cookies().set('jwt', token);
+                cookies().set(ECookieName.JWT, token);
 
                 return rootUser;
             }
@@ -47,7 +47,7 @@ export async function loginAction(formData: FormData): Promise<TUser | null> {
         const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
             expiresIn: JWT_EXPIRY
         });
-        cookies().set('jwt', token);
+        cookies().set(ECookieName.JWT, token);
 
         return user;
     } catch (err) {

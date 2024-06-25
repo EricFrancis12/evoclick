@@ -6,6 +6,8 @@ import (
 )
 
 func Click(w http.ResponseWriter, r *http.Request) {
+	cookies := r.Cookies()
+
 	jsonEncoder := json.NewEncoder(w)
 	jsonEncoder.SetIndent("", "  ")
 
@@ -14,6 +16,7 @@ func Click(w http.ResponseWriter, r *http.Request) {
 		QueryStrings: r.URL.Query(),
 		Method:       r.Method,
 		Message:      "Hello from ./api/click.go",
+		Data:         cookies,
 	}
 
 	err := jsonEncoder.Encode(debugResponse)

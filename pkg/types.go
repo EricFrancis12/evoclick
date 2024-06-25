@@ -113,3 +113,10 @@ const (
 	DeviceTypeMobile  DeviceType = "mobile"
 	DeviceTypeUnknown DeviceType = "unknown"
 )
+
+type CookieName string
+
+const (
+	CookieNameCampaignPublicId CookieName = "campaignPublicId"
+	CookieNameClickPublicId    CookieName = "clickPublicId"
+)
