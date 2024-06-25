@@ -89,13 +89,12 @@ func SaveKeyToRedis(ctx context.Context, cache *redis.Client, key string, v any)
 }
 
 var ipBlacklist = []string{
-	"",
 	"[::1]*",
 }
 
 func FetchIpInfo(ipAddr string, ipInfoToken string) (*IPInfoData, error) {
-	if ipInfoToken == "" {
-		return nil, fmt.Errorf(ipInfoTokenMissingErr)
+	if ipAddr == "" || ipInfoToken == "" {
+		return nil, fmt.Errorf(emptyStringError)
 	}
 	isMatch, err := matchValAgainstRegexSlice(ipBlacklist, ipAddr)
 	if err != nil {
@@ -124,7 +123,7 @@ func FetchIpInfo(ipAddr string, ipInfoToken string) (*IPInfoData, error) {
 	return &ipInfoData, nil
 }
 
-const ipInfoTokenMissingErr = "IP Info Token cannot be empty"
+const emptyStringError = "ip address and IP Info Token cannot be empty"
 
 func makeBlacklistErr(ipAddr string) string {
 	return "ip address: \"" + ipAddr + "\" found on blacklist"

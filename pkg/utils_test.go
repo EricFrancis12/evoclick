@@ -19,3 +19,17 @@ func TestSliceIncludes(t *testing.T) {
 	assert.True(t, sliceIncludes(boolSlice, true))
 	assert.False(t, sliceIncludes(boolSlice, false))
 }
+
+func TestMatchValAgainstRegexSlice(t *testing.T) {
+	isMatch, err := matchValAgainstRegexSlice([]string{"[::1]*"}, "[::1]12345")
+	assert.Nil(t, err)
+	assert.True(t, isMatch)
+
+	isMatch, __err := matchValAgainstRegexSlice([]string{""}, "[::1]12345")
+	assert.Nil(t, __err)
+	assert.True(t, isMatch)
+
+	isMatch, _err := matchValAgainstRegexSlice([]string{}, "[::1]12345")
+	assert.Nil(t, _err)
+	assert.False(t, isMatch)
+}

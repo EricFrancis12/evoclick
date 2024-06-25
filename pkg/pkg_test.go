@@ -7,20 +7,22 @@ import (
 )
 
 func TestFetchIpInfo(t *testing.T) {
-	emptyStr := ""
-	ipInfo1, err := FetchIpInfo(emptyStr, "")
+	ipInfo1, err := FetchIpInfo("", "")
 	assert.Nil(t, ipInfo1)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), ipInfoTokenMissingErr)
+	assert.Equal(t, err.Error(), emptyStringError)
 
-	ipAddr := "12.34.567.8"
-	ipInfo2, err := FetchIpInfo(ipAddr, "")
+	ipInfo2, err := FetchIpInfo("12.34.567.8", "")
 	assert.Nil(t, ipInfo2)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), ipInfoTokenMissingErr)
+	assert.Equal(t, err.Error(), emptyStringError)
 
-	ipInfo3, err := FetchIpInfo(emptyStr, "myipinfotoken")
+	ipInfo3, err := FetchIpInfo("", "myipinfotoken")
 	assert.Nil(t, ipInfo3)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), makeBlacklistErr(emptyStr))
+}
+
+func TestIpBlacklist(t *testing.T) {
+	// Having an empty string on the blacklist was causing the regex to return a false positive
+	assert.False(t, sliceIncludes(ipBlacklist, ""))
 }
