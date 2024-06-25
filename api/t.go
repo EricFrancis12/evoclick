@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/EricFrancis12/evoclick/pkg"
@@ -316,19 +317,45 @@ func makeCatchAllDest() Destination {
 	}
 }
 
+// Itterate over all key/value pairs in the query string,
+// creating a Token for them if they are listed as custom tokens on the traffic source
 func makeTokens(url url.URL, ts pkg.TrafficSource) []pkg.Token {
-	// TODO: ...
-	return []pkg.Token{}
+	tokens := []pkg.Token{}
+	query := url.Query()
+	for key, val := range query {
+		for _, tstoken := range ts.CustomTokens {
+			if key == tstoken.QueryParam {
+				tokens = append(tokens, pkg.Token{
+					QueryParam: key,
+					Value:      getTokenValue(val),
+				})
+			}
+		}
+	}
+	return tokens
+}
+
+// Returns the string at index 0 in a slice of strings,
+// or an empty string if the slice is empty
+func getTokenValue(val []string) string {
+	value := ""
+	if len(val) > 0 {
+		value = val[0]
+	}
+	return value
 }
 
 func getExternalId(url url.URL, ts pkg.TrafficSource) string {
-	// TODO: ...
-	return ""
+	return url.Query().Get(ts.ExternalIdToken.QueryParam)
 }
 
 func getCost(url url.URL, ts pkg.TrafficSource) int {
-	// TODO: ...
-	return 0
+	costStr := url.Query().Get(ts.CostToken.QueryParam)
+	cost, err := strconv.Atoi(costStr)
+	if err != nil || cost < 0 {
+		return 0
+	}
+	return cost
 }
 
 func getClicktime(dest Destination, timestamp time.Time) time.Time {
