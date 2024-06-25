@@ -97,7 +97,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 		dest = makeCatchAllDest()
 	}
 
-	// If we are sending them to a landing page,
+	// If we are sending the visitor to a landing page,
 	// set cookies for campaign public ID and click public ID
 	// to be retrieved later at /click
 	if dest.Type == DestTypeLandingPage {
