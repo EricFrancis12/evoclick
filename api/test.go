@@ -2,8 +2,13 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"net/url"
+	"os"
+
+	"github.com/EricFrancis12/evoclick/pkg"
 )
 
 // Test response for api routes
@@ -16,33 +21,26 @@ type Response struct {
 }
 
 func Test(w http.ResponseWriter, r *http.Request) {
-	// ctx := context.Background()
-	// storer := pkg.NewStorer()
-	// storer.Renew()
+	ipInfoToken := os.Getenv("IP_INFO_TOKEN")
+	endpoint := "https://ipinfo.io/" + "24.53.137.36" + "?token=" + ipInfoToken
+	resp, err := http.Get(endpoint)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer resp.Body.Close()
 
-	// result, err := storer.GetAffiliateNetworkById(ctx, 2)
-	// if err != nil {
-	// 	fmt.Println("error fetching Affiliate Network", err)
-	// 	return
-	// }
-	// fmt.Println("Fetched Affiliate Network:", result.Name)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	// results, err := storer.GetAllFlows(ctx)
-	// if err != nil {
-	// 	fmt.Println("error fetching Flow", err)
-	// 	return
-	// }
-	// fmt.Println("Fetched Flows", results)
+	fmt.Println(body)
+	fmt.Println(string(body))
 
-	// // create new:
-	// createdAffiliateNetwork, err := client.AffiliateNetwork.CreateOne(
-	// 	db.AffiliateNetwork.Name.Set("Hi from Prisma!"),
-	// 	db.AffiliateNetwork.DefaultNewOfferString.Set("123"),
-	// ).Exec(ctx)
-	// if err != nil {
-	// 	fmt.Errorf(err.Error())
-	// 	return
-	// }
+	ipInfoData, err := pkg.ParseJSON[pkg.IPInfoData](string(body))
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	jsonEncoder := json.NewEncoder(w)
 	jsonEncoder.SetIndent("", "  ")
@@ -52,7 +50,7 @@ func Test(w http.ResponseWriter, r *http.Request) {
 		QueryStrings: r.URL.Query(),
 		Method:       r.Method,
 		Message:      "Hello from ./api/test.go",
-		Data:         r.URL,
+		Data:         ipInfoData,
 	}
 
 	if err := jsonEncoder.Encode(debugResponse); err != nil {

@@ -73,16 +73,16 @@ func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationRe
 
 	optionalParams := []db.ClickSetParam{}
 	// Optional parameters that CANNOT accept default values, so they should be ommitted if they are 0
-	appendIfTrue(optionalParams, db.Click.ClickTime.Set(creationReq.ClickTime), creationReq.ClickTime.IsZero())
-	appendIfTrue(optionalParams, db.Click.ConvTime.Set(creationReq.ConvTime), creationReq.ConvTime.IsZero())
-	appendIfTrue(optionalParams, db.Click.ClickOutputURL.Set(creationReq.ClickOutputURL), creationReq.ClickOutputURL != "")
-	appendIfTrue(optionalParams, db.Click.Isp.Set(creationReq.Isp), creationReq.Isp != "")
-	appendIfTrue(optionalParams, db.Click.Country.Set(creationReq.Country), creationReq.Country != "")
-	appendIfTrue(optionalParams, db.Click.Region.Set(creationReq.Region), creationReq.Region != "")
-	appendIfTrue(optionalParams, db.Click.City.Set(creationReq.City), creationReq.City != "")
-	appendIfTrue(optionalParams, db.Click.AffiliateNetwork.Link(db.AffiliateNetwork.ID.Equals(creationReq.AffiliateNetworkID)), creationReq.AffiliateNetworkID != 0)
-	appendIfTrue(optionalParams, db.Click.LandingPage.Link(db.LandingPage.ID.Equals(creationReq.LandingPageID)), creationReq.LandingPageID != 0)
-	appendIfTrue(optionalParams, db.Click.Offer.Link(db.Offer.ID.Equals(creationReq.OfferID)), creationReq.OfferID != 0)
+	optionalParams = appendIfTrue(optionalParams, db.Click.ClickTime.Set(creationReq.ClickTime), creationReq.ClickTime.IsZero())
+	optionalParams = appendIfTrue(optionalParams, db.Click.ConvTime.Set(creationReq.ConvTime), creationReq.ConvTime.IsZero())
+	optionalParams = appendIfTrue(optionalParams, db.Click.ClickOutputURL.Set(creationReq.ClickOutputURL), creationReq.ClickOutputURL != "")
+	optionalParams = appendIfTrue(optionalParams, db.Click.Isp.Set(creationReq.Isp), creationReq.Isp != "")
+	optionalParams = appendIfTrue(optionalParams, db.Click.Country.Set(creationReq.Country), creationReq.Country != "")
+	optionalParams = appendIfTrue(optionalParams, db.Click.Region.Set(creationReq.Region), creationReq.Region != "")
+	optionalParams = appendIfTrue(optionalParams, db.Click.City.Set(creationReq.City), creationReq.City != "")
+	optionalParams = appendIfTrue(optionalParams, db.Click.AffiliateNetwork.Link(db.AffiliateNetwork.ID.Equals(creationReq.AffiliateNetworkID)), creationReq.AffiliateNetworkID != 0)
+	optionalParams = appendIfTrue(optionalParams, db.Click.LandingPage.Link(db.LandingPage.ID.Equals(creationReq.LandingPageID)), creationReq.LandingPageID != 0)
+	optionalParams = appendIfTrue(optionalParams, db.Click.Offer.Link(db.Offer.ID.Equals(creationReq.OfferID)), creationReq.OfferID != 0)
 
 	model, err := s.Client.Click.CreateOne(
 		// Mandatory parameters:
