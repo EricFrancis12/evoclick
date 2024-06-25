@@ -28,6 +28,7 @@ model User {
 model Click {
   id                 Int               @id @default(autoincrement())
   publicId           String            @unique
+  externalId         String
   cost               Int
   revenue            Int
   viewTime           DateTime

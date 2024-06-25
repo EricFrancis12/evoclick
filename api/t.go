@@ -132,6 +132,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 	// Log click in db
 	creationReq := pkg.ClickCreationReq{
 		PublicId:           publicClickId,
+		ExternalId:         getExternalId(*r.URL, trafficSource),
 		Cost:               getCost(*r.URL, trafficSource),
 		Revenue:            0,
 		ViewTime:           timestamp,
@@ -318,6 +319,11 @@ func makeCatchAllDest() Destination {
 func makeTokens(url url.URL, ts pkg.TrafficSource) []pkg.Token {
 	// TODO: ...
 	return []pkg.Token{}
+}
+
+func getExternalId(url url.URL, ts pkg.TrafficSource) string {
+	// TODO: ...
+	return ""
 }
 
 func getCost(url url.URL, ts pkg.TrafficSource) int {

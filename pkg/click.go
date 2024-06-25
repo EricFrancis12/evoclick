@@ -31,6 +31,7 @@ func (s *Storer) GetClickByPublicId(ctx context.Context, publicId string) (Click
 
 type ClickCreationReq struct {
 	PublicId           string
+	ExternalId         string
 	Cost               int
 	Revenue            int
 	ViewTime           time.Time
@@ -86,6 +87,7 @@ func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationRe
 	model, err := s.Client.Click.CreateOne(
 		// Mandatory parameters:
 		db.Click.PublicID.Set(creationReq.PublicId),
+		db.Click.ExternalID.Set(creationReq.ExternalId),
 		db.Click.Cost.Set(creationReq.Cost),
 		db.Click.Revenue.Set(creationReq.Revenue),
 		db.Click.ViewTime.Set(creationReq.ViewTime),
