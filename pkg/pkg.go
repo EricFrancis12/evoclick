@@ -92,35 +92,35 @@ var ipBlacklist = []string{
 	"[::1]*",
 }
 
-func FetchIpInfo(ipAddr string, ipInfoToken string) (*IPInfoData, error) {
+func FetchIpInfo(ipAddr string, ipInfoToken string) (IPInfoData, error) {
 	if ipAddr == "" || ipInfoToken == "" {
-		return nil, fmt.Errorf(emptyStringError)
+		return IPInfoData{}, fmt.Errorf(emptyStringError)
 	}
 	isMatch, err := matchValAgainstRegexSlice(ipBlacklist, ipAddr)
 	if err != nil {
-		return nil, err
+		return IPInfoData{}, err
 	}
 	if isMatch {
-		return nil, fmt.Errorf(makeBlacklistErr(ipAddr))
+		return IPInfoData{}, fmt.Errorf(makeBlacklistErr(ipAddr))
 	}
 
 	endpoint := "https://ipinfo.io/" + ipAddr + "?token=" + ipInfoToken
 	resp, err := http.Get(endpoint)
 	if err != nil {
-		return nil, err
+		return IPInfoData{}, err
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return IPInfoData{}, err
 	}
 
 	ipInfoData, err := ParseJSON[IPInfoData](string(body))
 	if err != nil {
-		return nil, err
+		return IPInfoData{}, err
 	}
 
-	return &ipInfoData, nil
+	return ipInfoData, nil
 }
 
 const emptyStringError = "ip address and IP Info Token cannot be empty"

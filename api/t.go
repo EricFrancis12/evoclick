@@ -65,7 +65,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println("error fetching IP Info: " + err.Error())
 		} else {
-			ipInfoData = *data
+			ipInfoData = data
 			receivedIpInfo = true
 		}
 	}
@@ -110,7 +110,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println("error fetching IP Info: " + err.Error())
 		} else {
-			ipInfoData = *data
+			ipInfoData = data
 			receivedIpInfo = true
 		}
 	}
