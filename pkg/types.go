@@ -1,11 +1,25 @@
 package pkg
 
-import "github.com/EricFrancis12/evoclick/prisma/db"
+import (
+	"time"
+
+	"github.com/EricFrancis12/evoclick/prisma/db"
+)
 
 // TODO: Change Click model so that none of it's properties are pointers:
 type Click struct {
 	db.InnerClick
-	Tokens []Token
+	ClickTime          time.Time `json:"clickTime"`
+	ConvTime           time.Time `json:"convTime"`
+	ClickOutputURL     string    `json:"clickOutputURL"`
+	Isp                string    `json:"isp"`
+	Country            string    `json:"country"`
+	Region             string    `json:"region"`
+	City               string    `json:"city"`
+	Tokens             []Token   `json:"tokens"`
+	AffiliateNetworkID int       `json:"affiliateNetworkID"`
+	LandingPageID      int       `json:"landingPageID"`
+	OfferID            int       `json:"offerID"`
 }
 
 type AffiliateNetwork struct {
@@ -19,6 +33,8 @@ type Campaign struct {
 // TODO: Change Flow model so that none of it's properties are pointers:
 type Flow struct {
 	db.InnerFlow
+	Name       string  `json:"name"`
+	URL        string  `json:"url"`
 	MainRoute  Route   `json:"mainRoute"`
 	RuleRoutes []Route `json:"ruleRoutes"`
 }
@@ -34,7 +50,8 @@ type Offer struct {
 // TODO: Change Traffic Source model so that none of it's properties are pointers:
 type TrafficSource struct {
 	db.InnerTrafficSource
-	ExternalIdToken Token        `json:"externalIdToken"`
+	PostbackURL     string       `json:"postbackURL"`
+	ExternalIDToken Token        `json:"externalIDToken"`
 	CostToken       Token        `json:"costToken"`
 	CustomTokens    []NamedToken `json:"customTokens"`
 }
@@ -65,8 +82,8 @@ type Rule struct {
 type Path struct {
 	IsActive             bool  `json:"isActive"`
 	Weight               int   `json:"weight"` // Ranges from 0 to 100
-	LandingPageIds       []int `json:"landingPageIds"`
-	OfferIds             []int `json:"offerIds"`
+	LandingPageIDs       []int `json:"landingPageIDs"`
+	OfferIDs             []int `json:"offerIDs"`
 	DirectLinkingEnabled bool  `json:"directLinkingEnabled"`
 }
 
@@ -120,6 +137,6 @@ const (
 type CookieName string
 
 const (
-	CookieNameCampaignPublicId CookieName = "campaignPublicId"
-	CookieNameClickPublicId    CookieName = "clickPublicId"
+	CookieNameCampaignPublicID CookieName = "campaignPublicID"
+	CookieNameClickPublicID    CookieName = "clickPublicID"
 )

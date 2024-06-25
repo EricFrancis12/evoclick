@@ -44,13 +44,13 @@ func (s *Storer) GetTrafficSourceById(ctx context.Context, id int) (TrafficSourc
 
 func formatTrafficSource(model *db.TrafficSourceModel) TrafficSource {
 	var (
-		externalIdToken = parseToken(model.ExternalIDToken)
+		externalIDToken = parseToken(model.ExternalIDToken)
 		costToken       = parseToken(model.CostToken)
 		customTokens    = parseNamedTokens(model.CustomTokens)
 	)
 	return TrafficSource{
 		InnerTrafficSource: model.InnerTrafficSource,
-		ExternalIdToken:    externalIdToken,
+		ExternalIDToken:    externalIDToken,
 		CostToken:          costToken,
 		CustomTokens:       customTokens,
 	}

@@ -86,16 +86,16 @@ func (rule Rule) ClickDoesTrigger(click Click) bool {
 
 	rulesMap[RuleNameBrowserName] = click.BrowserName
 	rulesMap[RuleNameBrowserVersion] = click.BrowserVersion
-	rulesMap[RuleNameCity] = *click.City
-	rulesMap[RuleNameCountry] = *click.Country
+	rulesMap[RuleNameCity] = click.City
+	rulesMap[RuleNameCountry] = click.Country
 	rulesMap[RuleNameDevice] = click.Device
 	rulesMap[RuleNameDeviceType] = click.DeviceType
 	rulesMap[RuleNameIP] = click.IP
-	rulesMap[RuleNameISP] = *click.Isp
+	rulesMap[RuleNameISP] = click.Isp
 	rulesMap[RuleNameLanguage] = click.Language
 	rulesMap[RuleNameOS] = click.Os
 	rulesMap[RuleNameOSVersion] = click.OsVersion
-	rulesMap[RuleNameRegion] = *click.Region
+	rulesMap[RuleNameRegion] = click.Region
 	rulesMap[RuleNameScreenResolution] = click.ScreenResolution
 	rulesMap[RuleNameUserAgent] = click.UserAgent
 

@@ -16,7 +16,7 @@ func Click(w http.ResponseWriter, r *http.Request) {
 	storer.Renew()
 
 	// campaignPublicId := getCookieValue(r, pkg.CookieNameCampaignPublicId)
-	clickPublicId := getCookieValue(r, pkg.CookieNameClickPublicId)
+	clickPublicId := getCookieValue(r, pkg.CookieNameClickPublicID)
 
 	if clickPublicId == "" {
 		fmt.Println("no public Click ID found")
@@ -85,7 +85,7 @@ func Click(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oID, err := selectIdUsingRotType[pkg.Offer](path.OfferIds, campaign.OfferRotationType)
+	oID, err := selectIdUsingRotType[pkg.Offer](path.OfferIDs, campaign.OfferRotationType)
 	if err != nil {
 		fmt.Println("error selecting Offer ID: " + err.Error())
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
@@ -112,8 +112,8 @@ func Click(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateClick(click pkg.Click, clickTime time.Time, clickOutputUrl string) pkg.Click {
-	click.ClickTime = &clickTime
-	click.ClickOutputURL = &clickOutputUrl
+	click.ClickTime = clickTime
+	click.ClickOutputURL = clickOutputUrl
 	return click
 }
 

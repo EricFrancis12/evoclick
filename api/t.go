@@ -71,10 +71,10 @@ func T(w http.ResponseWriter, r *http.Request) {
 
 	// Determine where we are redirecting the visitor
 	var dest Destination
-	if flow.Type == db.FlowTypeURL && *flow.URL != "" {
+	if flow.Type == db.FlowTypeURL && flow.URL != "" {
 		dest = Destination{
 			Type: DestTypeURL,
-			URL:  *flow.URL,
+			URL:  flow.URL,
 		}
 	} else if flow.Type == db.FlowTypeBuiltIn || flow.Type == db.FlowTypeSaved {
 		opts := DetermineDestOptions{
@@ -101,8 +101,8 @@ func T(w http.ResponseWriter, r *http.Request) {
 	// set cookies for campaign public ID and click public ID
 	// to be retrieved later at /click
 	if dest.Type == DestTypeLandingPage {
-		setCookie(w, pkg.CookieNameCampaignPublicId, campaign.PublicID)
-		setCookie(w, pkg.CookieNameClickPublicId, publicClickId)
+		setCookie(w, pkg.CookieNameCampaignPublicID, campaign.PublicID)
+		setCookie(w, pkg.CookieNameClickPublicID, publicClickId)
 	}
 
 	http.Redirect(w, r, dest.URL, http.StatusTemporaryRedirect)
@@ -224,7 +224,7 @@ func determineDest(opts DetermineDestOptions) (Destination, error) {
 	}
 
 	if !path.DirectLinkingEnabled {
-		lpID, err := selectIdUsingRotType[pkg.LandingPage](path.LandingPageIds, opts.campaign.LandingPageRotationType)
+		lpID, err := selectIdUsingRotType[pkg.LandingPage](path.LandingPageIDs, opts.campaign.LandingPageRotationType)
 		if err != nil {
 			return catchAllDest(), err
 		}
@@ -240,7 +240,7 @@ func determineDest(opts DetermineDestOptions) (Destination, error) {
 			ID:   lp.ID,
 		}, nil
 	} else {
-		oID, err := selectIdUsingRotType[pkg.Offer](path.OfferIds, opts.campaign.OfferRotationType)
+		oID, err := selectIdUsingRotType[pkg.Offer](path.OfferIDs, opts.campaign.OfferRotationType)
 		if err != nil {
 			return catchAllDest(), err
 		}
@@ -353,7 +353,7 @@ func getTokenValue(val []string) string {
 }
 
 func getExternalId(url url.URL, ts pkg.TrafficSource) string {
-	return url.Query().Get(ts.ExternalIdToken.QueryParam)
+	return url.Query().Get(ts.ExternalIDToken.QueryParam)
 }
 
 func getCost(url url.URL, ts pkg.TrafficSource) int {

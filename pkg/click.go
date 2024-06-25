@@ -179,16 +179,16 @@ func makeUpsertParams(click Click) []db.ClickSetParam {
 
 	// Optional parameters:
 	optParams := makeOptParams(ClickCreationReq{
-		ClickTime:          *click.ClickTime,
-		ConvTime:           *click.ConvTime,
-		ClickOutputURL:     *click.ClickOutputURL,
-		Isp:                *click.Isp,
-		Country:            *click.Country,
-		Region:             *click.Region,
-		City:               *click.City,
-		AffiliateNetworkID: *click.AffiliateNetworkID,
-		LandingPageID:      *click.LandingPageID,
-		OfferID:            *click.OfferID,
+		ClickTime:          click.ClickTime,
+		ConvTime:           click.ConvTime,
+		ClickOutputURL:     click.ClickOutputURL,
+		Isp:                click.Isp,
+		Country:            click.Country,
+		Region:             click.Region,
+		City:               click.City,
+		AffiliateNetworkID: click.AffiliateNetworkID,
+		LandingPageID:      click.LandingPageID,
+		OfferID:            click.OfferID,
 	})
 	params = append(params, optParams...)
 	return params
