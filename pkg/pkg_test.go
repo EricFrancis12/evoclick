@@ -8,17 +8,17 @@ import (
 
 func TestFetchIpInfo(t *testing.T) {
 	ipInfo1, err := FetchIpInfo("", "")
-	assert.Nil(t, ipInfo1)
+	assert.Equal(t, ipInfo1.Country, "")
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), emptyStringError)
 
 	ipInfo2, err := FetchIpInfo("12.34.567.8", "")
-	assert.Nil(t, ipInfo2)
+	assert.Equal(t, ipInfo2.Country, "")
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), emptyStringError)
 
 	ipInfo3, err := FetchIpInfo("", "myipinfotoken")
-	assert.Nil(t, ipInfo3)
+	assert.Equal(t, ipInfo3.Country, "")
 	assert.NotNil(t, err)
 }
 

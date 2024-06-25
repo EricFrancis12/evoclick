@@ -92,6 +92,7 @@ var ipBlacklist = []string{
 	"[::1]*",
 }
 
+// TODO: Fix bug where an initiated IPInfoData is not being returned from FetchIpInfo()
 func FetchIpInfo(ipAddr string, ipInfoToken string) (IPInfoData, error) {
 	if ipAddr == "" || ipInfoToken == "" {
 		return IPInfoData{}, fmt.Errorf(emptyStringError)
