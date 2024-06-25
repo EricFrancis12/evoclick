@@ -38,7 +38,7 @@ type ClickCreationReq struct {
 	ConvTime           time.Time
 	ViewOutputURL      string
 	ClickOutputURL     string
-	Tokens             []ClickToken
+	Tokens             []Token
 	IP                 string
 	Isp                string
 	UserAgent          string
@@ -143,10 +143,10 @@ func formatClick(model *db.ClickModel) Click {
 	}
 }
 
-func parseClickTokens(jsonStr string) []ClickToken {
-	clickTokens, err := ParseJSON[[]ClickToken](jsonStr)
+func parseClickTokens(jsonStr string) []Token {
+	clickTokens, err := ParseJSON[[]Token](jsonStr)
 	if err != nil {
-		return []ClickToken{}
+		return []Token{}
 	}
 	return clickTokens
 }

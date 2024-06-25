@@ -2,8 +2,8 @@ import { TrafficSource } from '@prisma/client';
 import { z } from 'zod';
 import cache from '../cache';
 import db from '../db';
-import { trafficSourceSchema, tokenSchema } from '../schemas';
-import { TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest, TToken } from '../types';
+import { trafficSourceSchema, tokenSchema, namedTokenSchema } from '../schemas';
+import { TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest, TToken, TNamedToken } from '../types';
 import { initMakeRedisKey } from '../utils';
 
 const makeKey = initMakeRedisKey('trafficSource');
@@ -48,7 +48,8 @@ export async function createNewTrafficSource(creationRequest: TTrafficSource_cre
             ...creationRequest,
             // Changing defaultTokens and customTokens into strings because
             // they are saved as strings in the db
-            defaultTokens: JSON.stringify(creationRequest.defaultTokens),
+            externalIdToken: JSON.stringify(creationRequest.externalIdToken),
+            costToken: JSON.stringify(creationRequest.costToken),
             customTokens: JSON.stringify(creationRequest.customTokens)
         }
     });
@@ -73,7 +74,8 @@ export async function updateTrafficSourceById(id: number, data: TTrafficSource_u
             ...data,
             // Changing defaultTokens and customTokens into strings (if defined) because
             // they are saved as strings in the db
-            defaultTokens: data.defaultTokens ? JSON.stringify(data.defaultTokens) : undefined,
+            externalIdToken: data.externalIdToken ? JSON.stringify(data.externalIdToken) : undefined,
+            costToken: data.costToken ? JSON.stringify(data.costToken) : undefined,
             customTokens: data.customTokens ? JSON.stringify(data.customTokens) : undefined
         }
     });
@@ -106,16 +108,30 @@ export async function deleteTrafficSourceById(id: number): Promise<TTrafficSourc
 }
 
 async function makeClientTrafficSource(dbModel: TrafficSource): Promise<TTrafficSource> {
-    const defaultTokensProm = parseTokens(dbModel.defaultTokens);
-    const customTokensProm = parseTokens(dbModel.customTokens);
+    const externalIdTokenProm = parseToken(dbModel.externalIdToken);
+    const costTokenProm = parseToken(dbModel.costToken);
+    const customTokensProm = parseNamedTokens(dbModel.customTokens);
     return {
         ...dbModel,
-        defaultTokens: await defaultTokensProm,
+        externalIdToken: await externalIdTokenProm,
+        costToken: await costTokenProm,
         customTokens: await customTokensProm
     };
 }
 
-async function parseTokens(jsonStr: string): Promise<TToken[]> {
-    const { success, data } = await z.array(tokenSchema).safeParseAsync(jsonStr);
+async function parseToken(jsonStr: string): Promise<TToken> {
+    const { success, data } = await tokenSchema.safeParseAsync(jsonStr);
+    return success ? data : makeBoilerplateToken();
+}
+
+async function parseNamedTokens(jsonStr: string): Promise<TNamedToken[]> {
+    const { success, data } = await z.array(namedTokenSchema).safeParseAsync(jsonStr);
     return success ? data : [];
+}
+
+function makeBoilerplateToken(): TToken {
+    return {
+        queryParam: '',
+        value: ''
+    };
 }

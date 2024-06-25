@@ -143,16 +143,17 @@ model Offer {
 }
 
 model TrafficSource {
-  id            Int        @id @default(autoincrement())
-  name          String
-  postbackUrl   String?
-  defaultTokens String
-  customTokens  String
-  tags          String[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  Campaign      Campaign[]
-  Click         Click[]
+  id              Int        @id @default(autoincrement())
+  name            String
+  postbackUrl     String?
+  externalIdToken String
+  costToken       String
+  customTokens    String
+  tags            String[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  Campaign        Campaign[]
+  Click           Click[]
 }
 
 enum GeoName {

@@ -138,7 +138,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 		ClickTime:          getClicktime(dest, timestamp),
 		ViewOutputURL:      dest.URL,
 		ClickOutputURL:     getClickOutputURL(dest),
-		Tokens:             makeClickTokens(*r.URL, trafficSource),
+		Tokens:             makeTokens(*r.URL, trafficSource),
 		IP:                 r.RemoteAddr,
 		Isp:                ipInfoData.Org,
 		UserAgent:          userAgentStr,
@@ -315,9 +315,9 @@ func makeCatchAllDest() Destination {
 	}
 }
 
-func makeClickTokens(url url.URL, ts pkg.TrafficSource) []pkg.ClickToken {
+func makeTokens(url url.URL, ts pkg.TrafficSource) []pkg.Token {
 	// TODO: ...
-	return []pkg.ClickToken{}
+	return []pkg.Token{}
 }
 
 func getCost(url url.URL, ts pkg.TrafficSource) int {

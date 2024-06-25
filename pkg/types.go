@@ -4,7 +4,7 @@ import "github.com/EricFrancis12/evoclick/prisma/db"
 
 type Click struct {
 	db.InnerClick
-	Tokens []ClickToken
+	Tokens []Token
 }
 
 type AffiliateNetwork struct {
@@ -31,18 +31,19 @@ type Offer struct {
 
 type TrafficSource struct {
 	db.InnerTrafficSource
-	DefaultTokens []Token `json:"defaultTokens"`
-	CustomTokens  []Token `json:"customTokens"`
+	ExternalIdToken Token        `json:"externalIdToken"`
+	CostToken       Token        `json:"costToken"`
+	CustomTokens    []NamedToken `json:"customTokens"`
 }
 
 type Token struct {
-	ClickToken
-	Name string `json:"name"`
-}
-
-type ClickToken struct {
 	QueryParam string `json:"queryParam"`
 	Value      string `json:"value"`
+}
+
+type NamedToken struct {
+	Token
+	Name string `json:"name"`
 }
 
 type Route struct {

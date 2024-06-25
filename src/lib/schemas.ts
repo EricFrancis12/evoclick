@@ -2,7 +2,7 @@ import { $Enums } from '@prisma/client';
 import { z } from 'zod';
 import { toZod } from 'tozod';
 import {
-    TAffiliateNetwork, TLandingPage, TOffer, TToken, TTrafficSource, TUser,
+    TAffiliateNetwork, TLandingPage, TOffer, TToken, TNamedToken, TTrafficSource, TUser,
     TPath, ELogicalRelation, ERuleName
 } from './types';
 
@@ -92,6 +92,11 @@ export const offersSchema: toZod<TOffer> = z.object({
 
 export const tokenSchema: toZod<TToken> = z.object({
     queryParam: z.string(),
+    value: z.string()
+});
+
+export const namedTokenSchema: toZod<TNamedToken> = z.object({
+    queryParam: z.string(),
     value: z.string(),
     name: z.string()
 });
@@ -100,8 +105,9 @@ export const trafficSourceSchema: toZod<TTrafficSource> = z.object({
     id: z.number(),
     name: z.string(),
     postbackUrl: z.nullable(z.string()),
-    defaultTokens: z.array(tokenSchema),
-    customTokens: z.array(tokenSchema),
+    externalIdToken: tokenSchema,
+    costToken: tokenSchema,
+    customTokens: z.array(namedTokenSchema),
     tags: z.array(z.string()),
     createdAt: z.date(),
     updatedAt: z.date()

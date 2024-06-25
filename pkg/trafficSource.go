@@ -44,12 +44,14 @@ func (s *Storer) GetTrafficSourceById(ctx context.Context, id int) (TrafficSourc
 
 func formatTrafficSource(model *db.TrafficSourceModel) TrafficSource {
 	var (
-		defaultTokens = parseTokens(model.DefaultTokens)
-		customTokens  = parseTokens(model.CustomTokens)
+		externalIdToken = parseToken(model.ExternalIDToken)
+		costToken       = parseToken(model.CostToken)
+		customTokens    = parseNamedTokens(model.CustomTokens)
 	)
 	return TrafficSource{
 		InnerTrafficSource: model.InnerTrafficSource,
-		DefaultTokens:      defaultTokens,
+		ExternalIdToken:    externalIdToken,
+		CostToken:          costToken,
 		CustomTokens:       customTokens,
 	}
 }
@@ -63,10 +65,18 @@ func formatTrafficSources(models []db.TrafficSourceModel) []TrafficSource {
 	return trafficSources
 }
 
-func parseTokens(jsonStr string) []Token {
-	tokens, err := ParseJSON[[]Token](jsonStr)
+func parseToken(jsonStr string) Token {
+	token, err := ParseJSON[Token](jsonStr)
 	if err != nil {
-		return []Token{}
+		return Token{}
+	}
+	return token
+}
+
+func parseNamedTokens(jsonStr string) []NamedToken {
+	tokens, err := ParseJSON[[]NamedToken](jsonStr)
+	if err != nil {
+		return []NamedToken{}
 	}
 	return tokens
 }

@@ -36,9 +36,10 @@ export type TOffer_createRequest = Omit<TOffer, omissions>;
 export type TOffer_updateRequest = Omit<Partial<TOffer>, omissions>;
 
 // Extending Traffic Source model
-export type TTrafficSource = Omit<TrafficSource, 'defaultTokens' | 'customTokens'> & {
-    defaultTokens: TToken[];
-    customTokens: TToken[];
+export type TTrafficSource = Omit<TrafficSource, 'externalIdToken' | 'costToken' | 'customTokens'> & {
+    externalIdToken: TToken;
+    costToken: TToken;
+    customTokens: TNamedToken[];
 };
 export type TTrafficSource_createRequest = Omit<TTrafficSource, omissions>;
 export type TTrafficSource_updateRequest = Omit<Partial<TTrafficSource>, omissions>;
@@ -46,13 +47,14 @@ export type TTrafficSource_updateRequest = Omit<Partial<TTrafficSource>, omissio
 export type TToken = {
     queryParam: string;
     value: string;
+};
+export type TNamedToken = TToken & {
     name: string;
 };
-export type TClickToken = Omit<TToken, 'name'>;
 
 // Extending Click model
 export type TClick = Omit<Click, 'tokens'> & {
-    tokens: TClickToken[]
+    tokens: TToken[]
 };
 
 export type TRoute = {
