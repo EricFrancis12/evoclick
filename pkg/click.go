@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/EricFrancis12/evoclick/prisma/db"
+	"github.com/google/uuid"
 )
 
 func (s *Storer) GetClickById(ctx context.Context, id int) (Click, error) {
@@ -200,6 +201,10 @@ func formatClick(model *db.ClickModel) Click {
 		InnerClick: model.InnerClick,
 		Tokens:     clickTokens,
 	}
+}
+
+func NewPublicClickID() string {
+	return uuid.New().String()
 }
 
 func parseClickTokens(jsonStr string) []Token {

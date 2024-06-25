@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
@@ -12,7 +11,6 @@ import (
 
 	"github.com/EricFrancis12/evoclick/pkg"
 	"github.com/EricFrancis12/evoclick/prisma/db"
-	"github.com/google/uuid"
 	"github.com/mileusna/useragent"
 )
 
@@ -24,7 +22,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 
 	g := getGValue(r)
 	if g == "" {
-		// If g is not specifid, we have no way of fetching the campaign,
+		// If g is not specified we have no way of fetching the campaign,
 		// so redirect to the catch-all url
 		fmt.Println("g not specified")
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
@@ -47,11 +45,12 @@ func T(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	publicClickId := uuid.New().String()
-
 	var (
 		ipInfoData     pkg.IPInfoData
 		receivedIpInfo = false
+		userAgentStr   = r.UserAgent()
+		ua             = useragent.Parse(userAgentStr)
+		publicClickId  = pkg.NewPublicClickID()
 	)
 
 	// Fetch IP Info
@@ -66,40 +65,18 @@ func T(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	userAgentStr := r.UserAgent()
-	ua := useragent.Parse(userAgentStr)
-
-	// Determine where we are redirecting the visitor
-	var dest Destination
-	if flow.Type == db.FlowTypeURL && flow.URL != "" {
-		dest = Destination{
-			Type: DestTypeURL,
-			URL:  flow.URL,
-		}
-	} else if flow.Type == db.FlowTypeBuiltIn || flow.Type == db.FlowTypeSaved {
-		opts := DetermineDestOptions{
-			ctx:        ctx,
-			storer:     *storer,
-			campaign:   campaign,
-			flow:       flow,
-			r:          r,
-			userAgent:  ua,
-			ipInfoData: ipInfoData,
-		}
-		determinedDest, err := determineDest(opts)
-		if err != nil {
-			dest = catchAllDest()
-		} else {
-			dest = determinedDest
-		}
-	} else {
-		// If the flow type is missing, redirect to the catch-all url
-		dest = catchAllDest()
-	}
+	dest, _ := determineDest(DestOpts{
+		ctx:        ctx,
+		storer:     *storer,
+		campaign:   campaign,
+		flow:       flow,
+		r:          r,
+		userAgent:  ua,
+		ipInfoData: ipInfoData,
+	})
 
 	// If we are sending the visitor to a landing page,
-	// set cookies for campaign public ID and click public ID
-	// to be retrieved later at /click
+	// set cookies to be retrieved later at /click
 	if dest.Type == DestTypeLandingPage {
 		setCookie(w, pkg.CookieNameCampaignPublicID, campaign.PublicID)
 		setCookie(w, pkg.CookieNameClickPublicID, publicClickId)
@@ -107,7 +84,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, dest.URL, http.StatusTemporaryRedirect)
 
-	// If we have an IP Info Token, but we didn't fetch data before,
+	// If we have an IP Info Token, AND we didn't fetch data before,
 	// fetch the IP Info now
 	if ipInfoToken != "" && !receivedIpInfo {
 		data, err := pkg.FetchIpInfo(r.RemoteAddr, ipInfoToken)
@@ -172,7 +149,13 @@ func T(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type DetermineDestOptions struct {
+type Destination struct {
+	Type DestType
+	URL  string
+	ID   int // The ID of the landing page OR offer the visitor will being redirected to
+}
+
+type DestOpts struct {
 	ctx        context.Context
 	storer     pkg.Storer
 	campaign   pkg.Campaign
@@ -180,12 +163,6 @@ type DetermineDestOptions struct {
 	r          *http.Request
 	userAgent  useragent.UserAgent
 	ipInfoData pkg.IPInfoData
-}
-
-type Destination struct {
-	Type DestType
-	URL  string
-	ID   int // The ID of the landing page OR offer where we are sending the visitor
 }
 
 type DestType string
@@ -197,65 +174,54 @@ const (
 	DestTypeCatchAll    DestType = "catchAll"
 )
 
-func determineDest(opts DetermineDestOptions) (Destination, error) {
-	// See if we triggered any rule routes
-	// If not, we are going using the main route
-	route := opts.flow.MainRoute
-	for _, ruleRoute := range opts.flow.RuleRoutes {
-		if !ruleRoute.IsActive {
-			continue
-		}
-		if ruleRoute.ViewDoesTrigger(opts.r, opts.userAgent, opts.ipInfoData) {
-			route = ruleRoute
-			break
-		}
-	}
-
-	// Filter out the active paths
-	activePaths := pkg.FilterSlice[pkg.Path](route.Paths, func(p pkg.Path) bool {
-		return p.IsActive
-	})
-
-	// Determine what path we are going down,
-	// factoring in the weight of each one
-	path, err := weightedSelectPath(activePaths)
-	if err != nil {
-		return catchAllDest(), err
-	}
-
-	if !path.DirectLinkingEnabled {
-		lpID, err := selectIdUsingRotType[pkg.LandingPage](path.LandingPageIDs, opts.campaign.LandingPageRotationType)
-		if err != nil {
-			return catchAllDest(), err
-		}
-
-		lp, err := opts.storer.GetLandingPageById(opts.ctx, lpID)
-		if err != nil {
-			return catchAllDest(), err
-		}
-
+func determineDest(opts DestOpts) (Destination, error) {
+	if opts.flow.Type == db.FlowTypeURL && opts.flow.URL != "" {
 		return Destination{
-			Type: DestTypeLandingPage,
-			URL:  lp.URL,
-			ID:   lp.ID,
+			Type: DestTypeURL,
+			URL:  opts.flow.URL,
 		}, nil
-	} else {
-		oID, err := selectIdUsingRotType[pkg.Offer](path.OfferIDs, opts.campaign.OfferRotationType)
+	} else if opts.flow.Type == db.FlowTypeBuiltIn || opts.flow.Type == db.FlowTypeSaved {
+		route := opts.flow.SelectViewRoute(opts.r, opts.userAgent, opts.ipInfoData)
+		path, err := route.WeightedSelectPath()
 		if err != nil {
 			return catchAllDest(), err
 		}
 
-		o, err := opts.storer.GetOfferById(opts.ctx, oID)
-		if err != nil {
-			return catchAllDest(), err
-		}
+		if !path.DirectLinkingEnabled {
+			lpID, err := selectIdUsingRotType[pkg.LandingPage](path.LandingPageIDs, opts.campaign.LandingPageRotationType)
+			if err != nil {
+				return catchAllDest(), err
+			}
 
-		return Destination{
-			Type: DestTypeOffer,
-			URL:  o.URL,
-			ID:   o.ID,
-		}, nil
+			lp, err := opts.storer.GetLandingPageById(opts.ctx, lpID)
+			if err != nil {
+				return catchAllDest(), err
+			}
+
+			return Destination{
+				Type: DestTypeLandingPage,
+				URL:  lp.URL,
+				ID:   lp.ID,
+			}, nil
+		} else {
+			oID, err := selectIdUsingRotType[pkg.Offer](path.OfferIDs, opts.campaign.OfferRotationType)
+			if err != nil {
+				return catchAllDest(), err
+			}
+
+			o, err := opts.storer.GetOfferById(opts.ctx, oID)
+			if err != nil {
+				return catchAllDest(), err
+			}
+
+			return Destination{
+				Type: DestTypeOffer,
+				URL:  o.URL,
+				ID:   o.ID,
+			}, nil
+		}
 	}
+	return catchAllDest(), fmt.Errorf("missing or unknown flow type")
 }
 
 func selectIdUsingRotType[T pkg.LandingPage | pkg.Offer](ids []int, rotType db.RotationType) (int, error) {
@@ -267,33 +233,6 @@ func selectIdUsingRotType[T pkg.LandingPage | pkg.Offer](ids []int, rotType db.R
 	} else {
 		return 0, fmt.Errorf("unknown rotation type: " + string(rotType))
 	}
-}
-
-func weightedSelectPath(paths []pkg.Path) (*pkg.Path, error) {
-	if len(paths) == 0 {
-		return nil, fmt.Errorf("paths slice is empty")
-	}
-
-	// Calculate the total weight
-	totalWeight := 0
-	for _, path := range paths {
-		totalWeight += path.Weight
-	}
-
-	// Generate a random number between 0 and totalWeight-1
-	rand.Seed(time.Now().UnixNano())
-	r := rand.Intn(totalWeight)
-
-	// Find the path corresponding to the random number
-	runningWeight := 0
-	for _, path := range paths {
-		runningWeight += path.Weight
-		if r < runningWeight {
-			return &path, nil
-		}
-	}
-
-	return nil, fmt.Errorf("error selecting path")
 }
 
 func getGValue(r *http.Request) string {

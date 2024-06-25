@@ -3,9 +3,11 @@ package pkg
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"strconv"
 
 	"github.com/EricFrancis12/evoclick/prisma/db"
+	"github.com/mileusna/useragent"
 )
 
 func (s *Storer) GetAllFlows(ctx context.Context) ([]Flow, error) {
@@ -40,6 +42,36 @@ func (s *Storer) GetFlowById(ctx context.Context, id int) (Flow, error) {
 	defer SaveKeyToRedis(ctx, s.Cache, key, fl)
 
 	return fl, nil
+}
+
+// Checks if the click triggered any rule routes, and if not returns the main route
+func (f *Flow) SelectViewRoute(r *http.Request, userAgent useragent.UserAgent, ipInfoData IPInfoData) Route {
+	route := f.MainRoute
+	for _, ruleRoute := range f.RuleRoutes {
+		if !ruleRoute.IsActive {
+			continue
+		}
+		if ruleRoute.ViewDoesTrigger(r, userAgent, ipInfoData) {
+			route = ruleRoute
+			break
+		}
+	}
+	return route
+}
+
+// Checks if the click triggered any rule routes, and if not returns the main route
+func (f *Flow) SelectClickRoute(click Click) Route {
+	route := f.MainRoute
+	for _, ruleRoute := range f.RuleRoutes {
+		if !ruleRoute.IsActive {
+			continue
+		}
+		if ruleRoute.ClickDoesTrigger(click) {
+			route = ruleRoute
+			break
+		}
+	}
+	return route
 }
 
 func formatFlow(model *db.FlowModel) Flow {

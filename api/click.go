@@ -15,7 +15,6 @@ func Click(w http.ResponseWriter, r *http.Request) {
 	storer := pkg.NewStorer()
 	storer.Renew()
 
-	// campaignPublicId := getCookieValue(r, pkg.CookieNameCampaignPublicId)
 	clickPublicId := getCookieValue(r, pkg.CookieNameClickPublicID)
 
 	if clickPublicId == "" {
@@ -24,61 +23,29 @@ func Click(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var (
-		campaign pkg.Campaign
-		flow     pkg.Flow
-		offer    pkg.Offer
-		click    pkg.Click
-	)
-
-	cl, err := storer.GetClickByPublicId(ctx, clickPublicId)
+	click, err := storer.GetClickByPublicId(ctx, clickPublicId)
 	if err != nil {
 		fmt.Println("error fetching click by Public ID: " + err.Error())
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
-	} else {
-		click = cl
 	}
 
-	c, err := storer.GetCampaignById(ctx, click.CampaignID)
+	campaign, err := storer.GetCampaignById(ctx, click.CampaignID)
 	if err != nil {
 		fmt.Println("error fetching campaign by ID: " + err.Error())
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
-	} else {
-		campaign = c
 	}
 
-	fl, err := storer.GetFlowById(ctx, click.FlowID)
+	flow, err := storer.GetFlowById(ctx, click.FlowID)
 	if err != nil {
 		fmt.Println("error fetching flow by ID: " + err.Error())
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
-	} else {
-		flow = fl
 	}
 
-	// See if we triggered any rule routes
-	// If not, we are going using the main route
-	route := flow.MainRoute
-	for _, ruleRoute := range flow.RuleRoutes {
-		if !ruleRoute.IsActive {
-			continue
-		}
-		if ruleRoute.ClickDoesTrigger(click) {
-			route = ruleRoute
-			break
-		}
-	}
-
-	// Filter out the active paths
-	activePaths := pkg.FilterSlice[pkg.Path](route.Paths, func(p pkg.Path) bool {
-		return p.IsActive
-	})
-
-	// Determine what path we are going down,
-	// factoring in the weight of each one
-	path, err := weightedSelectPath(activePaths)
+	route := flow.SelectClickRoute(click)
+	path, err := route.WeightedSelectPath()
 	if err != nil {
 		fmt.Println("error selecting path: " + err.Error())
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
@@ -92,15 +59,14 @@ func Click(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	o, err := storer.GetOfferById(ctx, oID)
+	offer, err := storer.GetOfferById(ctx, oID)
 	if err != nil {
 		fmt.Println("error fetching offer by ID: " + err.Error())
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
-	} else {
-		offer = o
-		http.Redirect(w, r, offer.URL, http.StatusTemporaryRedirect)
 	}
+
+	http.Redirect(w, r, offer.URL, http.StatusTemporaryRedirect)
 
 	// Update clickTime and clickOutputUrl
 	updatedClick := updateClick(click, timestamp, offer.URL)
