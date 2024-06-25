@@ -49,10 +49,6 @@ func T(w http.ResponseWriter, r *http.Request) {
 
 	publicClickId := uuid.New().String()
 
-	// Set cookies for campaign public ID and click public ID
-	setCookie(w, pkg.CookieNameCampaignPublicId, campaign.PublicID)
-	setCookie(w, pkg.CookieNameClickPublicId, publicClickId)
-
 	var (
 		ipInfoData     pkg.IPInfoData
 		receivedIpInfo = false
@@ -99,6 +95,14 @@ func T(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// If the flow type is missing, redirect to the catch-all url
 		dest = makeCatchAllDest()
+	}
+
+	// If we are sending them to a landing page,
+	// set cookies for campaign public ID and click public ID
+	// to be retrieved later at /click
+	if dest.Type == DestTypeLandingPage {
+		setCookie(w, pkg.CookieNameCampaignPublicId, campaign.PublicID)
+		setCookie(w, pkg.CookieNameClickPublicId, publicClickId)
 	}
 
 	http.Redirect(w, r, dest.URL, http.StatusTemporaryRedirect)
