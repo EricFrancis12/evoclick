@@ -37,12 +37,12 @@ model Click {
   clickOutputUrl     String?
   tokens             String
   ip                 String
-  isp                String
+  isp                String?
   userAgent          String
   language           String
-  country            String
-  region             String
-  city               String
+  country            String?
+  region             String?
+  city               String?
   deviceType         String
   device             String
   screenResolution   String

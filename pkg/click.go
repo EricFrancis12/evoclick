@@ -70,17 +70,18 @@ func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationRe
 		clickTokensStr = string(jsonData)
 	}
 
-	optionalParams := []db.ClickSetParam{
-		// Optional parameters that CAN accept default values:
-		db.Click.ClickTime.Set(creationReq.ClickTime),
-		db.Click.ConvTime.Set(creationReq.ConvTime),
-		db.Click.ClickOutputURL.Set(creationReq.ClickOutputURL),
-	}
-
+	optionalParams := []db.ClickSetParam{}
 	// Optional parameters that CANNOT accept default values, so they should be ommitted if they are 0
-	appendIfNotZero(optionalParams, db.Click.AffiliateNetwork.Link(db.AffiliateNetwork.ID.Equals(creationReq.AffiliateNetworkID)), creationReq.AffiliateNetworkID)
-	appendIfNotZero(optionalParams, db.Click.LandingPage.Link(db.LandingPage.ID.Equals(creationReq.LandingPageID)), creationReq.LandingPageID)
-	appendIfNotZero(optionalParams, db.Click.Offer.Link(db.Offer.ID.Equals(creationReq.OfferID)), creationReq.OfferID)
+	appendIfTrue(optionalParams, db.Click.ClickTime.Set(creationReq.ClickTime), creationReq.ClickTime.IsZero())
+	appendIfTrue(optionalParams, db.Click.ConvTime.Set(creationReq.ConvTime), creationReq.ConvTime.IsZero())
+	appendIfTrue(optionalParams, db.Click.ClickOutputURL.Set(creationReq.ClickOutputURL), creationReq.ClickOutputURL != "")
+	appendIfTrue(optionalParams, db.Click.Isp.Set(creationReq.Isp), creationReq.Isp != "")
+	appendIfTrue(optionalParams, db.Click.Country.Set(creationReq.Country), creationReq.Country != "")
+	appendIfTrue(optionalParams, db.Click.Region.Set(creationReq.Region), creationReq.Region != "")
+	appendIfTrue(optionalParams, db.Click.City.Set(creationReq.City), creationReq.City != "")
+	appendIfTrue(optionalParams, db.Click.AffiliateNetwork.Link(db.AffiliateNetwork.ID.Equals(creationReq.AffiliateNetworkID)), creationReq.AffiliateNetworkID != 0)
+	appendIfTrue(optionalParams, db.Click.LandingPage.Link(db.LandingPage.ID.Equals(creationReq.LandingPageID)), creationReq.LandingPageID != 0)
+	appendIfTrue(optionalParams, db.Click.Offer.Link(db.Offer.ID.Equals(creationReq.OfferID)), creationReq.OfferID != 0)
 
 	model, err := s.Client.Click.CreateOne(
 		// Mandatory parameters:
@@ -90,14 +91,9 @@ func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationRe
 		db.Click.ViewTime.Set(creationReq.ViewTime),
 		db.Click.ViewOutputURL.Set(creationReq.ViewOutputURL),
 		db.Click.Tokens.Set(clickTokensStr),
-		// TODO: Determine what other parameters below can be optional
 		db.Click.IP.Set(creationReq.IP),
-		db.Click.Isp.Set(creationReq.Isp),
 		db.Click.UserAgent.Set(creationReq.UserAgent),
 		db.Click.Language.Set(creationReq.Language),
-		db.Click.Country.Set(creationReq.Country),
-		db.Click.Region.Set(creationReq.Region),
-		db.Click.City.Set(creationReq.City),
 		db.Click.DeviceType.Set(creationReq.DeviceType),
 		db.Click.Device.Set(creationReq.Device),
 		db.Click.ScreenResolution.Set(creationReq.ScreenResolution),
@@ -108,6 +104,7 @@ func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationRe
 		db.Click.Campaign.Link(db.Campaign.ID.Equals(creationReq.CampaignID)),
 		db.Click.Flow.Link(db.Flow.ID.Equals(creationReq.FlowID)),
 		db.Click.TrafficSource.Link(db.TrafficSource.ID.Equals(creationReq.TrafficSourceID)),
+		// Optional parameters:
 		optionalParams...,
 	).Exec(ctx)
 	if err != nil {
@@ -117,8 +114,8 @@ func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationRe
 	return formatClick(model), nil
 }
 
-func appendIfNotZero(params []db.ClickSetParam, p db.ClickSetParam, i int) []db.ClickSetParam {
-	if i != 0 {
+func appendIfTrue(params []db.ClickSetParam, p db.ClickSetParam, condition bool) []db.ClickSetParam {
+	if condition {
 		params = append(params, p)
 	}
 	return params
