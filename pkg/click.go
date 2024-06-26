@@ -139,8 +139,8 @@ func (s *Storer) UpsertClickById(ctx context.Context, id int, click Click) (Clic
 func makeOptParams(cp ClickCreationReq) []db.ClickSetParam {
 	optParams := []db.ClickSetParam{}
 	// Optional parameters that CANNOT accept default values, so they should be ommitted if they are 0
-	optParams = appendIfTrue(optParams, db.Click.ClickTime.Set(cp.ClickTime), cp.ClickTime.IsZero())
-	optParams = appendIfTrue(optParams, db.Click.ConvTime.Set(cp.ConvTime), cp.ConvTime.IsZero())
+	optParams = appendIfTrue(optParams, db.Click.ClickTime.Set(cp.ClickTime), !cp.ClickTime.IsZero())
+	optParams = appendIfTrue(optParams, db.Click.ConvTime.Set(cp.ConvTime), !cp.ConvTime.IsZero())
 	optParams = appendIfTrue(optParams, db.Click.ClickOutputURL.Set(cp.ClickOutputURL), cp.ClickOutputURL != "")
 	optParams = appendIfTrue(optParams, db.Click.Isp.Set(cp.Isp), cp.Isp != "")
 	optParams = appendIfTrue(optParams, db.Click.Country.Set(cp.Country), cp.Country != "")
