@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My First Landing Page</title>
+
+    <style>
+        * {
+            font-family: Arial, Helvetica, sans-serif;
+            color: black;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1em;
+        }
+
+        body>* {
+            margin-bottom: 2em;
+            text-align: center;
+        }
+
+        .evoclick-link {
+            color: blue;
+        }
+
+        .btn {
+            padding-top: 1em;
+            padding-bottom: 1em;
+            padding-left: 2em;
+            padding-right: 2em;
+            background-color: #45df45;
+            border: solid black 1px;
+            border-radius: 15px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            opacity: 0.7;
+        }
+
+        #host {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>My First Landing Page</h1>
+    <h2>This is a sample Landing Page from
+        <a href="https://github.com/EricFrancis12/evoclick" target="_blank" class="evoclick-link">EvoClick</a>
+    </h2>
+    <p>Click the button below to be taken to the Click URL:</p>
+    <a href="/click" class="btn">
+        Click Here
+    </a>
+    <p id="host"></p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const hostElement = document.getElementById('host');
+            hostElement.insertAdjacentHTML('beforeend', `(${hostnameAndPort()}/click)`);
+        });
+
+        function hostnameAndPort() {
+            const { hostname, port } = window.location;
+            if (!port || port === ':') {
+                return hostname;
+            }
+            if (port[0] === ':') {
+                return `${hostname}${port}`;
+            }
+            return `${hostname}:${port}`;
+        }
+    </script>
+</body>
+
+</html>

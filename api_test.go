@@ -9,16 +9,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestTHandler(t *testing.T) {
+	assert.True(t, isValidHandler(handler.T))
+}
+
 func TestClickHandler(t *testing.T) {
 	assert.True(t, isValidHandler(handler.Click))
 }
 
 func TestPostbackHandler(t *testing.T) {
 	assert.True(t, isValidHandler(handler.Postback))
-}
-
-func TestTHandler(t *testing.T) {
-	assert.True(t, isValidHandler(handler.T))
 }
 
 func isValidHandler(handler http.HandlerFunc) bool {

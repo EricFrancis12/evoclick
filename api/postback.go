@@ -41,6 +41,8 @@ func Postback(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("error encoding JSON: " + err.Error())
 	}
+
+	// TODO: Create the traffic source postback URL and make an http request to it
 }
 
 func convertClick(click pkg.Click, convTime time.Time, revenue int) pkg.Click {

@@ -41,9 +41,21 @@ func (s *APIServer) Run() error {
 	router.HandleFunc("/click", handler.Click)
 	router.HandleFunc("/postback", handler.Postback)
 	router.HandleFunc("/t", handler.T)
+	router.HandleFunc("/sample-landing-page", HandleSampleLandingPage)
 	router.HandleFunc("/test", handler.Test)
 
 	log.Println("Dev API running on port", s.listenAddr)
 
 	return http.ListenAndServe(s.listenAddr, router)
+}
+
+func HandleSampleLandingPage(w http.ResponseWriter, r *http.Request) {
+	fpath := "./assets/sample-landing-page.html"
+	htmlContent, err := os.ReadFile(fpath)
+	if err != nil {
+		http.Error(w, "error reading HTML file at: "+fpath, http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "text/html")
+	w.Write(htmlContent)
 }

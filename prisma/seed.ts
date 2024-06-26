@@ -3,49 +3,67 @@
 // uses ts-node under the hood,
 // and it's not able to recognize that syntax in the current tsconfig.
 import prisma from '../src/lib/db';
-import bcrypt from 'bcrypt';
-import { TAffiliateNetwork_createRequest } from '../src/lib/types';
-import { SALT_ROUNDS } from '../src/lib/constants';
-
-const affiliateNetworks: TAffiliateNetwork_createRequest[] = [
-    {
-        name: 'Max Bounty',
-        tags: [],
-        defaultNewOfferString: ''
-    },
-    {
-        name: 'CPA Grip',
-        tags: [],
-        defaultNewOfferString: ''
-    },
-    {
-        name: 'Perform CB',
-        tags: [],
-        defaultNewOfferString: ''
-    }
-];
+import {
+    affiliateNetworkSeedData, campaignSeedData, flowSeedData,
+    landingPageSeedData, offerSeedData, trafficSourceData
+} from './seedData';
 
 async function main() {
-    if (!process.env.ROOT_USERNAME || !process.env.ROOT_PASSWORD) {
-        throw new Error('ROOT_USERNAME and ROOT_PASSWORD are required');
-    }
-
-    const hashedPassword = await bcrypt.hash(process.env.ROOT_PASSWORD, SALT_ROUNDS);
-    await prisma.user.create({
-        data: {
-            name: process.env.ROOT_USERNAME,
-            hashedPassword
-        }
+    const affiliateNetwork = await prisma.affiliateNetwork.create({
+        data: affiliateNetworkSeedData,
     });
 
-    await prisma.affiliateNetwork.createMany({
-        data: affiliateNetworks
+    const offer = await prisma.offer.create({
+        data: {
+            ...offerSeedData,
+            affiliateNetworkId: affiliateNetwork.id,
+        },
+    });
+
+    const landingPage = await prisma.landingPage.create({
+        data: landingPageSeedData,
+    });
+
+    const flow = await prisma.flow.create({
+        data: {
+            ...flowSeedData,
+            mainRoute: JSON.stringify({
+                ...flowSeedData.mainRoute,
+                paths: [
+                    {
+                        directLinkingEnabled: false,
+                        isActive: true,
+                        landingPageIds: [landingPage.id],
+                        offerIds: [offer.id],
+                        weight: 100,
+                    },
+                ],
+            }),
+            ruleRoutes: JSON.stringify(flowSeedData.ruleRoutes),
+        },
+    });
+
+    const trafficSource = await prisma.trafficSource.create({
+        data: {
+            ...trafficSourceData,
+            externalIdToken: JSON.stringify(trafficSourceData.externalIdToken),
+            costToken: JSON.stringify(trafficSourceData.costToken),
+            customTokens: JSON.stringify(trafficSourceData.customTokens),
+        },
+    });
+
+    await prisma.campaign.create({
+        data: {
+            ...campaignSeedData,
+            flowId: flow.id,
+            trafficSourceId: trafficSource.id,
+        },
     });
 }
 
 main()
-    .catch(e => {
-        console.error(e);
+    .catch(err => {
+        console.error(err);
         process.exit(1);
     })
     .finally(async () => {
