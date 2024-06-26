@@ -55,7 +55,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 
 	// Fetch IP Info
 	ipInfoToken := os.Getenv("IP_INFO_TOKEN")
-	if ipInfoToken != "" && pkg.RulesNeedIpInfo(flow.RuleRoutes) {
+	if ipInfoToken != "" && flow.RulesNeedIpInfo() {
 		data, err := pkg.FetchIpInfo(r.RemoteAddr, ipInfoToken)
 		if err != nil {
 			fmt.Println("error fetching IP Info: " + err.Error())

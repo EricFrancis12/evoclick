@@ -16,7 +16,6 @@ func Click(w http.ResponseWriter, r *http.Request) {
 	storer.Renew()
 
 	clickPublicId := getCookieValue(r, pkg.CookieNameClickPublicID)
-
 	if clickPublicId == "" {
 		fmt.Println("no public Click ID found")
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)

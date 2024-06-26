@@ -2,11 +2,10 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
-	"os"
 
 	"github.com/EricFrancis12/evoclick/pkg"
 )
@@ -21,25 +20,21 @@ type Response struct {
 }
 
 func Test(w http.ResponseWriter, r *http.Request) {
-	ipInfoToken := os.Getenv("IP_INFO_TOKEN")
-	endpoint := "https://ipinfo.io/" + "24.53.137.36" + "?token=" + ipInfoToken
-	resp, err := http.Get(endpoint)
+	resp, err := pkg.HttpClient.Get("https://barstoolsports.com/werwerwer")
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
+	log.Println(string(body))
 
-	fmt.Println(body)
-	fmt.Println(string(body))
-
-	ipInfoData, err := pkg.ParseJSON[pkg.IPInfoData](string(body))
+	v, err := pkg.ParseJSON[pkg.IPInfoData](string(body))
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	jsonEncoder := json.NewEncoder(w)
@@ -50,7 +45,7 @@ func Test(w http.ResponseWriter, r *http.Request) {
 		QueryStrings: r.URL.Query(),
 		Method:       r.Method,
 		Message:      "Hello from ./api/test.go",
-		Data:         ipInfoData,
+		Data:         v,
 	}
 
 	if err := jsonEncoder.Encode(debugResponse); err != nil {

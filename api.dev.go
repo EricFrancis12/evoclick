@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	handler "github.com/EricFrancis12/evoclick/api"
 	"github.com/gorilla/mux"
@@ -20,13 +21,21 @@ func NewAPIServer(listenAddr string) *APIServer {
 }
 
 func main() {
-	godotenv.Load(".env.local", ".env")
+	if err := godotenv.Load(".env.local", ".env"); err != nil {
+		log.Fatal("error loading .env files: " + err.Error())
+	}
+	if err := os.Setenv("NODE_ENV", "development"); err != nil {
+		log.Fatal("error setting ENV: " + err.Error())
+	}
 
 	server := NewAPIServer(":3001")
-	server.Run()
+	err := server.Run()
+	if err != nil {
+		log.Fatal("error starting Dev API: " + err.Error())
+	}
 }
 
-func (s *APIServer) Run() {
+func (s *APIServer) Run() error {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/click", handler.Click)
@@ -36,5 +45,5 @@ func (s *APIServer) Run() {
 
 	log.Println("Dev API running on port", s.listenAddr)
 
-	http.ListenAndServe(s.listenAddr, router)
+	return http.ListenAndServe(s.listenAddr, router)
 }

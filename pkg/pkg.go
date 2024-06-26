@@ -1,112 +1,86 @@
 package pkg
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
-	"time"
+	"regexp"
+	"strings"
 
-	"github.com/EricFrancis12/evoclick/prisma/db"
 	"github.com/mileusna/useragent"
-	"github.com/redis/go-redis/v9"
 )
 
-type Storer struct {
-	Client        *db.PrismaClient
-	PrismaRenewal time.Time
-	Cache         *redis.Client
-	RedisRenewal  time.Time
+var HttpClient = NewCustomClient()
+
+type CustomClient struct {
+	Client http.Client
 }
 
-func NewStorer() *Storer {
-	return &Storer{}
+func NewCustomClient() *CustomClient {
+	return &CustomClient{
+		Client: http.Client{
+			Transport: &customTransport{
+				rt: http.DefaultTransport,
+			},
+		},
+	}
 }
 
-func (s *Storer) Renew() {
-	if s.Client == nil {
-		s.Client = db.NewClient()
-		s.PrismaRenewal = time.Now()
-		fmt.Println("Created Prisma client")
-	}
+func (cc *CustomClient) Get(url string) (*http.Response, error) {
+	return cc.Client.Get(url)
+}
 
-	if err := s.Client.Prisma.Connect(); err != nil {
-		fmt.Println("error connecting to db:", err.Error())
-	} else {
-		fmt.Println("Connected to db")
-	}
+type customTransport struct {
+	rt http.RoundTripper
+}
 
-	if s.Cache == nil {
-		connStr := os.Getenv("REDIS_URL")
-		if connStr == "" {
-			return
+var DummyDataMap = map[string]any{
+	"ipinfo.io*": IPInfoData{
+		IP:       "12.34.567.8",
+		Hostname: "any.subdomains.hostname.com",
+		City:     "Aarhus",
+		Region:   "Central Jutland",
+		Country:  "DK",
+		Loc:      "95.1567,34.2108",
+		Org:      "AS6SB9 Telenor A/S",
+		Postal:   "4883",
+		Timezone: "Europe/Copenhagen",
+	},
+}
+
+func (ct *customTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if os.Getenv("NODE_ENV") == "development" {
+		for regex, val := range DummyDataMap {
+			b := []byte(req.URL.String())
+			if matched, _ := regexp.Match(regex, b); matched {
+				log.Println("Responding with dummy data")
+				return createJSONResp(val), nil
+			}
 		}
+	}
+	return ct.rt.RoundTrip(req)
+}
 
-		opt, err := redis.ParseURL(connStr)
-		if err != nil {
-			fmt.Println("error parsing Redis connection string:", err.Error())
-			return
-		}
-
-		s.Cache = redis.NewClient(opt)
-		s.RedisRenewal = time.Now()
-		fmt.Println("Created Redis client")
+func createJSONResp(v any) *http.Response {
+	bytes, _ := json.Marshal(v)
+	body := io.NopCloser(strings.NewReader(string(bytes)))
+	return &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       body,
+		Header:     make(http.Header),
 	}
 }
 
-func CheckRedisForKey[T any](ctx context.Context, cache *redis.Client, key string) (*T, error) {
-	if cache == nil {
-		return nil, fmt.Errorf("cache has not been created")
-	}
-
-	// Check redis cache for this key
-	cachedResult, err := cache.Get(ctx, key).Result()
-	if err != nil {
-		return nil, fmt.Errorf("error fetching from cache: " + err.Error())
-	}
-
-	// If found in the cache, parse and return it
-	t, err := ParseJSON[T](cachedResult)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing JSON: " + err.Error())
-	}
-
-	return &t, nil
-}
-
-func SaveKeyToRedis(ctx context.Context, cache *redis.Client, key string, v any) error {
-	jsonData, err := json.Marshal(v)
-	if err != nil {
-		return fmt.Errorf("error marshalling to JSON: %s", err)
-	}
-	_, err = cache.Set(ctx, key, string(jsonData), time.Millisecond*1000*60).Result()
-	if err != nil {
-		return fmt.Errorf("error saving to Redis cache: %s", err)
-	}
-	return nil
-}
-
-var ipBlacklist = []string{
-	"[::1]*",
-}
-
-// TODO: Fix bug where an initiated IPInfoData is not being returned from FetchIpInfo()
 func FetchIpInfo(ipAddr string, ipInfoToken string) (IPInfoData, error) {
 	if ipAddr == "" || ipInfoToken == "" {
 		return IPInfoData{}, fmt.Errorf(emptyStringError)
 	}
-	isMatch, err := matchValAgainstRegexSlice(ipBlacklist, ipAddr)
-	if err != nil {
-		return IPInfoData{}, err
-	}
-	if isMatch {
-		return IPInfoData{}, fmt.Errorf(makeBlacklistErr(ipAddr))
-	}
 
 	endpoint := "https://ipinfo.io/" + ipAddr + "?token=" + ipInfoToken
-	resp, err := http.Get(endpoint)
+	resp, err := HttpClient.Get(endpoint)
 	if err != nil {
 		return IPInfoData{}, err
 	}
@@ -126,10 +100,6 @@ func FetchIpInfo(ipAddr string, ipInfoToken string) (IPInfoData, error) {
 }
 
 const emptyStringError = "ip address and IP Info Token cannot be empty"
-
-func makeBlacklistErr(ipAddr string) string {
-	return "ip address: \"" + ipAddr + "\" found on blacklist"
-}
 
 func GetDeviceType(ua useragent.UserAgent) DeviceType {
 	if ua.Desktop {

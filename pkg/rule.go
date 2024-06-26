@@ -62,24 +62,3 @@ func (rm RulesMap) checkForMatch(rule Rule) bool {
 	}
 	return false
 }
-
-func RulesNeedIpInfo(routes []Route) bool {
-	ipInfoNeeded := make(map[RuleName]bool)
-
-	// An API call is needed to obtain this data:
-	ipInfoNeeded[RuleNameRegion] = true
-	ipInfoNeeded[RuleNameCountry] = true
-	ipInfoNeeded[RuleNameCity] = true
-	ipInfoNeeded[RuleNameISP] = true
-
-	// Loop over all rules to determine if there are
-	// any rules that require an API call
-	for _, route := range routes {
-		for _, rule := range route.Rules {
-			if ipInfoNeeded[rule.RuleName] {
-				return true
-			}
-		}
-	}
-	return false
-}

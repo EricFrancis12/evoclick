@@ -9,8 +9,7 @@ import (
 func TestParseJSON(t *testing.T) {
 	t.Run("Parse JSON into map", func(t *testing.T) {
 		jsonStr := `{"name": "John", "age": 30}`
-		var expected map[string]interface{}
-		expected = map[string]interface{}{"name": "John", "age": float64(30)}
+		expected := map[string]interface{}{"name": "John", "age": float64(30)}
 
 		result, err := ParseJSON[map[string]interface{}](jsonStr)
 		assert.NoError(t, err)
@@ -83,9 +82,4 @@ func TestFetchIpInfo(t *testing.T) {
 	ipInfo3, err := FetchIpInfo("", "myipinfotoken")
 	assert.Equal(t, ipInfo3.Country, "")
 	assert.NotNil(t, err)
-}
-
-func TestIpBlacklist(t *testing.T) {
-	// Having an empty string on the blacklist was causing the regex to return a false positive
-	assert.False(t, sliceIncludes(ipBlacklist, ""))
 }

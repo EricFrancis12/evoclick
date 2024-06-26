@@ -74,6 +74,27 @@ func (f *Flow) SelectClickRoute(click Click) Route {
 	return route
 }
 
+// An API call is needed to obtain this data:
+var ipInfoNeeded = map[RuleName]bool{
+	RuleNameRegion:  true,
+	RuleNameCountry: true,
+	RuleNameCity:    true,
+	RuleNameISP:     true,
+}
+
+func (f *Flow) RulesNeedIpInfo() bool {
+	// Loop over all rules to determine if there are
+	// any rules that require an API call
+	for _, route := range f.RuleRoutes {
+		for _, rule := range route.Rules {
+			if ipInfoNeeded[rule.RuleName] {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func formatFlow(model *db.FlowModel) Flow {
 	var (
 		mainRoute  = getRoute(model.MainRoute)
