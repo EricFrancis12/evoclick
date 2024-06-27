@@ -1,0 +1,43 @@
+name: End-To-End Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.17.0
+
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '^1.22.3'
+
+    - name: Run docker-compose
+      uses: hoverkraft-tech/compose-action@v2.0.1
+      with:
+        compose-file: './docker-compose.yml'
+
+    - run: npm ci
+
+    - run: prisma generate
+    - run: make db push
+    - run: make seed
+
+    - run: npm run build
+
+    - run: make dev api
+    - run: npm start
+    
+    - run: npm run e2e
+    
