@@ -25,7 +25,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 		// If g is not specified we have no way of fetching the campaign,
 		// so redirect to the catch-all url
 		fmt.Println("g not specified")
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, pkg.CatchAllUrl("8"), http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -33,7 +33,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// If campaign not found, redirect the visitor to the catch-all url
 		fmt.Println("error fetching Campaign by public ID: " + err.Error())
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, pkg.CatchAllUrl("9"), http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -41,7 +41,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// If flow not found, redirect the visitor to the catch-all url
 		fmt.Println("error fetching Flow: " + err.Error())
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, pkg.CatchAllUrl("10"), http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -259,7 +259,7 @@ func setCookie(w http.ResponseWriter, name pkg.CookieName, value string) {
 func catchAllDest() Destination {
 	return Destination{
 		Type: DestTypeCatchAll,
-		URL:  pkg.CatchAllUrl(),
+		URL:  pkg.CatchAllUrl("11"),
 	}
 }
 

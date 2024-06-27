@@ -136,10 +136,10 @@ func InitMakeRedisKey(prefix string) RedisKeyFunc {
 	}
 }
 
-func CatchAllUrl() string {
+func CatchAllUrl(src string) string {
 	catchAllUrl := os.Getenv("CATCH_ALL_REDIRECT_URL")
 	if catchAllUrl == "" {
-		return "https://bing.com"
+		return "https://bing.com?src=" + src
 	}
-	return catchAllUrl
+	return catchAllUrl + "?src=" + src
 }

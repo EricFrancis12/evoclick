@@ -18,28 +18,28 @@ func Click(w http.ResponseWriter, r *http.Request) {
 	clickPublicId := getCookieValue(r, pkg.CookieNameClickPublicID)
 	if clickPublicId == "" {
 		fmt.Println("no public Click ID found")
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, pkg.CatchAllUrl("1"), http.StatusTemporaryRedirect)
 		return
 	}
 
 	click, err := storer.GetClickByPublicId(ctx, clickPublicId)
 	if err != nil {
 		fmt.Println("error fetching click by Public ID: " + err.Error())
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, pkg.CatchAllUrl("2"), http.StatusTemporaryRedirect)
 		return
 	}
 
 	campaign, err := storer.GetCampaignById(ctx, click.CampaignID)
 	if err != nil {
 		fmt.Println("error fetching campaign by ID: " + err.Error())
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, pkg.CatchAllUrl("3"), http.StatusTemporaryRedirect)
 		return
 	}
 
 	flow, err := storer.GetFlowById(ctx, click.FlowID)
 	if err != nil {
 		fmt.Println("error fetching flow by ID: " + err.Error())
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, pkg.CatchAllUrl("4"), http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -47,21 +47,21 @@ func Click(w http.ResponseWriter, r *http.Request) {
 	path, err := route.WeightedSelectPath()
 	if err != nil {
 		fmt.Println("error selecting path: " + err.Error())
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, pkg.CatchAllUrl("5"), http.StatusTemporaryRedirect)
 		return
 	}
 
 	oID, err := selectIdUsingRotType[pkg.Offer](path.OfferIDs, campaign.OfferRotationType)
 	if err != nil {
 		fmt.Println("error selecting Offer ID: " + err.Error())
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, pkg.CatchAllUrl("6"), http.StatusTemporaryRedirect)
 		return
 	}
 
 	offer, err := storer.GetOfferById(ctx, oID)
 	if err != nil {
 		fmt.Println("error fetching offer by ID: " + err.Error())
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, pkg.CatchAllUrl("7"), http.StatusTemporaryRedirect)
 		return
 	}
 
