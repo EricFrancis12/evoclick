@@ -4,11 +4,11 @@ services:
       context: ./
       dockerfile: ./Dockerfile
     ports:
-      - '3000:3000'
+      - "3000:3000"
 
   dev-api:
     build:
       context: ./
       dockerfile: ./Dockerfile.api.dev
     ports:
-      - '3001:3001'
+      - "3001:3001"

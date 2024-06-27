@@ -5,6 +5,5 @@ COPY go.mod .
 RUN go mod download
 # TODO: Optimize COPY command so that only necessary files are copied
 COPY . .
-RUN go build -o ./output/bin
 EXPOSE 3001
-CMD ["/build/output/bin"]
+CMD ["go", "run", "api.dev.go"]
