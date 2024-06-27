@@ -7,7 +7,7 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
-        "test": "jest && @go test ./... -v",
+        "test": "jest && go test ./... -v",
         "e2e": "npx cypress run",
         "vercel-install": "npm install && yum install golang -y",
         "vercel-build": "prisma generate && next build",
