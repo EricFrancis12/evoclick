@@ -1,0 +1,41 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+    color: black;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1em;
+}
+
+body>* {
+    margin-bottom: 2em;
+    text-align: center;
+}
+
+.evoclick-link {
+    color: blue;
+}
+
+.btn {
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding-left: 2em;
+    padding-right: 2em;
+    background-color: #45df45;
+    border: solid black 1px;
+    border-radius: 15px;
+    text-decoration: none;
+}
+
+.btn:hover {
+    opacity: 0.7;
+}
+
+#host {
+    font-weight: bold;
+}

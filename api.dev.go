@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	handler "github.com/EricFrancis12/evoclick/api"
 	"github.com/gorilla/mux"
@@ -41,7 +42,7 @@ func (s *APIServer) Run() error {
 	router.HandleFunc("/click", handler.Click)
 	router.HandleFunc("/postback", handler.Postback)
 	router.HandleFunc("/t", handler.T)
-	router.HandleFunc("/sample-landing-page", HandleSampleLandingPage)
+	router.HandleFunc("/assets/{file}", HandleAssets)
 	router.HandleFunc("/test", handler.Test)
 
 	log.Println("Dev API running on port", s.listenAddr)
@@ -49,13 +50,30 @@ func (s *APIServer) Run() error {
 	return http.ListenAndServe(s.listenAddr, router)
 }
 
-func HandleSampleLandingPage(w http.ResponseWriter, r *http.Request) {
-	fpath := "./assets/sample-landing-page.html"
-	htmlContent, err := os.ReadFile(fpath)
-	if err != nil {
-		http.Error(w, "error reading HTML file at: "+fpath, http.StatusInternalServerError)
+func HandleAssets(w http.ResponseWriter, r *http.Request) {
+	file := mux.Vars(r)["file"]
+	if file == "" {
+		http.Error(w, "please specify a file", http.StatusBadRequest)
 		return
 	}
-	w.Header().Set("Content-Type", "text/html")
-	w.Write(htmlContent)
+	filepath := "./assets/" + file
+	bytes, err := os.ReadFile(filepath)
+	if err != nil {
+		http.Error(w, "error reading file at: "+filepath, http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", contentType(file))
+	w.Write(bytes)
+}
+
+func contentType(f string) string {
+	spl := strings.Split(f, ".")
+	fext := spl[len(spl)-1]
+	if fext == "html" {
+		return "text/html"
+	}
+	if fext == "css" {
+		return "text/css"
+	}
+	return "text/plain"
 }

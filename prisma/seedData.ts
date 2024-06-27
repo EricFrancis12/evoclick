@@ -11,14 +11,14 @@ export const affiliateNetworkSeedData = {
 
 export const offerSeedData = {
     name: 'My First Offer',
-    url: 'https://bing.com?source=My_First_Offer',
+    url: 'http://localhost:3001/assets/sample-offer.html',
     payout: 80,
     tags,
 };
 
 export const landingPageSeedData = {
     name: 'My First Landing Page',
-    url: 'http://localhost:3001/sample-landing-page',
+    url: 'http://localhost:3001/assets/sample-landing-page.html',
     tags,
 };
 
