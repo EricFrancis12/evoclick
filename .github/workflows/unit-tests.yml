@@ -25,9 +25,13 @@ jobs:
 
     - run: npm ci
 
+    - run: npx prisma generate
+
+    - run: docker build -t evoclick-dev-api .
+    - run: docker run --name evoclick-dev-api -p 3001:3001 -d evoclick-dev-api    
+
     - run: npm run build
 
-    - run: make dev api
     - run: npm start
     
     - run: npm test

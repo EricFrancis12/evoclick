@@ -27,13 +27,14 @@ jobs:
       uses: hoverkraft-tech/compose-action@v2.0.1
       with:
         compose-file: './docker-compose.yml'
-
-    - run: docker build -t evoclick-dev-api .
-    - run: docker run --name evoclick-dev-api -p 3001:3001 -d evoclick-dev-api
     
     - run: npm ci
 
     - run: npx prisma generate
+
+    - run: docker build -t evoclick-dev-api .
+    - run: docker run --name evoclick-dev-api -p 3001:3001 -d evoclick-dev-api
+
     - run: make db push
     - run: make seed
 
