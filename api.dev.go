@@ -27,7 +27,7 @@ func NewAPIServer(listenAddr string) *APIServer {
 }
 
 func main() {
-	if err := godotenv.Load(".env.local", ".env"); err != nil {
+	if err := SafeLoadEnvs(".env.local", ".env"); err != nil {
 		log.Fatal("error loading .env files: " + err.Error())
 	}
 	if err := os.Setenv("NODE_ENV", "development"); err != nil {
@@ -83,6 +83,28 @@ func TCPPortOpen(host string, port string) bool {
 	}
 	defer conn.Close()
 	return true
+}
+
+func SafeLoadEnvs(filenames ...string) error {
+	validFilenames := []string{}
+	for _, fn := range filenames {
+		if fileExists(fn) {
+			validFilenames = append(validFilenames, fn)
+		}
+	}
+	if len(validFilenames) == 0 {
+		fmt.Println("No env files found")
+		return nil
+	}
+	return godotenv.Load(validFilenames...)
+}
+
+func fileExists(filepath string) bool {
+	_, err := os.Stat(filepath)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return err == nil
 }
 
 func contentType(f string) string {

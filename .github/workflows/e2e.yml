@@ -30,7 +30,7 @@ jobs:
 
     - run: npm ci
 
-    - run: prisma generate
+    - run: npx prisma generate
     - run: make db push
     - run: make seed
 
