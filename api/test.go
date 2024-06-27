@@ -2,12 +2,8 @@ package handler
 
 import (
 	"encoding/json"
-	"io"
-	"log"
 	"net/http"
 	"net/url"
-
-	"github.com/EricFrancis12/evoclick/pkg"
 )
 
 // Test response for api routes
@@ -20,22 +16,22 @@ type Response struct {
 }
 
 func Test(w http.ResponseWriter, r *http.Request) {
-	resp, err := pkg.HttpClient.Get("https://barstoolsports.com/werwerwer")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer resp.Body.Close()
+	// resp, err := pkg.HttpClient.Get("https://barstoolsports.com/werwerwer")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println(string(body))
+	// body, err := io.ReadAll(resp.Body)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// log.Println(string(body))
 
-	v, err := pkg.ParseJSON[pkg.IPInfoData](string(body))
-	if err != nil {
-		log.Fatal(err)
-	}
+	// v, err := pkg.ParseJSON[pkg.IPInfoData](string(body))
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	jsonEncoder := json.NewEncoder(w)
 	jsonEncoder.SetIndent("", "  ")
@@ -45,7 +41,6 @@ func Test(w http.ResponseWriter, r *http.Request) {
 		QueryStrings: r.URL.Query(),
 		Method:       r.Method,
 		Message:      "Hello from ./api/test.go",
-		Data:         v,
 	}
 
 	if err := jsonEncoder.Encode(debugResponse); err != nil {

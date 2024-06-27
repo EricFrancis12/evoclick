@@ -28,6 +28,9 @@ jobs:
       with:
         compose-file: './docker-compose.yml'
 
+    - run: docker build -t evoclick-dev-api .
+    - run: docker run --name evoclick-dev-api -p 3001:3001 -d evoclick-dev-api
+    
     - run: npm ci
 
     - run: npx prisma generate
@@ -36,7 +39,6 @@ jobs:
 
     - run: npm run build
 
-    - run: make dev api
     - run: npm start
     
     - run: npm run e2e
