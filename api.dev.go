@@ -1,15 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	handler "github.com/EricFrancis12/evoclick/api"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
+
+const port = "3001"
 
 type APIServer struct {
 	listenAddr string
@@ -29,7 +34,12 @@ func main() {
 		log.Fatal("error setting ENV: " + err.Error())
 	}
 
-	server := NewAPIServer(":3001")
+	if TCPPortOpen("localhost", port) {
+		fmt.Println("TCP port " + port + " is already in use. Dev API exiting gracefully.")
+		os.Exit(0)
+	}
+
+	server := NewAPIServer(":" + port)
 	err := server.Run()
 	if err != nil {
 		log.Fatal("error starting Dev API: " + err.Error())
@@ -64,6 +74,15 @@ func HandleAssets(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", contentType(file))
 	w.Write(bytes)
+}
+
+func TCPPortOpen(host string, port string) bool {
+	conn, err := net.DialTimeout("tcp", net.JoinHostPort(host, port), time.Second)
+	if err != nil {
+		return false
+	}
+	defer conn.Close()
+	return true
 }
 
 func contentType(f string) string {
