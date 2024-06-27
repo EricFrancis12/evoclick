@@ -22,23 +22,15 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: '^1.22.3'
-
-    - name: Run docker-compose
-      uses: hoverkraft-tech/compose-action@v2.0.1
-      with:
-        compose-file: './docker-compose.yml'
     
     - run: npm ci
-
     - run: npx prisma generate
+    - run: npm run build
 
-    - run: docker build -t evoclick-dev-api .
-    - run: docker run --name evoclick-dev-api -p 3001:3001 -d evoclick-dev-api
+    - run: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
     - run: make db push
     - run: make seed
-
-    - run: npm run build
     
     - run: npm run e2e
     

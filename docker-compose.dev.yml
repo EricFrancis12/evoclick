@@ -1,0 +1,10 @@
+services:
+  nexp-app:
+    build: ./Dockerfile
+    ports:
+      - '3000:3000'
+
+  dev-api:
+    build: ./Dockerfile.api.dev
+    ports:
+      - '3001:3001'
