@@ -56,11 +56,11 @@ func T(w http.ResponseWriter, r *http.Request) {
 	// Fetch IP Info
 	ipInfoToken := os.Getenv("IP_INFO_TOKEN")
 	if ipInfoToken != "" && flow.RulesNeedIpInfo() {
-		_data, err := pkg.FetchIpInfo(r.RemoteAddr, ipInfoToken)
+		data, err := pkg.FetchIpInfo(r.RemoteAddr, ipInfoToken)
 		if err != nil {
 			fmt.Println("error fetching IP Info: " + err.Error())
 		} else {
-			ipInfoData = _data
+			ipInfoData = data
 			receivedIpInfo = true
 		}
 	}
@@ -87,11 +87,11 @@ func T(w http.ResponseWriter, r *http.Request) {
 	// If we have an IP Info Token, AND we didn't fetch data before,
 	// fetch the IP Info now
 	if ipInfoToken != "" && !receivedIpInfo {
-		__data, err := pkg.FetchIpInfo(r.RemoteAddr, ipInfoToken)
+		data, err := pkg.FetchIpInfo(r.RemoteAddr, ipInfoToken)
 		if err != nil {
 			fmt.Println("error fetching IP Info: " + err.Error())
 		} else {
-			ipInfoData = __data
+			ipInfoData = data
 			receivedIpInfo = true
 		}
 	}

@@ -10,7 +10,6 @@ COPY go.mod .
 RUN go mod download
 COPY . .
 RUN npx prisma generate
-RUN go build -o ./bin .
 
 EXPOSE 3001
-CMD ["./bin"]
+CMD ["go", "run", "api.dev.go"]
