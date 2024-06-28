@@ -1,5 +1,5 @@
 services:
-  nexp-app:
+  next-app:
     build:
       context: ./
       dockerfile: ./Dockerfile
@@ -13,6 +13,9 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile.api.dev
+    environment:
+      - "POSTGRES_URL=postgresql://postgres:mysecretpassword@postgres:5432/mydb?schema=public"
+      - "REDIS_URL=redis://redis:6379"
     ports:
       - "3001:3001"
     depends_on:
