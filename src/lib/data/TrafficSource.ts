@@ -1,9 +1,9 @@
 import { TrafficSource } from '@prisma/client';
-import { z } from 'zod';
 import cache from '../cache';
 import db from '../db';
-import { trafficSourceSchema, tokenSchema, namedTokenSchema } from '../schemas';
-import { TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest, TToken, TNamedToken } from '../types';
+import { parseToken, parseNamedTokens, makeBoilerplateToken } from '.';
+import { trafficSourceSchema } from '../schemas';
+import { TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest } from '../types';
 import { initMakeRedisKey } from '../utils';
 
 const makeKey = initMakeRedisKey('trafficSource');
@@ -116,22 +116,5 @@ async function makeClientTrafficSource(dbModel: TrafficSource): Promise<TTraffic
         externalIdToken: await externalIdTokenProm,
         costToken: await costTokenProm,
         customTokens: await customTokensProm
-    };
-}
-
-async function parseToken(jsonStr: string): Promise<TToken> {
-    const { success, data } = await tokenSchema.safeParseAsync(jsonStr);
-    return success ? data : makeBoilerplateToken();
-}
-
-async function parseNamedTokens(jsonStr: string): Promise<TNamedToken[]> {
-    const { success, data } = await z.array(namedTokenSchema).safeParseAsync(jsonStr);
-    return success ? data : [];
-}
-
-function makeBoilerplateToken(): TToken {
-    return {
-        queryParam: '',
-        value: ''
     };
 }
