@@ -101,5 +101,7 @@ export enum ERuleName {
 };
 
 export enum ECookieName {
-    JWT = 'jwt'
+    JWT = 'jwt',
+    CAMPAIGN_PUBLIC_ID = 'campaignPublicID',
+    CLICK_PUBLIC_ID = 'clickPublicID',
 }

@@ -20,7 +20,7 @@ func Postback(w http.ResponseWriter, r *http.Request) {
 	storer := pkg.NewStorer()
 	storer.Renew()
 
-	clickPublicId := r.URL.Query().Get("cid")
+	clickPublicId := r.URL.Query().Get("pid")
 	if clickPublicId != "" {
 		// Get click from db
 		click, err := storer.GetClickByPublicId(ctx, clickPublicId)
@@ -33,6 +33,14 @@ func Postback(w http.ResponseWriter, r *http.Request) {
 			if _, err := storer.UpsertClickById(ctx, click.ID, convertedClick); err != nil {
 				fmt.Println("error updating click in db: " + err.Error())
 			}
+
+			trafficSource, err := storer.GetTrafficSourceById(ctx, click.TrafficSourceID)
+			if err != nil {
+				fmt.Println("error fetching traffic source: " + err.Error())
+			}
+			if trafficSource.PostbackURL != "" {
+				go http.Get(trafficSource.FillPostbackURL(click))
+			}
 		}
 	}
 
@@ -41,8 +49,6 @@ func Postback(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("error encoding JSON: " + err.Error())
 	}
-
-	// TODO: Create the traffic source postback URL and make an http request to it
 }
 
 func convertClick(click pkg.Click, convTime time.Time, revenue int) pkg.Click {

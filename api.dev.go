@@ -52,8 +52,9 @@ func (s *APIServer) Run() error {
 	router.HandleFunc("/click", handler.Click)
 	router.HandleFunc("/postback", handler.Postback)
 	router.HandleFunc("/t", handler.T)
-	router.HandleFunc("/assets/{file}", HandleAssets)
 	router.HandleFunc("/test", handler.Test)
+
+	router.HandleFunc("/assets/{file}", HandleAssets)
 
 	log.Println("Dev API running on port", s.listenAddr)
 

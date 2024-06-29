@@ -57,7 +57,7 @@ export const trafficSourceData = {
         },
     ],
     name: 'My First Traffic Source',
-    postbackUrl: '',
+    postbackUrl: 'http://localhost:3001/postback/test',
     tags,
 };
 
