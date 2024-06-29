@@ -9,17 +9,17 @@ import (
 	"github.com/mileusna/useragent"
 )
 
-// TODO: Create a way to merge ViewDoesTrigger with ClickDoesTrigger
+type DoesTriggerRuleFunc func(rule Rule) bool
 
-// Determine if the view triggers any rules in this route
-func (route Route) ViewDoesTrigger(r *http.Request, ua useragent.UserAgent, ipInfoData IPInfoData) bool {
+// Determine if any rule in this route triggers based on a given condition
+func (route Route) doesTrigger(condition DoesTriggerRuleFunc) bool {
 	if !route.IsActive {
 		return false
 	}
 
 	bools := []bool{}
 	for _, rule := range route.Rules {
-		bools = append(bools, rule.ViewDoesTrigger(r, ua, ipInfoData))
+		bools = append(bools, condition(rule))
 	}
 
 	if route.LogicalRelation == LogicalRelationAnd {
@@ -35,28 +35,18 @@ func (route Route) ViewDoesTrigger(r *http.Request, ua useragent.UserAgent, ipIn
 	return false
 }
 
+// Determine if the view triggers any rules in this route
+func (route Route) ViewDoesTrigger(r *http.Request, ua useragent.UserAgent, ipInfoData IPInfoData) bool {
+	return route.doesTrigger(func(rule Rule) bool {
+		return rule.ViewDoesTrigger(r, ua, ipInfoData)
+	})
+}
+
 // Determine if the click triggers any rules in this route
 func (route Route) ClickDoesTrigger(click Click) bool {
-	if !route.IsActive {
-		return false
-	}
-
-	bools := []bool{}
-	for _, rule := range route.Rules {
-		bools = append(bools, rule.ClickDoesTrigger(click))
-	}
-
-	if route.LogicalRelation == LogicalRelationAnd {
-		// Handle "AND" logical relation
-		// Check if at least one result is false
-		return !sliceIncludes(bools, false)
-	} else if route.LogicalRelation == LogicalRelationOr {
-		// Handle "OR" logical relation
-		// Check if at least one result is true
-		return sliceIncludes(bools, true)
-	}
-
-	return false
+	return route.doesTrigger(func(rule Rule) bool {
+		return rule.ClickDoesTrigger(click)
+	})
 }
 
 func (r *Route) WeightedSelectPath() (Path, error) {
