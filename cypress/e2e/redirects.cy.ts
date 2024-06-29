@@ -18,6 +18,8 @@ describe('Testing campaign redirects', () => {
 
         cy.visit('http://localhost:3001/click');
         cy.url().should('eq', offerSeedData.url);
+
+        // TODO: Add test for postback URL
     });
 
     it('redirects to the catch-all URL when visiting /t with no "g" value in the query string', () => {
