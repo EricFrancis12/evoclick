@@ -90,7 +90,7 @@ export enum ERuleName {
     LANGUAGE = 'language',
     COUNTRY = 'country',
     REGION = 'region',
-    City = 'city',
+    CITY = 'city',
     DEVICE_TYPE = 'deviceType',
     DEVICE = 'device',
     SCREEN_RESOLUTION = 'screenResolution',
@@ -98,6 +98,29 @@ export enum ERuleName {
     OS_VERSION = 'OSVersion',
     BROWSER_NAME = 'browserName',
     BROWSER_VERSION = 'browserVersion'
+};
+
+export enum EItemName {
+    AFFILIATE_NETWORK = 'affiliate network',
+    CAMPAIGN = 'campaign',
+    FLOW = 'flow',
+    LANDING_PAGE = 'landing page',
+    OFFER = 'offer',
+    TRAFFIC_SOURCE = 'traffic source',
+    IP = ERuleName.IP,
+    ISP = ERuleName.ISP,
+    USER_AGENT = ERuleName.USER_AGENT,
+    LANGUAGE = ERuleName.LANGUAGE,
+    COUNTRY = ERuleName.COUNTRY,
+    REGION = ERuleName.REGION,
+    City = ERuleName.CITY,
+    DEVICE_TYPE = ERuleName.DEVICE_TYPE,
+    DEVICE = ERuleName.DEVICE,
+    SCREEN_RESOLUTION = ERuleName.SCREEN_RESOLUTION,
+    OS = ERuleName.OS,
+    OS_VERSION = ERuleName.OS_VERSION,
+    BROWSER_NAME = ERuleName.BROWSER_NAME,
+    BROWSER_VERSION = ERuleName.BROWSER_VERSION
 };
 
 export enum ECookieName {
