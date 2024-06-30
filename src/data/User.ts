@@ -7,31 +7,31 @@ export async function getAllUsers(): Promise<TUser[]> {
 
 export async function getUserById(id: number): Promise<TUser | null> {
     return prisma.user.findUnique({
-        where: { id }
+        where: { id },
     });
 }
 
 export async function getUserByName(name: string): Promise<TUser | null> {
     return prisma.user.findUnique({
-        where: { name }
+        where: { name },
     });
 }
 
 export async function createNewUser(creationRequest: TUser_createRequest): Promise<TUser> {
     return prisma.user.create({
-        data: { ...creationRequest }
+        data: { ...creationRequest },
     });
 }
 
 export async function updateUserById(id: number, data: TUser_updateRequest): Promise<TUser> {
     return prisma.user.update({
         where: { id },
-        data
+        data,
     });
 }
 
 export async function deleteUserById(id: number): Promise<TUser> {
     return prisma.user.delete({
-        where: { id }
+        where: { id },
     });
 }

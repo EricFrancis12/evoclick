@@ -23,14 +23,14 @@ export async function getOfferById(id: number): Promise<TOffer | null> {
 
     // If not in cache, query db for it
     const offerProm = db.offer.findUnique({
-        where: { id }
+        where: { id },
     });
 
     // If we fetch from the db successfully, create a new key for this offer in the cache
     offerProm.then(offer => {
         if (offer && cache) {
             cache.set(key, JSON.stringify(offer), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -40,7 +40,7 @@ export async function getOfferById(id: number): Promise<TOffer | null> {
 
 export async function createNewOffer(creationRequest: TOffer_createRequest): Promise<TOffer> {
     const offerProm = db.offer.create({
-        data: { ...creationRequest }
+        data: { ...creationRequest },
     });
 
     // If the creation was successful, create a new key for this new offer in the cache
@@ -48,7 +48,7 @@ export async function createNewOffer(creationRequest: TOffer_createRequest): Pro
         if (offer && cache) {
             const key = makeKey(offer.id);
             cache.set(key, JSON.stringify(offer), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -59,7 +59,7 @@ export async function createNewOffer(creationRequest: TOffer_createRequest): Pro
 export async function updateOfferById(id: number, data: TOffer_updateRequest): Promise<TOffer> {
     const offerProm = db.offer.update({
         where: { id },
-        data
+        data,
     });
 
     // If the update was successful, update the corresponding key for this offer in the cache
@@ -67,7 +67,7 @@ export async function updateOfferById(id: number, data: TOffer_updateRequest): P
         if (offer && cache) {
             const key = makeKey(offer.id);
             cache.set(key, JSON.stringify(offer), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -83,6 +83,6 @@ export async function deleteOfferById(id: number): Promise<TOffer> {
     }
 
     return db.offer.delete({
-        where: { id }
+        where: { id },
     });
 }

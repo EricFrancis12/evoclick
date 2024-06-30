@@ -66,7 +66,7 @@ export type TRoute = {
 
 export enum ELogicalRelation {
     AND = "and",
-    OR = "or"
+    OR = "or",
 };
 
 export type TRule = {
@@ -97,7 +97,7 @@ export enum ERuleName {
     OS = "OS",
     OS_VERSION = "OSVersion",
     BROWSER_NAME = "browserName",
-    BROWSER_VERSION = "browserVersion"
+    BROWSER_VERSION = "browserVersion",
 };
 
 export enum EItemName {
@@ -120,7 +120,7 @@ export enum EItemName {
     OS = ERuleName.OS,
     OS_VERSION = ERuleName.OS_VERSION,
     BROWSER_NAME = ERuleName.BROWSER_NAME,
-    BROWSER_VERSION = ERuleName.BROWSER_VERSION
+    BROWSER_VERSION = ERuleName.BROWSER_VERSION,
 };
 
 export enum ECookieName {

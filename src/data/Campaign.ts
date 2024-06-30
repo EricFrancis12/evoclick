@@ -24,14 +24,14 @@ export async function getCampaignById(id: number): Promise<TCampaign | null> {
 
     // If not in cache, query db for it
     const campaignProm = db.campaign.findUnique({
-        where: { id }
+        where: { id },
     });
 
     // If we fetch from the db successfully, create a new key for this campaign in the cache
     campaignProm.then(campaign => {
         if (campaign && cache) {
             cache.set(key, JSON.stringify(campaign), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -43,7 +43,7 @@ export async function createNewCampaign(creationRequest: TCampaign_createRequest
     const campaignProm = db.campaign.create({
         data: {
             ...creationRequest,
-            publicId: crypto.randomUUID() as string
+            publicId: crypto.randomUUID() as string,
         }
     });
 
@@ -52,7 +52,7 @@ export async function createNewCampaign(creationRequest: TCampaign_createRequest
         if (campaign && cache) {
             const key = makeKey(campaign.id);
             cache.set(key, JSON.stringify(campaign), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -63,7 +63,7 @@ export async function createNewCampaign(creationRequest: TCampaign_createRequest
 export async function updateCampaignById(id: number, data: TCampaign_updateRequest): Promise<TCampaign> {
     const campaignProm = db.campaign.update({
         where: { id },
-        data
+        data,
     });
 
     // If the update was successful, update the corresponding key for this campaign in the cache
@@ -71,7 +71,7 @@ export async function updateCampaignById(id: number, data: TCampaign_updateReque
         if (campaign && cache) {
             const key = makeKey(campaign.id);
             cache.set(key, JSON.stringify(campaign), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -87,6 +87,6 @@ export async function deleteCampaignById(id: number): Promise<TCampaign> {
     }
 
     return db.campaign.delete({
-        where: { id }
+        where: { id },
     });
 }

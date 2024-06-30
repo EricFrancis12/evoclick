@@ -7,8 +7,8 @@ import { updateAffiliateNetworkAction } from "@/lib/actions";
 import { TAffiliateNetwork, TAffiliateNetwork_updateRequest } from "@/lib/types";
 
 export default function Editor({ affiliateNetwork, setAffiliateNetwork }: {
-    affiliateNetwork: TAffiliateNetwork,
-    setAffiliateNetwork: (an: TAffiliateNetwork | null) => any
+    affiliateNetwork: TAffiliateNetwork;
+    setAffiliateNetwork: (an: TAffiliateNetwork | null) => any;
 }) {
     const [updateRequest, setUpdateRequest] = useState<TAffiliateNetwork_updateRequest>({
         name: affiliateNetwork.name,
@@ -19,7 +19,7 @@ export default function Editor({ affiliateNetwork, setAffiliateNetwork }: {
     useEffect(() => setUpdateRequest({
         name: affiliateNetwork.name,
         defaultNewOfferString: affiliateNetwork.defaultNewOfferString,
-        tags: affiliateNetwork.tags
+        tags: affiliateNetwork.tags,
     }), [affiliateNetwork.id]);
 
     async function handleSubmit() {

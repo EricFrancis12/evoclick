@@ -51,7 +51,7 @@ export function generateRootUser(): TUser | null {
         name: process.env.ROOT_USERNAME,
         hashedPassword: "",
         createdAt: date,
-        updatedAt: date
+        updatedAt: date,
     };
 }
 

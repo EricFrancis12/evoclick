@@ -3,7 +3,7 @@
         "lib": [
             "dom",
             "dom.iterable",
-            "esnext"
+            "esnext",
         ],
         "allowJs": true,
         "skipLibCheck": true,
@@ -19,29 +19,32 @@
         "incremental": true,
         "plugins": [
             {
-                "name": "next"
-            }
+                "name": "next",
+            },
         ],
         "paths": {
             "@/*": [
-                "./src/*"
-            ]
-        }
+                "./src/*",
+            ],
+        },
     },
     "include": [
         "next-env.d.ts",
         "**/*.ts",
         "**/*.tsx",
-        ".next/types/**/*.ts"
+        ".next/types/**/*.ts",
     ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "./cypress.config.ts",
+        "cypress",
+        "**/*.cy.tsx",
     ],
     "ts-node": {
         // these options are overrides used only by ts-node
         // same as the --compilerOptions flag and the TS_NODE_COMPILER_OPTIONS environment variable
         "compilerOptions": {
-            "module": "Node16"
-        }
+            "module": "Node16",
+        },
     },
 }

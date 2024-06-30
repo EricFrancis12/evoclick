@@ -11,7 +11,7 @@ export const userSchema: toZod<TUser> = z.object({
     name: z.string(),
     hashedPassword: z.string(),
     createdAt: z.date(),
-    updatedAt: z.date()
+    updatedAt: z.date(),
 });
 
 export const affiliateNetworkSchema: toZod<TAffiliateNetwork> = z.object({
@@ -20,7 +20,7 @@ export const affiliateNetworkSchema: toZod<TAffiliateNetwork> = z.object({
     defaultNewOfferString: z.string(),
     tags: z.array(z.string()),
     createdAt: z.date(),
-    updatedAt: z.date()
+    updatedAt: z.date(),
 });
 
 export const campaignSchema = z.object({
@@ -34,13 +34,13 @@ export const campaignSchema = z.object({
     createdAt: z.date(),
     updatedAt: z.date(),
     flowId: z.number(),
-    trafficSourceId: z.number()
+    trafficSourceId: z.number(),
 });
 
 export const ruleSchema = z.object({
     ruleName: z.nativeEnum(ERuleName),
     includes: z.boolean(),
-    data: z.array(z.string())
+    data: z.array(z.string()),
 });
 
 export const pathSchema: toZod<TPath> = z.object({
@@ -48,14 +48,14 @@ export const pathSchema: toZod<TPath> = z.object({
     weight: z.number(),
     landingPageIds: z.array(z.number()),
     offerIds: z.array(z.number()),
-    directLinkingEnabled: z.boolean()
+    directLinkingEnabled: z.boolean(),
 });
 
 export const routeSchema = z.object({
     isActive: z.boolean(),
     logicalRelation: z.nativeEnum(ELogicalRelation),
     rules: z.array(ruleSchema),
-    paths: z.array(pathSchema)
+    paths: z.array(pathSchema),
 });
 
 export const flowSchema = z.object({
@@ -67,7 +67,7 @@ export const flowSchema = z.object({
     ruleRoutes: z.array(routeSchema).nullable(),
     tags: z.array(z.string()),
     createdAt: z.date(),
-    updatedAt: z.date()
+    updatedAt: z.date(),
 });
 
 export const landingPageSchema: toZod<TLandingPage> = z.object({
@@ -76,7 +76,7 @@ export const landingPageSchema: toZod<TLandingPage> = z.object({
     url: z.string(),
     tags: z.array(z.string()),
     createdAt: z.date(),
-    updatedAt: z.date()
+    updatedAt: z.date(),
 });
 
 export const offersSchema: toZod<TOffer> = z.object({
@@ -87,18 +87,18 @@ export const offersSchema: toZod<TOffer> = z.object({
     tags: z.array(z.string()),
     createdAt: z.date(),
     updatedAt: z.date(),
-    affiliateNetworkId: z.number()
+    affiliateNetworkId: z.number(),
 });
 
 export const tokenSchema: toZod<TToken> = z.object({
     queryParam: z.string(),
-    value: z.string()
+    value: z.string(),
 });
 
 export const namedTokenSchema: toZod<TNamedToken> = z.object({
     queryParam: z.string(),
     value: z.string(),
-    name: z.string()
+    name: z.string(),
 });
 
 export const trafficSourceSchema: toZod<TTrafficSource> = z.object({
@@ -110,5 +110,5 @@ export const trafficSourceSchema: toZod<TTrafficSource> = z.object({
     customTokens: z.array(namedTokenSchema),
     tags: z.array(z.string()),
     createdAt: z.date(),
-    updatedAt: z.date()
+    updatedAt: z.date(),
 });

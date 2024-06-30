@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	handler "github.com/EricFrancis12/evoclick/api"
+	"github.com/EricFrancis12/evoclick/api"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
@@ -49,10 +49,9 @@ func main() {
 func (s *APIServer) Run() error {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/click", handler.Click)
-	router.HandleFunc("/postback", handler.Postback)
-	router.HandleFunc("/t", handler.T)
-	router.HandleFunc("/test", handler.Test)
+	router.HandleFunc("/click", api.Click)
+	router.HandleFunc("/postback", api.Postback)
+	router.HandleFunc("/t", api.T)
 
 	router.HandleFunc("/assets/{file}", HandleAssets)
 

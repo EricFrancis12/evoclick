@@ -29,6 +29,6 @@ export async function parseNamedTokens(jsonStr: string): Promise<TNamedToken[]> 
 export function makeBoilerplateToken(): TToken {
     return {
         queryParam: "",
-        value: ""
+        value: "",
     };
 }

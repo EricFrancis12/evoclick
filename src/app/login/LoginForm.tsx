@@ -40,8 +40,8 @@ export default function LoginForm() {
 }
 
 function Input({ name, type }: {
-    name: string,
-    type: string
+    name: string;
+    type: string;
 }) {
     return (
         <input

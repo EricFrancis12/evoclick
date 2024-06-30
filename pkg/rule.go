@@ -56,9 +56,8 @@ func (rule Rule) ClickDoesTrigger(click Click) bool {
 func (rm RulesMap) checkForMatch(rule Rule) bool {
 	for _, str := range rule.Data {
 		if rm[rule.RuleName] == str {
-			// TODO: Write test for this return value:
 			return rule.Includes
 		}
 	}
-	return false
+	return !rule.Includes
 }

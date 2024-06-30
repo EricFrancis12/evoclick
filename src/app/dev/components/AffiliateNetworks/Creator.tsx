@@ -9,7 +9,7 @@ import { TAffiliateNetwork_createRequest } from "@/lib/types";
 const initialCreationRequest: TAffiliateNetwork_createRequest = {
     name: "",
     defaultNewOfferString: "",
-    tags: []
+    tags: [],
 };
 
 export default function Creator() {
@@ -23,7 +23,7 @@ export default function Creator() {
         {
             name: "defaultNewOfferString",
             onchange: (e: React.ChangeEvent<HTMLInputElement>) => setCreationRequest(prev => ({ ...prev, defaultNewOfferString: e.target.value }))
-        }
+        },
     ];
 
     async function handleSubmit() {

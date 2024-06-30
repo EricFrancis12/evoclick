@@ -24,14 +24,14 @@ export async function getLandingPageById(id: number): Promise<TLandingPage | nul
 
     // If not in cache, query db for it
     const landingPageProm = db.landingPage.findUnique({
-        where: { id }
+        where: { id },
     });
 
     // If we fetch from the db successfully, create a new key for this landing page in the cache
     landingPageProm.then(landingPage => {
         if (landingPage && cache) {
             cache.set(key, JSON.stringify(landingPage), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -41,7 +41,7 @@ export async function getLandingPageById(id: number): Promise<TLandingPage | nul
 
 export async function createNewLandingPage(creationRequest: TLandingPage_createRequest): Promise<TLandingPage> {
     const landingPageProm = db.landingPage.create({
-        data: { ...creationRequest }
+        data: { ...creationRequest },
     });
 
     // If the creation was successful, create a new key for this new landing page in the cache
@@ -49,7 +49,7 @@ export async function createNewLandingPage(creationRequest: TLandingPage_createR
         if (landingPage && cache) {
             const key = makeKey(landingPage.id);
             cache.set(key, JSON.stringify(landingPage), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -60,7 +60,7 @@ export async function createNewLandingPage(creationRequest: TLandingPage_createR
 export async function updateLandingPageById(id: number, data: TLandingPage_updateRequest): Promise<TLandingPage> {
     const landingPageProm = db.landingPage.update({
         where: { id },
-        data
+        data,
     });
 
     // If the update was successful, update the corresponding key for this landing page in the cache
@@ -68,7 +68,7 @@ export async function updateLandingPageById(id: number, data: TLandingPage_updat
         if (landingPage && cache) {
             const key = makeKey(landingPage.id);
             cache.set(key, JSON.stringify(landingPage), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -84,6 +84,6 @@ export async function deleteLandingPageById(id: number): Promise<TLandingPage> {
     }
 
     return db.landingPage.delete({
-        where: { id }
+        where: { id },
     });
 }

@@ -13,6 +13,6 @@ async function makeClientClick(dbModel: Click): Promise<TClick> {
     const tokensProm = parseTokens(dbModel.tokens);
     return {
         ...dbModel,
-        tokens: await tokensProm
+        tokens: await tokensProm,
     };
 }

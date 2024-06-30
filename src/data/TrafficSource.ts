@@ -27,14 +27,14 @@ export async function geTTrafficSourceById(id: number): Promise<TTrafficSource |
 
     // If not in cache, query db for it
     const trafficSourceProm = db.trafficSource.findUnique({
-        where: { id }
+        where: { id },
     });
 
     // If we fetch from the db successfully, create a new key for this traffic source in the cache
     trafficSourceProm.then(trafficSource => {
         if (trafficSource && cache) {
             cache.set(key, JSON.stringify(trafficSource), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -50,7 +50,7 @@ export async function createNewTrafficSource(creationRequest: TTrafficSource_cre
             // they are saved as strings in the db
             externalIdToken: JSON.stringify(creationRequest.externalIdToken),
             costToken: JSON.stringify(creationRequest.costToken),
-            customTokens: JSON.stringify(creationRequest.customTokens)
+            customTokens: JSON.stringify(creationRequest.customTokens),
         }
     });
 
@@ -59,7 +59,7 @@ export async function createNewTrafficSource(creationRequest: TTrafficSource_cre
         if (trafficSource && cache) {
             const key = makeKey(trafficSource.id);
             cache.set(key, JSON.stringify(trafficSource), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -76,7 +76,7 @@ export async function updateTrafficSourceById(id: number, data: TTrafficSource_u
             // they are saved as strings in the db
             externalIdToken: data.externalIdToken ? JSON.stringify(data.externalIdToken) : undefined,
             costToken: data.costToken ? JSON.stringify(data.costToken) : undefined,
-            customTokens: data.customTokens ? JSON.stringify(data.customTokens) : undefined
+            customTokens: data.customTokens ? JSON.stringify(data.customTokens) : undefined,
         }
     });
 
@@ -85,7 +85,7 @@ export async function updateTrafficSourceById(id: number, data: TTrafficSource_u
         if (trafficSource && cache) {
             const key = makeKey(trafficSource.id);
             cache.set(key, JSON.stringify(trafficSource), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -101,7 +101,7 @@ export async function deleteTrafficSourceById(id: number): Promise<TTrafficSourc
     }
 
     const trafficSourceProm = db.trafficSource.delete({
-        where: { id }
+        where: { id },
     });
 
     return trafficSourceProm.then(ts => makeClientTrafficSource(ts));
@@ -115,6 +115,6 @@ async function makeClientTrafficSource(dbModel: TrafficSource): Promise<TTraffic
         ...dbModel,
         externalIdToken: await externalIdTokenProm,
         costToken: await costTokenProm,
-        customTokens: await customTokensProm
+        customTokens: await customTokensProm,
     };
 }

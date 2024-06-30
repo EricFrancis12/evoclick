@@ -32,7 +32,7 @@ export async function loginAction(formData: FormData): Promise<TUser | null> {
             if (rootUser) {
                 // Set JWT
                 const token = jwt.sign({ isRootUser: true }, JWT_SECRET, {
-                    expiresIn: JWT_EXPIRY
+                    expiresIn: JWT_EXPIRY,
                 });
                 cookies().set(ECookieName.JWT, token);
 
@@ -51,7 +51,7 @@ export async function loginAction(formData: FormData): Promise<TUser | null> {
 
         // Set JWT
         const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
-            expiresIn: JWT_EXPIRY
+            expiresIn: JWT_EXPIRY,
         });
         cookies().set(ECookieName.JWT, token);
 
@@ -62,7 +62,7 @@ export async function loginAction(formData: FormData): Promise<TUser | null> {
 }
 
 export async function getClicksAction(args: Prisma.ClickFindManyArgs = {}, pathname?: string): Promise<TClick[]> {
-    const prom = data.getClicks(args)
+    const prom = data.getClicks(args);
     refreshUrl(prom, pathname);
     return prom;
 }
@@ -98,7 +98,7 @@ function createCUDActions<CreationRequest, UpdateRequest, Result>(
 const affiliateNetworkOperations: CUDOperations<TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest, TAffiliateNetwork> = {
     create: data.createNewAffiliateNetwork,
     update: data.updateAffiliateNetworkById,
-    delete: data.deleteAffiliateNetworkById
+    delete: data.deleteAffiliateNetworkById,
 };
 
 const affiliateNetworkActions = createCUDActions(affiliateNetworkOperations);
@@ -109,7 +109,7 @@ export const deleteAffiliateNetworkAction = affiliateNetworkActions.deleteAction
 const campaignOperations: CUDOperations<TCampaign_createRequest, TCampaign_updateRequest, TCampaign> = {
     create: data.createNewCampaign,
     update: data.updateCampaignById,
-    delete: data.deleteCampaignById
+    delete: data.deleteCampaignById,
 };
 
 const campaignActions = createCUDActions(campaignOperations);
@@ -120,7 +120,7 @@ export const deleteCampaignAction = campaignActions.deleteAction;
 const flowOperations: CUDOperations<TFlow_createRequest, TFlow_updateRequest, TFlow> = {
     create: data.createNewFlow,
     update: data.updateFlowById,
-    delete: data.deleteFlowById
+    delete: data.deleteFlowById,
 };
 
 const flowActions = createCUDActions(flowOperations);
@@ -131,7 +131,7 @@ export const deleteFlowAction = flowActions.deleteAction;
 const landingPageOperations: CUDOperations<TLandingPage_createRequest, TLandingPage_updateRequest, TLandingPage> = {
     create: data.createNewLandingPage,
     update: data.updateLandingPageById,
-    delete: data.deleteLandingPageById
+    delete: data.deleteLandingPageById,
 };
 
 const landingPageActions = createCUDActions(landingPageOperations);
@@ -142,7 +142,7 @@ export const deleteLandingPageAction = landingPageActions.deleteAction;
 const offerOperations: CUDOperations<TOffer_createRequest, TOffer_updateRequest, TOffer> = {
     create: data.createNewOffer,
     update: data.updateOfferById,
-    delete: data.deleteOfferById
+    delete: data.deleteOfferById,
 };
 
 const offerActions = createCUDActions(offerOperations);
@@ -153,7 +153,7 @@ export const deleteOfferAction = offerActions.deleteAction;
 const trafficSourceOperations: CUDOperations<TTrafficSource_createRequest, TTrafficSource_updateRequest, TTrafficSource> = {
     create: data.createNewTrafficSource,
     update: data.updateTrafficSourceById,
-    delete: data.deleteTrafficSourceById
+    delete: data.deleteTrafficSourceById,
 };
 
 const trafficSourceActions = createCUDActions(trafficSourceOperations);

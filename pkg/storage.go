@@ -12,10 +12,8 @@ import (
 )
 
 type Storer struct {
-	Client        *db.PrismaClient
-	PrismaRenewal time.Time
-	Cache         *redis.Client
-	RedisRenewal  time.Time
+	Client *db.PrismaClient
+	Cache  *redis.Client
 }
 
 func NewStorer() *Storer {
@@ -25,7 +23,6 @@ func NewStorer() *Storer {
 func (s *Storer) Renew() {
 	if s.Client == nil {
 		s.Client = db.NewClient()
-		s.PrismaRenewal = time.Now()
 		fmt.Println("Created Prisma client")
 	}
 
@@ -48,7 +45,6 @@ func (s *Storer) Renew() {
 		}
 
 		s.Cache = redis.NewClient(opt)
-		s.RedisRenewal = time.Now()
 		fmt.Println("Created Redis client")
 	}
 }

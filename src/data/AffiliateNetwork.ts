@@ -23,7 +23,7 @@ export async function getAffiliateNetworkById(id: number): Promise<TAffiliateNet
 
     // If not in cache, query db for it
     const affiliateNetworkProm = db.affiliateNetwork.findUnique({
-        where: { id }
+        where: { id },
     });
 
     // If we fetch from the db successfully, create a new key for this affiliate network in the cache
@@ -40,7 +40,7 @@ export async function getAffiliateNetworkById(id: number): Promise<TAffiliateNet
 
 export async function createNewAffiliateNetwork(creationRequest: TAffiliateNetwork_createRequest): Promise<TAffiliateNetwork> {
     const affiliateNetworkProm = db.affiliateNetwork.create({
-        data: { ...creationRequest }
+        data: { ...creationRequest },
     });
 
     // If the creation was successful, create a new key for this new affiliate network in the cache
@@ -48,7 +48,7 @@ export async function createNewAffiliateNetwork(creationRequest: TAffiliateNetwo
         if (affiliateNetwork && cache) {
             const key = makeKey(affiliateNetwork.id);
             cache.set(key, JSON.stringify(affiliateNetwork), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -59,7 +59,7 @@ export async function createNewAffiliateNetwork(creationRequest: TAffiliateNetwo
 export async function updateAffiliateNetworkById(id: number, data: TAffiliateNetwork_updateRequest): Promise<TAffiliateNetwork> {
     const affiliateNetworkProm = db.affiliateNetwork.update({
         where: { id },
-        data
+        data,
     });
 
     // If the update was successful, update the corresponding key for this affiliate network in the cache
@@ -67,7 +67,7 @@ export async function updateAffiliateNetworkById(id: number, data: TAffiliateNet
         if (affiliateNetwork && cache) {
             const key = makeKey(affiliateNetwork.id);
             cache.set(key, JSON.stringify(affiliateNetwork), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -83,6 +83,6 @@ export async function deleteAffiliateNetworkById(id: number): Promise<TAffiliate
     }
 
     return db.affiliateNetwork.delete({
-        where: { id }
+        where: { id },
     });
 }

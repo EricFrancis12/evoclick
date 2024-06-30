@@ -4,12 +4,12 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencil, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-import { deleteAffiliateNetworkAction, updateAffiliateNetworkAction } from "../../../../lib/actions";
+import { deleteAffiliateNetworkAction } from "../../../../lib/actions";
 import { TAffiliateNetwork } from "@/lib/types";
 import Editor from "./Editor";
 
 export default function List({ affiliateNetworks }: {
-    affiliateNetworks: TAffiliateNetwork[]
+    affiliateNetworks: TAffiliateNetwork[];
 }) {
     const [selectedAffiliateNetwork, setSelectedAffiliateNetwork] = useState<TAffiliateNetwork | null>(null);
 

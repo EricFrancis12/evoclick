@@ -3,7 +3,7 @@ import { getClicks } from "@/data";
 import Dashboard from "./Dashboard";
 
 export default async function DashboardPage({ searchParams }: {
-    searchParams: { page?: string, size?: string, item?: string, order?: string }
+    searchParams: { page?: string, size?: string, item?: string, order?: string };
 }) {
     await useProtectedRoute();
 
@@ -12,7 +12,7 @@ export default async function DashboardPage({ searchParams }: {
 
     const clicks = await getClicks({
         skip: getSkip(page, size),
-        take: size
+        take: size,
     });
 
     return (

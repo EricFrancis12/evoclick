@@ -27,14 +27,14 @@ export async function getFlowById(id: number): Promise<TFlow | null> {
 
     // If not in cache, query db for it
     const flowProm = db.flow.findUnique({
-        where: { id }
+        where: { id },
     });
 
     // If we fetch from the db successfully, create a new key for this flow in the cache
     flowProm.then(flow => {
         if (flow && cache) {
             cache.set(key, JSON.stringify(flow), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -49,7 +49,7 @@ export async function createNewFlow(creationRequest: TFlow_createRequest): Promi
             // Changing mainRoute and ruleRoutes into strings because
             // they are saved as strings in the db
             mainRoute: JSON.stringify(creationRequest.mainRoute),
-            ruleRoutes: JSON.stringify(creationRequest.ruleRoutes)
+            ruleRoutes: JSON.stringify(creationRequest.ruleRoutes),
         }
     });
 
@@ -58,7 +58,7 @@ export async function createNewFlow(creationRequest: TFlow_createRequest): Promi
         if (flow && cache) {
             const key = makeKey(flow.id);
             cache.set(key, JSON.stringify(flow), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -74,7 +74,7 @@ export async function updateFlowById(id: number, data: TFlow_updateRequest): Pro
             // Changing mainRoute and ruleRoutes into strings because
             // they are saved as strings in the db
             mainRoute: JSON.stringify(data.mainRoute),
-            ruleRoutes: JSON.stringify(data.ruleRoutes)
+            ruleRoutes: JSON.stringify(data.ruleRoutes),
         }
     });
 
@@ -83,7 +83,7 @@ export async function updateFlowById(id: number, data: TFlow_updateRequest): Pro
         if (flow && cache) {
             const key = makeKey(flow.id);
             cache.set(key, JSON.stringify(flow), {
-                EX: 60 // Exipry time in seconds
+                EX: 60, // Exipry time in seconds
             });
         }
     });
@@ -99,7 +99,7 @@ export async function deleteFlowById(id: number): Promise<TFlow> {
     }
 
     const flowProm = db.flow.delete({
-        where: { id }
+        where: { id },
     });
 
     return flowProm.then(flow => makeClientFlow(flow));
@@ -111,7 +111,7 @@ async function makeClientFlow(dbModel: Flow): Promise<TFlow> {
     return {
         ...dbModel,
         mainRoute: await mainRouteProm,
-        ruleRoutes: await ruleRoutesProm
+        ruleRoutes: await ruleRoutesProm,
     };
 }
 

@@ -8,9 +8,9 @@ if (process.env.REDIS_URL && process.env.NODE_ENV !== "test" && process.env.NEXT
     cache = createClient({
         url: process.env.REDIS_URL,
         socket: {
-            reconnectStrategy: 5000 // If disconnected, try to reconnect every 5 seconds
+            reconnectStrategy: 5000, // If disconnected, try to reconnect every 5 seconds
         },
-        disableOfflineQueue: true // If disconnected, commands are NOT queued, and are instead rejected
+        disableOfflineQueue: true, // If disconnected, commands are NOT queued, and are instead rejected
     });
 
     cache?.on("connect", () => console.log("Connected to Redis"));

@@ -10,7 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import useHover from "@/hooks/useHover";
 import useQueryRouter from "@/hooks/useQueryRouter";
-import Tab from "../Tab";
+import Tab from "../components/Tab";
 import { TClick } from "@/lib/types";
 
 const tabs = [
@@ -95,7 +95,7 @@ const upperControlPanelRow1: TUpperControlPanelItem[] = [
     { name: "Landing Pages", icon: faFolder },
     { name: "Flows", icon: faSitemap },
     { name: "Traffic Sources", icon: faGlobe },
-    { name: "Affiliate Networks", icon: faUsers }
+    { name: "Affiliate Networks", icon: faUsers },
 ];
 
 const upperControlPanelRow2: TUpperControlPanelItem[] = [
@@ -104,36 +104,36 @@ const upperControlPanelRow2: TUpperControlPanelItem[] = [
             { name: "Countries", icon: faGlobeEurope },
             { name: "States / Regions", icon: faGlobeEurope },
             { name: "Cities", icon: faGlobeEurope },
-            { name: "Languages", icon: faGlobeEurope }
-        ]
+            { name: "Languages", icon: faGlobeEurope },
+        ],
     },
     {
         name: "ISP", icon: faWifi, children: [
             { name: "ISP", icon: faWifi },
             { name: "Mobile Carriers", icon: faWifi },
-            { name: "Connection Types", icon: faWifi }
-        ]
+            { name: "Connection Types", icon: faWifi },
+        ],
     },
     {
         name: "Device Types", icon: faLaptop, children: [
             { name: "Device Types", icon: faLaptop },
             { name: "Device Models", icon: faLaptop },
             { name: "Device Vendors", icon: faLaptop },
-            { name: "Screen Resolutions", icon: faLaptop }
-        ]
+            { name: "Screen Resolutions", icon: faLaptop },
+        ],
     },
     {
         name: "OS", icon: faMobile, children: [
             { name: "OS", icon: faMobile },
-            { name: "OS Versions", icon: faMobile }
-        ]
+            { name: "OS Versions", icon: faMobile },
+        ],
     },
     {
         name: "Browser Names", icon: faFolder, children: [
             { name: "Browser Names", icon: faFolder },
-            { name: "Browser Versions", icon: faFolder }
-        ]
-    }
+            { name: "Browser Versions", icon: faFolder },
+        ],
+    },
 ];
 
 function UpperControlPanel({ row1, row2, onClick = () => { } }: {
