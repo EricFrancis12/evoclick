@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { tokenSchema, namedTokenSchema } from '../schemas';
-import { TToken, TNamedToken } from '../types';
+import { tokenSchema, namedTokenSchema } from '../lib/schemas';
+import { TToken, TNamedToken } from '../lib/types';
 
 export * from './User';
 export * from './AffiliateNetwork';

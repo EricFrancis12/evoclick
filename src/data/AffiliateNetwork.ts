@@ -1,8 +1,8 @@
-import cache from '../cache';
-import db from '../db';
-import { affiliateNetworkSchema } from '../schemas';
-import { TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest } from '../types';
-import { initMakeRedisKey } from '../utils';
+import cache from '../lib/cache';
+import db from '../lib/db';
+import { affiliateNetworkSchema } from '../lib/schemas';
+import { TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest } from '../lib/types';
+import { initMakeRedisKey } from '../lib/utils';
 
 const makeKey = initMakeRedisKey('affiliateNetwork');
 

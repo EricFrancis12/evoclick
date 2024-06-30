@@ -1,9 +1,9 @@
 
-import cache from '../cache';
-import db from '../db';
-import { landingPageSchema } from '../schemas';
-import { TLandingPage, TLandingPage_createRequest, TLandingPage_updateRequest } from '../types';
-import { initMakeRedisKey } from '../utils';
+import cache from '../lib/cache';
+import db from '../lib/db';
+import { landingPageSchema } from '../lib/schemas';
+import { TLandingPage, TLandingPage_createRequest, TLandingPage_updateRequest } from '../lib/types';
+import { initMakeRedisKey } from '../lib/utils';
 
 const makeKey = initMakeRedisKey('landingPage');
 

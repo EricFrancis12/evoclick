@@ -1,10 +1,10 @@
 import { TrafficSource } from '@prisma/client';
-import cache from '../cache';
-import db from '../db';
+import cache from '../lib/cache';
+import db from '../lib/db';
 import { parseToken, parseNamedTokens, makeBoilerplateToken } from '.';
-import { trafficSourceSchema } from '../schemas';
-import { TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest } from '../types';
-import { initMakeRedisKey } from '../utils';
+import { trafficSourceSchema } from '../lib/schemas';
+import { TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest } from '../lib/types';
+import { initMakeRedisKey } from '../lib/utils';
 
 const makeKey = initMakeRedisKey('trafficSource');
 

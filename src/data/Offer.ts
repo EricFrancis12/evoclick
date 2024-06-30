@@ -1,8 +1,8 @@
-import cache from '../cache';
-import db from '../db';
-import { offersSchema } from '../schemas';
-import { TOffer, TOffer_createRequest, TOffer_updateRequest } from '../types';
-import { initMakeRedisKey } from '../utils';
+import cache from '../lib/cache';
+import db from '../lib/db';
+import { offersSchema } from '../lib/schemas';
+import { TOffer, TOffer_createRequest, TOffer_updateRequest } from '../lib/types';
+import { initMakeRedisKey } from '../lib/utils';
 
 const makeKey = initMakeRedisKey('offer');
 

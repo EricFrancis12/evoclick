@@ -2,13 +2,14 @@
 
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers'
+import { Prisma } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { generateRootUser } from './auth';
 import { JWT_EXPIRY, JWT_SECRET } from './constants';
-import * as data from './data';
+import * as data from '../data';
 import {
-    TUser, ECookieName,
+    TUser, ECookieName, TClick,
     TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest,
     TCampaign, TCampaign_createRequest, TCampaign_updateRequest,
     TFlow, TFlow_createRequest, TFlow_updateRequest,
@@ -60,6 +61,12 @@ export async function loginAction(formData: FormData): Promise<TUser | null> {
     }
 }
 
+export async function getClicksAction(args: Prisma.ClickFindManyArgs = {}, pathname?: string): Promise<TClick[]> {
+    const prom = data.getClicks(args)
+    refreshUrl(prom, pathname);
+    return prom;
+}
+
 type CUDOperations<CreationRequest, UpdateRequest, Result> = {
     create: (request: CreationRequest) => Promise<Result>;
     update: (id: number, request: UpdateRequest) => Promise<Result>;
@@ -94,11 +101,10 @@ const affiliateNetworkOperations: CUDOperations<TAffiliateNetwork_createRequest,
     delete: data.deleteAffiliateNetworkById
 };
 
-export const {
-    createAction: createNewAffiliateNetworkAction,
-    updateAction: updateAffiliateNetworkAction,
-    deleteAction: deleteAffiliateNetworkAction
-} = createCUDActions(affiliateNetworkOperations);
+const affiliateNetworkActions = createCUDActions(affiliateNetworkOperations);
+export const createNewAffiliateNetworkAction = affiliateNetworkActions.createAction;
+export const updateAffiliateNetworkAction = affiliateNetworkActions.updateAction;
+export const deleteAffiliateNetworkAction = affiliateNetworkActions.deleteAction;
 
 const campaignOperations: CUDOperations<TCampaign_createRequest, TCampaign_updateRequest, TCampaign> = {
     create: data.createNewCampaign,
@@ -106,11 +112,10 @@ const campaignOperations: CUDOperations<TCampaign_createRequest, TCampaign_updat
     delete: data.deleteCampaignById
 };
 
-export const {
-    createAction: createNewCampaignAction,
-    updateAction: updateCampaignAction,
-    deleteAction: deleteCampaignAction
-} = createCUDActions(campaignOperations);
+const campaignActions = createCUDActions(campaignOperations);
+export const createNewCampaignAction = campaignActions.createAction;
+export const updateCampaignAction = campaignActions.updateAction;
+export const deleteCampaignAction = campaignActions.deleteAction;
 
 const flowOperations: CUDOperations<TFlow_createRequest, TFlow_updateRequest, TFlow> = {
     create: data.createNewFlow,
@@ -118,11 +123,10 @@ const flowOperations: CUDOperations<TFlow_createRequest, TFlow_updateRequest, TF
     delete: data.deleteFlowById
 };
 
-export const {
-    createAction: createNewFlowAction,
-    updateAction: updateFlowAction,
-    deleteAction: deleteFlowAction
-} = createCUDActions(flowOperations);
+const flowActions = createCUDActions(flowOperations);
+export const createNewFlowAction = flowActions.createAction;
+export const updateFlowAction = flowActions.updateAction;
+export const deleteFlowAction = flowActions.deleteAction;
 
 const landingPageOperations: CUDOperations<TLandingPage_createRequest, TLandingPage_updateRequest, TLandingPage> = {
     create: data.createNewLandingPage,
@@ -130,11 +134,10 @@ const landingPageOperations: CUDOperations<TLandingPage_createRequest, TLandingP
     delete: data.deleteLandingPageById
 };
 
-export const {
-    createAction: createNewLandingPageAction,
-    updateAction: updateLandingPageAction,
-    deleteAction: deleteLandingPageAction
-} = createCUDActions(landingPageOperations);
+const landingPageActions = createCUDActions(landingPageOperations);
+export const createNewLandingPageAction = landingPageActions.createAction;
+export const updateLandingPageAction = landingPageActions.updateAction;
+export const deleteLandingPageAction = landingPageActions.deleteAction;
 
 const offerOperations: CUDOperations<TOffer_createRequest, TOffer_updateRequest, TOffer> = {
     create: data.createNewOffer,
@@ -142,11 +145,10 @@ const offerOperations: CUDOperations<TOffer_createRequest, TOffer_updateRequest,
     delete: data.deleteOfferById
 };
 
-export const {
-    createAction: createNewOfferAction,
-    updateAction: updateOfferAction,
-    deleteAction: deleteOfferAction
-} = createCUDActions(offerOperations);
+const offerActions = createCUDActions(offerOperations);
+export const createNewOfferAction = offerActions.createAction;
+export const updateOfferAction = offerActions.updateAction;
+export const deleteOfferAction = offerActions.deleteAction;
 
 const trafficSourceOperations: CUDOperations<TTrafficSource_createRequest, TTrafficSource_updateRequest, TTrafficSource> = {
     create: data.createNewTrafficSource,
@@ -154,11 +156,10 @@ const trafficSourceOperations: CUDOperations<TTrafficSource_createRequest, TTraf
     delete: data.deleteTrafficSourceById
 };
 
-export const {
-    createAction: createNewTrafficSourceAction,
-    updateAction: updateTrafficSourceAction,
-    deleteAction: deleteTrafficSourceAction
-} = createCUDActions(trafficSourceOperations);
+const trafficSourceActions = createCUDActions(trafficSourceOperations);
+export const createNewTrafficSourceAction = trafficSourceActions.createAction;
+export const updateTrafficSourceAction = trafficSourceActions.updateAction;
+export const deleteTrafficSourceAction = trafficSourceActions.deleteAction;
 
 function refreshUrl(prom: Promise<any>, pathname?: string): void {
     if (pathname) prom.then(() => revalidatePath(pathname));

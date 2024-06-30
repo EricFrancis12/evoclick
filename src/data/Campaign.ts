@@ -1,9 +1,9 @@
 import crypto from 'crypto';
-import cache from '../cache';
-import db from '../db';
-import { campaignSchema } from '../schemas';
-import { TCampaign, TCampaign_createRequest, TCampaign_updateRequest } from '../types';
-import { initMakeRedisKey } from '../utils';
+import cache from '../lib/cache';
+import db from '../lib/db';
+import { campaignSchema } from '../lib/schemas';
+import { TCampaign, TCampaign_createRequest, TCampaign_updateRequest } from '../lib/types';
+import { initMakeRedisKey } from '../lib/utils';
 
 const makeKey = initMakeRedisKey('campaign');
 

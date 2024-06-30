@@ -1,10 +1,10 @@
 import { Flow } from '@prisma/client';
 import { z } from 'zod';
-import cache from '../cache';
-import db from '../db';
-import { flowSchema, routeSchema } from '../schemas';
-import { TFlow, TFlow_createRequest, TFlow_updateRequest, TRoute } from '../types';
-import { initMakeRedisKey } from '../utils';
+import cache from '../lib/cache';
+import db from '../lib/db';
+import { flowSchema, routeSchema } from '../lib/schemas';
+import { TFlow, TFlow_createRequest, TFlow_updateRequest, TRoute } from '../lib/types';
+import { initMakeRedisKey } from '../lib/utils';
 
 const makeKey = initMakeRedisKey('flow');
 

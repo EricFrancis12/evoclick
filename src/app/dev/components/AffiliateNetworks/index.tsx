@@ -1,6 +1,6 @@
 import Creator from './Creator';
 import List from './List';
-import { getAllAffiliateNetworks } from '@/lib/data';
+import { getAllAffiliateNetworks } from '@/data';
 
 export default async function AffiliateNetworks() {
     try {

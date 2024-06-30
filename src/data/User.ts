@@ -1,5 +1,5 @@
-import prisma from '../db';
-import { TUser, TUser_createRequest, TUser_updateRequest } from '../types';
+import prisma from '../lib/db';
+import { TUser, TUser_createRequest, TUser_updateRequest } from '../lib/types';
 
 export async function getAllUsers(): Promise<TUser[]> {
     return prisma.user.findMany();

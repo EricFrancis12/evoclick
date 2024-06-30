@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation'
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '@/lib/constants';
-import { getUserById } from '@/lib/data';
+import { getUserById } from '@/data';
 import { TUser, ECookieName } from '@/lib/types';
 
 export async function useProtectedRoute(redirectUrl = '/login'): Promise<TUser> {
