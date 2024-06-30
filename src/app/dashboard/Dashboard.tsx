@@ -10,7 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import useHover from "@/hooks/useHover";
 import useQueryRouter from "@/hooks/useQueryRouter";
-import Tab from "../components/Tab";
+import Tab from "../../components/Tab";
 import { TClick } from "@/lib/types";
 
 const tabs = [
