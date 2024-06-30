@@ -5,26 +5,28 @@ import (
 	"reflect"
 	"testing"
 
-	handler "github.com/EricFrancis12/evoclick/api"
+	"github.com/EricFrancis12/evoclick/api"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestTHandler(t *testing.T) {
-	assert.True(t, isValidHandler(handler.T))
+	assert.True(t, isValidVercelHandler(api.T))
 }
 
 func TestClickHandler(t *testing.T) {
-	assert.True(t, isValidHandler(handler.Click))
+	assert.True(t, isValidVercelHandler(api.Click))
 }
 
 func TestPostbackHandler(t *testing.T) {
-	assert.True(t, isValidHandler(handler.Postback))
+	assert.True(t, isValidVercelHandler(api.Postback))
 }
 
-func isValidHandler(handler http.HandlerFunc) bool {
+// Makes sure the handler will run as a Serverless Function when deployed to Vercel
+// More info: https://vercel.com/docs/functions/runtimes/go
+func isValidVercelHandler(handler http.HandlerFunc) bool {
 	handlerType := reflect.TypeOf(handler)
 
-	// Check that the handler does not return any value.
+	// Check that the handler does not return a value.
 	// This is important because if this project is deployed to Vercel,
 	// the build will fail if the handlers return any value.
 	if handlerType.NumOut() != 0 {
