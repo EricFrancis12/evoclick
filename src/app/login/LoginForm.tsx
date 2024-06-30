@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import toast from 'react-hot-toast';
-import { loginAction } from '@/lib/actions';
-import { formatErr } from '@/lib/utils';
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { loginAction } from "@/lib/actions";
+import { formatErr } from "@/lib/utils";
 
 export default function LoginForm() {
     const router = useRouter();
@@ -14,9 +14,9 @@ export default function LoginForm() {
         login(formData)
             .then(user => {
                 if (!user) {
-                    toast.error('Login error');
+                    toast.error("Login error");
                 } else {
-                    router.push('/dashboard');
+                    router.push("/dashboard");
                 }
             })
             .catch(err => toast.error(formatErr(err)));
@@ -25,13 +25,13 @@ export default function LoginForm() {
     return (
         <form
             action={handleLoginAction}
-            className='flex flex-col gap-1'
+            className="flex flex-col gap-1"
         >
-            <Input name='username' type='text' />
-            <Input name='password' type='password' />
+            <Input name="username" type="text" />
+            <Input name="password" type="password" />
             <button
-                type='submit'
-                className='mt-2 bg-blue-400 border rounded'
+                type="submit"
+                className="mt-2 bg-blue-400 border rounded"
             >
                 Login
             </button>
@@ -49,7 +49,7 @@ function Input({ name, type }: {
             type={type}
             name={name}
             placeholder={name}
-            className='border px-2 py-1'
+            className="border px-2 py-1"
         />
     )
 }

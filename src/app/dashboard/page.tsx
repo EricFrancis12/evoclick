@@ -1,6 +1,6 @@
-import { useProtectedRoute } from '@/lib/auth';
-import { getClicks } from '@/data';
-import Dashboard from './Dashboard';
+import { useProtectedRoute } from "@/lib/auth";
+import { getClicks } from "@/data";
+import Dashboard from "./Dashboard";
 
 export default async function DashboardPage({ searchParams }: {
     searchParams: { page?: string, size?: string, item?: string, order?: string }

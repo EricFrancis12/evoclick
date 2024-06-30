@@ -1,11 +1,11 @@
 
-import cache from '../lib/cache';
-import db from '../lib/db';
-import { landingPageSchema } from '../lib/schemas';
-import { TLandingPage, TLandingPage_createRequest, TLandingPage_updateRequest } from '../lib/types';
-import { initMakeRedisKey } from '../lib/utils';
+import cache from "../lib/cache";
+import db from "../lib/db";
+import { landingPageSchema } from "../lib/schemas";
+import { TLandingPage, TLandingPage_createRequest, TLandingPage_updateRequest } from "../lib/types";
+import { initMakeRedisKey } from "../lib/utils";
 
-const makeKey = initMakeRedisKey('landingPage');
+const makeKey = initMakeRedisKey("landingPage");
 
 export async function getAllLandingPages(): Promise<TLandingPage[]> {
     return db.landingPage.findMany();

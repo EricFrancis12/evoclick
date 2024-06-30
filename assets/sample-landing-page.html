@@ -20,17 +20,17 @@
     <p id="host"></p>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const hostElement = document.getElementById('host');
-            hostElement.insertAdjacentHTML('beforeend', `(${hostnameAndPort()}/click)`);
+        document.addEventListener("DOMContentLoaded", () => {
+            const hostElement = document.getElementById("host");
+            hostElement.insertAdjacentHTML("beforeend", `(${hostnameAndPort()}/click)`);
         });
 
         function hostnameAndPort() {
             const { hostname, port } = window.location;
-            if (!port || port === ':') {
+            if (!port || port === ":") {
                 return hostname;
             }
-            if (port[0] === ':') {
+            if (port[0] === ":") {
                 return `${hostname}${port}`;
             }
             return `${hostname}:${port}`;

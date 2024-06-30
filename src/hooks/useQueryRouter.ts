@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 export default function useQueryRouter() {
     const router = useRouter();
@@ -20,7 +20,7 @@ export default function useQueryRouter() {
 
 function getCurrentQuery() {
     const currentQuery: Record<string, string> = {};
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
         const searchParams = new URLSearchParams(window.location.search);
         searchParams.forEach((value, key) => {
             currentQuery[key] = value;

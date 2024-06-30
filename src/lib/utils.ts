@@ -3,9 +3,9 @@
 export const initMakeRedisKey = (prefix: string) => (id: number | string) => `${prefix}:${id}`;
 
 export function formatErr(err: unknown): string {
-    if (typeof err === 'string') return err;
+    if (typeof err === "string") return err;
     if (err instanceof Error) return err.message;
-    return 'Unknown error';
+    return "Unknown error";
 }
 
 // Determines whether an element contains overflowing nodes or not

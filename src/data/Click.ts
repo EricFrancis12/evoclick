@@ -1,7 +1,7 @@
-import { Prisma, Click } from '@prisma/client';
-import db from '../lib/db';
-import { parseTokens } from '.';
-import { TClick } from '../lib/types';
+import { Prisma, Click } from "@prisma/client";
+import db from "../lib/db";
+import { parseTokens } from ".";
+import { TClick } from "../lib/types";
 
 export async function getClicks(args: Prisma.ClickFindManyArgs = {}): Promise<TClick[]> {
     const clicks: Click[] = await db.click.findMany(args);

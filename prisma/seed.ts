@@ -2,11 +2,11 @@
 // because the seed command that runs this file "npx prisma db seed"
 // uses ts-node under the hood,
 // and it's not able to recognize that syntax in the current tsconfig.
-import prisma from '../src/lib/db';
+import prisma from "../src/lib/db";
 import {
     affiliateNetworkSeedData, campaignSeedData, flowSeedData,
     landingPageSeedData, offerSeedData, trafficSourceData
-} from './seedData';
+} from "./seedData";
 
 async function main() {
     const affiliateNetwork = await prisma.affiliateNetwork.create({

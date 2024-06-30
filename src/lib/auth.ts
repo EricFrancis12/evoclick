@@ -1,11 +1,11 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation'
-import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '@/lib/constants';
-import { getUserById } from '@/data';
-import { TUser, ECookieName } from '@/lib/types';
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation"
+import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "@/lib/constants";
+import { getUserById } from "@/data";
+import { TUser, ECookieName } from "@/lib/types";
 
-export async function useProtectedRoute(redirectUrl = '/login'): Promise<TUser> {
+export async function useProtectedRoute(redirectUrl = "/login"): Promise<TUser> {
     const user = await getUserFromJWT();
     if (!user) {
         redirect(redirectUrl);
@@ -21,15 +21,15 @@ export async function getUserFromJWT(): Promise<TUser | null> {
 
     try {
         const payload = jwt.verify(token, JWT_SECRET);
-        if (typeof payload === 'string') {
+        if (typeof payload === "string") {
             return null;
         }
 
-        if ('isRootUser' in payload) {
+        if ("isRootUser" in payload) {
             return generateRootUser();
         }
 
-        if ('userId' in payload) {
+        if ("userId" in payload) {
             return getUserById(payload.userId);
         }
     } catch (err) {
@@ -41,7 +41,7 @@ export async function getUserFromJWT(): Promise<TUser | null> {
 
 export function generateRootUser(): TUser | null {
     if (!process.env.ROOT_USERNAME) {
-        console.log('Unable to genreate Root User because ROOT_USERNAME is not set');
+        console.log("Unable to genreate Root User because ROOT_USERNAME is not set");
         return null;
     }
 
@@ -49,13 +49,13 @@ export function generateRootUser(): TUser | null {
     return {
         id: -1,
         name: process.env.ROOT_USERNAME,
-        hashedPassword: '',
+        hashedPassword: "",
         createdAt: date,
         updatedAt: date
     };
 }
 
-export async function useRootUserRoute(redirectUrl = '/login'): Promise<TUser> {
+export async function useRootUserRoute(redirectUrl = "/login"): Promise<TUser> {
     const user = await getUserFromJWT();
     if (user?.name !== process.env.ROOT_USERNAME || user?.id !== -1) {
         redirect(redirectUrl);

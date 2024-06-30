@@ -1,10 +1,10 @@
-import cache from '../lib/cache';
-import db from '../lib/db';
-import { affiliateNetworkSchema } from '../lib/schemas';
-import { TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest } from '../lib/types';
-import { initMakeRedisKey } from '../lib/utils';
+import cache from "../lib/cache";
+import db from "../lib/db";
+import { affiliateNetworkSchema } from "../lib/schemas";
+import { TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest } from "../lib/types";
+import { initMakeRedisKey } from "../lib/utils";
 
-const makeKey = initMakeRedisKey('affiliateNetwork');
+const makeKey = initMakeRedisKey("affiliateNetwork");
 
 export async function getAllAffiliateNetworks(): Promise<TAffiliateNetwork[]> {
     return db.affiliateNetwork.findMany();

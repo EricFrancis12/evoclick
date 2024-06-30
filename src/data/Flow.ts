@@ -1,12 +1,12 @@
-import { Flow } from '@prisma/client';
-import { z } from 'zod';
-import cache from '../lib/cache';
-import db from '../lib/db';
-import { flowSchema, routeSchema } from '../lib/schemas';
-import { TFlow, TFlow_createRequest, TFlow_updateRequest, TRoute } from '../lib/types';
-import { initMakeRedisKey } from '../lib/utils';
+import { Flow } from "@prisma/client";
+import { z } from "zod";
+import cache from "../lib/cache";
+import db from "../lib/db";
+import { flowSchema, routeSchema } from "../lib/schemas";
+import { TFlow, TFlow_createRequest, TFlow_updateRequest, TRoute } from "../lib/types";
+import { initMakeRedisKey } from "../lib/utils";
 
-const makeKey = initMakeRedisKey('flow');
+const makeKey = initMakeRedisKey("flow");
 
 export async function getAllFlows(): Promise<TFlow[]> {
     const flows: Flow[] = await db.flow.findMany();

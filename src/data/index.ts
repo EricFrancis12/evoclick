@@ -1,15 +1,15 @@
-import { z } from 'zod';
-import { tokenSchema, namedTokenSchema } from '../lib/schemas';
-import { TToken, TNamedToken } from '../lib/types';
+import { z } from "zod";
+import { tokenSchema, namedTokenSchema } from "../lib/schemas";
+import { TToken, TNamedToken } from "../lib/types";
 
-export * from './User';
-export * from './AffiliateNetwork';
-export * from './Campaign';
-export * from './Click';
-export * from './Flow';
-export * from './LandingPage';
-export * from './Offer';
-export * from './TrafficSource';
+export * from "./User";
+export * from "./AffiliateNetwork";
+export * from "./Campaign";
+export * from "./Click";
+export * from "./Flow";
+export * from "./LandingPage";
+export * from "./Offer";
+export * from "./TrafficSource";
 
 export async function parseToken(jsonStr: string): Promise<TToken> {
     const { success, data } = await tokenSchema.safeParseAsync(jsonStr);
@@ -28,7 +28,7 @@ export async function parseNamedTokens(jsonStr: string): Promise<TNamedToken[]> 
 
 export function makeBoilerplateToken(): TToken {
     return {
-        queryParam: '',
-        value: ''
+        queryParam: "",
+        value: ""
     };
 }

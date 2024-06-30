@@ -1,6 +1,6 @@
-import { generateRootUser } from './auth';
+import { generateRootUser } from "./auth";
 
-describe('Testing auth', () => {
+describe("Testing auth", () => {
     const OLD_ENV = process.env;
 
     beforeEach(() => {
@@ -12,17 +12,17 @@ describe('Testing auth', () => {
         process.env = OLD_ENV; // Restore old environment
     });
 
-    test('Root User properties', () => {
+    test("Root User properties", () => {
         process.env.ROOT_USERNAME = undefined;
         expect(generateRootUser()).toEqual(null);
 
-        process.env.ROOT_USERNAME = '';
+        process.env.ROOT_USERNAME = "";
         expect(generateRootUser()).toEqual(null);
 
-        const ADMIN = 'ADMIN';
+        const ADMIN = "ADMIN";
         process.env.ROOT_USERNAME = ADMIN;
         expect(generateRootUser()?.id).toEqual(-1);
         expect(generateRootUser()?.name).toEqual(ADMIN);
-        expect(generateRootUser()?.hashedPassword).toEqual('');
+        expect(generateRootUser()?.hashedPassword).toEqual("");
     });
 });

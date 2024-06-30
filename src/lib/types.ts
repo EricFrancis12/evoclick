@@ -1,6 +1,6 @@
-import { AffiliateNetwork, Campaign, Click, Flow, LandingPage, Offer, TrafficSource, User } from '@prisma/client';
+import { AffiliateNetwork, Campaign, Click, Flow, LandingPage, Offer, TrafficSource, User } from "@prisma/client";
 
-type omissions = 'id' | 'createdAt' | 'updatedAt';
+type omissions = "id" | "createdAt" | "updatedAt";
 
 // Extending User model
 export type TUser = User;
@@ -14,11 +14,11 @@ export type TAffiliateNetwork_updateRequest = Omit<Partial<TAffiliateNetwork>, o
 
 // Extending Campaign model
 export type TCampaign = Campaign;
-export type TCampaign_createRequest = Omit<TCampaign, omissions | 'publicId'>;
+export type TCampaign_createRequest = Omit<TCampaign, omissions | "publicId">;
 export type TCampaign_updateRequest = Omit<Partial<TCampaign>, omissions>;
 
 // Extending Flow model
-export type TFlow = Omit<Flow, 'mainRoute' | 'ruleRoutes'> & {
+export type TFlow = Omit<Flow, "mainRoute" | "ruleRoutes"> & {
     mainRoute: TRoute | null;
     ruleRoutes: TRoute[] | null;
 };
@@ -36,7 +36,7 @@ export type TOffer_createRequest = Omit<TOffer, omissions>;
 export type TOffer_updateRequest = Omit<Partial<TOffer>, omissions>;
 
 // Extending Traffic Source model
-export type TTrafficSource = Omit<TrafficSource, 'externalIdToken' | 'costToken' | 'customTokens'> & {
+export type TTrafficSource = Omit<TrafficSource, "externalIdToken" | "costToken" | "customTokens"> & {
     externalIdToken: TToken;
     costToken: TToken;
     customTokens: TNamedToken[];
@@ -53,7 +53,7 @@ export type TNamedToken = TToken & {
 };
 
 // Extending Click model
-export type TClick = Omit<Click, 'tokens'> & {
+export type TClick = Omit<Click, "tokens"> & {
     tokens: TToken[]
 };
 
@@ -65,8 +65,8 @@ export type TRoute = {
 };
 
 export enum ELogicalRelation {
-    AND = 'and',
-    OR = 'or'
+    AND = "and",
+    OR = "or"
 };
 
 export type TRule = {
@@ -84,29 +84,29 @@ export type TPath = {
 };
 
 export enum ERuleName {
-    IP = 'IP',
-    ISP = 'ISP',
-    USER_AGENT = 'userAgent',
-    LANGUAGE = 'language',
-    COUNTRY = 'country',
-    REGION = 'region',
-    CITY = 'city',
-    DEVICE_TYPE = 'deviceType',
-    DEVICE = 'device',
-    SCREEN_RESOLUTION = 'screenResolution',
-    OS = 'OS',
-    OS_VERSION = 'OSVersion',
-    BROWSER_NAME = 'browserName',
-    BROWSER_VERSION = 'browserVersion'
+    IP = "IP",
+    ISP = "ISP",
+    USER_AGENT = "userAgent",
+    LANGUAGE = "language",
+    COUNTRY = "country",
+    REGION = "region",
+    CITY = "city",
+    DEVICE_TYPE = "deviceType",
+    DEVICE = "device",
+    SCREEN_RESOLUTION = "screenResolution",
+    OS = "OS",
+    OS_VERSION = "OSVersion",
+    BROWSER_NAME = "browserName",
+    BROWSER_VERSION = "browserVersion"
 };
 
 export enum EItemName {
-    AFFILIATE_NETWORK = 'affiliate network',
-    CAMPAIGN = 'campaign',
-    FLOW = 'flow',
-    LANDING_PAGE = 'landing page',
-    OFFER = 'offer',
-    TRAFFIC_SOURCE = 'traffic source',
+    AFFILIATE_NETWORK = "affiliate network",
+    CAMPAIGN = "campaign",
+    FLOW = "flow",
+    LANDING_PAGE = "landing page",
+    OFFER = "offer",
+    TRAFFIC_SOURCE = "traffic source",
     IP = ERuleName.IP,
     ISP = ERuleName.ISP,
     USER_AGENT = ERuleName.USER_AGENT,
@@ -124,7 +124,7 @@ export enum EItemName {
 };
 
 export enum ECookieName {
-    JWT = 'jwt',
-    CAMPAIGN_PUBLIC_ID = 'campaignPublicID',
-    CLICK_PUBLIC_ID = 'clickPublicID',
+    JWT = "jwt",
+    CAMPAIGN_PUBLIC_ID = "campaignPublicID",
+    CLICK_PUBLIC_ID = "clickPublicID",
 }

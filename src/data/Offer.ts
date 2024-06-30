@@ -1,10 +1,10 @@
-import cache from '../lib/cache';
-import db from '../lib/db';
-import { offersSchema } from '../lib/schemas';
-import { TOffer, TOffer_createRequest, TOffer_updateRequest } from '../lib/types';
-import { initMakeRedisKey } from '../lib/utils';
+import cache from "../lib/cache";
+import db from "../lib/db";
+import { offersSchema } from "../lib/schemas";
+import { TOffer, TOffer_createRequest, TOffer_updateRequest } from "../lib/types";
+import { initMakeRedisKey } from "../lib/utils";
 
-const makeKey = initMakeRedisKey('offer');
+const makeKey = initMakeRedisKey("offer");
 
 export async function getAllOffers(): Promise<TOffer[]> {
     return db.offer.findMany();

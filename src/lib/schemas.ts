@@ -1,10 +1,10 @@
-import { $Enums } from '@prisma/client';
-import { z } from 'zod';
-import { toZod } from 'tozod';
+import { $Enums } from "@prisma/client";
+import { z } from "zod";
+import { toZod } from "tozod";
 import {
     TAffiliateNetwork, TLandingPage, TOffer, TToken, TNamedToken, TTrafficSource, TUser,
     TPath, ELogicalRelation, ERuleName
-} from './types';
+} from "./types";
 
 export const userSchema: toZod<TUser> = z.object({
     id: z.number(),

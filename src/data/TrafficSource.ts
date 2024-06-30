@@ -1,12 +1,12 @@
-import { TrafficSource } from '@prisma/client';
-import cache from '../lib/cache';
-import db from '../lib/db';
-import { parseToken, parseNamedTokens, makeBoilerplateToken } from '.';
-import { trafficSourceSchema } from '../lib/schemas';
-import { TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest } from '../lib/types';
-import { initMakeRedisKey } from '../lib/utils';
+import { TrafficSource } from "@prisma/client";
+import cache from "../lib/cache";
+import db from "../lib/db";
+import { parseToken, parseNamedTokens, makeBoilerplateToken } from ".";
+import { trafficSourceSchema } from "../lib/schemas";
+import { TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest } from "../lib/types";
+import { initMakeRedisKey } from "../lib/utils";
 
-const makeKey = initMakeRedisKey('trafficSource');
+const makeKey = initMakeRedisKey("trafficSource");
 
 export async function getAllTrafficSources(): Promise<TTrafficSource[]> {
     const trafficSources: TrafficSource[] = await db.trafficSource.findMany();

@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { EItemName } from './types';
+import { create } from "zustand";
+import { EItemName } from "./types";
 
 interface TTab {
     itemName: EItemName;

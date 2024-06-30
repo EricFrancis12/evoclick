@@ -1,11 +1,11 @@
-import crypto from 'crypto';
-import cache from '../lib/cache';
-import db from '../lib/db';
-import { campaignSchema } from '../lib/schemas';
-import { TCampaign, TCampaign_createRequest, TCampaign_updateRequest } from '../lib/types';
-import { initMakeRedisKey } from '../lib/utils';
+import crypto from "crypto";
+import cache from "../lib/cache";
+import db from "../lib/db";
+import { campaignSchema } from "../lib/schemas";
+import { TCampaign, TCampaign_createRequest, TCampaign_updateRequest } from "../lib/types";
+import { initMakeRedisKey } from "../lib/utils";
 
-const makeKey = initMakeRedisKey('campaign');
+const makeKey = initMakeRedisKey("campaign");
 
 export async function getAllCampaigns(): Promise<TCampaign[]> {
     return db.campaign.findMany();

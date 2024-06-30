@@ -1,19 +1,19 @@
-import { $Enums } from '@prisma/client';
-import { affiliateNetworkSchema, campaignSchema, flowSchema, landingPageSchema, offersSchema, routeSchema, ruleSchema } from './schemas';
-import { ELogicalRelation, ERuleName, TCampaign, TFlow, TPath, TRoute, TRule } from './types';
+import { $Enums } from "@prisma/client";
+import { affiliateNetworkSchema, campaignSchema, flowSchema, landingPageSchema, offersSchema, routeSchema, ruleSchema } from "./schemas";
+import { ELogicalRelation, ERuleName, TCampaign, TFlow, TPath, TRoute, TRule } from "./types";
 
-describe('Testing Schemas', () => {
-    test('Campaign Schema aligns with type', () => {
+describe("Testing Schemas", () => {
+    test("Campaign Schema aligns with type", () => {
         expect(campaignSchema.safeParse({}).success).toEqual(false);
 
         const boilerplateCampaign: TCampaign = {
             id: 1,
-            publicId: 'e83htr892ujhoo3hnfksl04utynh23873towow',
-            name: 'My Campaign',
+            publicId: "e83htr892ujhoo3hnfksl04utynh23873towow",
+            name: "My Campaign",
             landingPageRotationType: $Enums.RotationType.RANDOM,
             offerRotationType: $Enums.RotationType.RANDOM,
             geoName: $Enums.GeoName.UNITED_STATES,
-            tags: ['my', 'campaign'],
+            tags: ["my", "campaign"],
             createdAt: new Date(),
             updatedAt: new Date(),
             flowId: 2,
@@ -41,7 +41,7 @@ describe('Testing Schemas', () => {
     const boilerplateRule1: TRule = {
         ruleName: ERuleName.IP,
         includes: true,
-        data: ['1', '4', '7']
+        data: ["1", "4", "7"]
     };
 
     const boilerplateRule2: TRule = {
@@ -64,19 +64,19 @@ describe('Testing Schemas', () => {
         rules: [boilerplateRule2]
     };
 
-    test('Route Schema aligns with type', () => {
+    test("Route Schema aligns with type", () => {
         expect(routeSchema.safeParse({}).success).toEqual(false);
         expect(routeSchema.safeParse(boilerplateRoute1).success).toEqual(true);
         expect(routeSchema.safeParse(boilerplateRoute2).success).toEqual(true);
     });
 
-    test('Rule Schema aligns with type', () => {
+    test("Rule Schema aligns with type", () => {
         expect(ruleSchema.safeParse({}).success).toEqual(false);
         expect(ruleSchema.safeParse(boilerplateRule1).success).toEqual(true);
         expect(ruleSchema.safeParse(boilerplateRule1).success).toEqual(true);
     });
 
-    test('Flow Schema aligns with type', () => {
+    test("Flow Schema aligns with type", () => {
         expect(flowSchema.safeParse({}).success).toEqual(false);
 
         const boilerplateBuiltInFlow: TFlow = {
@@ -86,7 +86,7 @@ describe('Testing Schemas', () => {
             url: null, // Built In Flows do not have a url
             mainRoute: boilerplateRoute1,
             ruleRoutes: [boilerplateRoute2],
-            tags: ['built', 'in', 'flow'],
+            tags: ["built", "in", "flow"],
             createdAt: new Date(),
             updatedAt: new Date()
         };
@@ -95,11 +95,11 @@ describe('Testing Schemas', () => {
         const boilerplateSavedFlow: TFlow = {
             id: 2,
             type: $Enums.FlowType.SAVED,
-            name: 'My Saved Flow',
+            name: "My Saved Flow",
             url: null, // Saved Flows do not have a url
             mainRoute: boilerplateRoute1,
             ruleRoutes: [boilerplateRoute2],
-            tags: ['saved', 'flow'],
+            tags: ["saved", "flow"],
             createdAt: new Date(),
             updatedAt: new Date()
         };
@@ -109,27 +109,27 @@ describe('Testing Schemas', () => {
             id: 3,
             type: $Enums.FlowType.URL,
             name: null, // URL Flows do not have a name
-            url: 'https://example.com',
+            url: "https://example.com",
             mainRoute: null, // URL Flows do not have a main route
             ruleRoutes: null, // URL Flows do not have ruleRoutes
-            tags: ['url', 'flow'],
+            tags: ["url", "flow"],
             createdAt: new Date(),
             updatedAt: new Date()
         };
         expect(flowSchema.safeParse(boilerplateUrlFlow).success).toEqual(true);
     });
 
-    test('Affiliate Network Schema aligns with type', () => {
+    test("Affiliate Network Schema aligns with type", () => {
         expect(affiliateNetworkSchema.safeParse({}).success).toEqual(false);
         // TODO: ...
     });
 
-    test('Landing Page Schema aligns with type', () => {
+    test("Landing Page Schema aligns with type", () => {
         expect(landingPageSchema.safeParse({}).success).toEqual(false);
         // TODO: ...
     });
 
-    test('Offer aligns with type', () => {
+    test("Offer aligns with type", () => {
         expect(offersSchema.safeParse({}).success).toEqual(false);
         // TODO: ...
     });

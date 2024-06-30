@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 
 export default function useHover(ref: React.RefObject<HTMLElement>) {
     const [isHovered, setIsHovered] = useState(false);
@@ -11,13 +11,13 @@ export default function useHover(ref: React.RefObject<HTMLElement>) {
 
         const node = ref.current;
         if (node) {
-            node.addEventListener('mouseenter', handleMouseEnter);
-            node.addEventListener('mouseleave', handleMouseLeave);
+            node.addEventListener("mouseenter", handleMouseEnter);
+            node.addEventListener("mouseleave", handleMouseLeave);
 
             // Cleanup the event listeners on unmount
             return () => {
-                node.removeEventListener('mouseenter', handleMouseEnter);
-                node.removeEventListener('mouseleave', handleMouseLeave);
+                node.removeEventListener("mouseenter", handleMouseEnter);
+                node.removeEventListener("mouseleave", handleMouseLeave);
             };
         }
     }, [ref]);

@@ -1,13 +1,13 @@
-'use server';
+"use server";
 
-import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers'
-import { Prisma } from '@prisma/client';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { generateRootUser } from './auth';
-import { JWT_EXPIRY, JWT_SECRET } from './constants';
-import * as data from '../data';
+import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers"
+import { Prisma } from "@prisma/client";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { generateRootUser } from "./auth";
+import { JWT_EXPIRY, JWT_SECRET } from "./constants";
+import * as data from "../data";
 import {
     TUser, ECookieName, TClick,
     TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest,
@@ -16,14 +16,14 @@ import {
     TLandingPage, TLandingPage_createRequest, TLandingPage_updateRequest,
     TOffer, TOffer_createRequest, TOffer_updateRequest,
     TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest
-} from './types';
+} from "./types";
 
 export async function loginAction(formData: FormData): Promise<TUser | null> {
-    const username = getFormDataName(formData, 'username');
-    const password = getFormDataName(formData, 'password');
+    const username = getFormDataName(formData, "username");
+    const password = getFormDataName(formData, "password");
 
     if (!username || !password) {
-        throw new Error('Username and password are required');
+        throw new Error("Username and password are required");
     }
 
     try {
@@ -166,5 +166,5 @@ function refreshUrl(prom: Promise<any>, pathname?: string): void {
 }
 
 function getFormDataName(formData: FormData, name: string): string {
-    return formData.get(name)?.toString() || '';
+    return formData.get(name)?.toString() || "";
 }

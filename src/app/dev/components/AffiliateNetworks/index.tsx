@@ -1,6 +1,6 @@
-import Creator from './Creator';
-import List from './List';
-import { getAllAffiliateNetworks } from '@/data';
+import Creator from "./Creator";
+import List from "./List";
+import { getAllAffiliateNetworks } from "@/data";
 
 export default async function AffiliateNetworks() {
     try {
@@ -14,7 +14,7 @@ export default async function AffiliateNetworks() {
         )
     } catch (err) {
         return (
-            <div className='p-2 border'>Error fetching Affiliate Networks...</div>
+            <div className="p-2 border">Error fetching Affiliate Networks...</div>
         )
     }
 }
