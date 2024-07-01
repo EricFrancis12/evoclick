@@ -12,6 +12,7 @@ import useHover from "@/hooks/useHover";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import Tab, { TTab, newTab } from "@/components/Tab";
 import Button from "@/components/Button";
+import CalendarButton from "@/components/CalendarButton";
 import { refreshAction } from "@/lib/actions";
 import { useTabsStore } from "@/lib/store";
 import { EItemName, TClick } from "@/lib/types";
@@ -61,13 +62,18 @@ export default function ReportView({ clicks, page, size }: {
                 ))}
             </div>
             <div className="width-[100vw] text-sm">
-                <UpperControlPanel
-                    items={upperCPItems}
-                    groups={upperCPItemGroups}
-                    onClick={item => updateTabById(activeTab.id, { itemName: item.itemName })}
-                />
-                <LowerControlPanel timeframe={activeTab.timeframe} />
-                <div>Data Table</div>
+                {activeTab
+                    ? <>
+                        <UpperControlPanel
+                            items={upperCPItems}
+                            groups={upperCPItemGroups}
+                            onClick={item => updateTabById(activeTab.id, { itemName: item.itemName })}
+                        />
+                        <LowerControlPanel tab={activeTab} />
+                        <DataTable />
+                    </>
+                    : "Report Not Found :("
+                }
             </div>
         </div >
     )
@@ -164,7 +170,7 @@ function UpperCPItem({ item, onClick = () => { } }: {
     onClick?: (item: TUpperCPItem) => any;
 }) {
     const activeTab = useActiveTab()
-    const isActive = activeTab.itemName === item.itemName;
+    const isActive = activeTab?.itemName === item.itemName;
 
     function handleClick(e: React.MouseEvent<HTMLDivElement>, item: TUpperCPItem) {
         e.stopPropagation();
@@ -211,7 +217,7 @@ function UpperCPItemGroup({ itemGroup, onClick = () => { } }: {
             >
                 <FontAwesomeIcon icon={itemGroup.icon} className="mr-[4px]" />
                 <span className="mr-[4px]">
-                    {isActive ? activeTab.itemName : itemGroup.name}
+                    {isActive ? activeTab?.itemName : itemGroup.name}
                 </span>
                 <FontAwesomeIcon icon={isHovered ? faChevronUp : faChevronDown} />
                 {isHovered &&
@@ -236,22 +242,23 @@ function UpperCPItemGroup({ itemGroup, onClick = () => { } }: {
 
 function useIsActive(group: TUpperCPItemGroup): boolean {
     const activeTab = useActiveTab()
+    if (!activeTab) return false;
     for (const item of group.children) {
         if (item.itemName === activeTab.itemName) return true;
     }
     return false;
 }
 
-function LowerControlPanel({ timeframe }: {
-    timeframe: [Date, Date];
+function LowerControlPanel({ tab }: {
+    tab: TTab;
 }) {
-    const { makeNewReportTab } = useTabsStore(store => store);
+    const { makeNewReportTab, updateTabById } = useTabsStore(store => store);
     const queryRouter = useQueryRouter();
 
     function handleClick() {
-        const tab = newTab(EItemName.LANDING_PAGE, "report", faBullseye);
-        makeNewReportTab(tab);
-        queryRouter.push(`/dashboard/report/${tab.id}`, {}, true);
+        const _tab = newTab(EItemName.LANDING_PAGE, "report", faBullseye);
+        makeNewReportTab(_tab);
+        queryRouter.push(`/dashboard/report/${_tab.id}`, {}, true);
     }
 
     return (
@@ -260,12 +267,12 @@ function LowerControlPanel({ timeframe }: {
             style={{ borderTop: 'solid lightgrey 3px' }}
         >
             <Row>
-                <CalendarButton timeframe={timeframe} />
+                <CalendarButton timeframe={tab.timeframe} onChange={timeframe => updateTabById(tab.id, { timeframe })} />
                 <RefreshButton />
-                <ReportButton onClick={handleClick} />
+                {tab.type === "main" && <ReportButton onClick={handleClick} />}
             </Row>
             <Row>
-                Report Chain
+                {tab.type === "report" && <ReportChain />}
             </Row>
         </div>
     )
@@ -280,14 +287,6 @@ function Row({ children }: {
                 {children}
             </div>
         </div>
-    )
-}
-
-function CalendarButton({ timeframe }: {
-    timeframe: [Date, Date];
-}) {
-    return (
-        <div>Calendar Button</div>
     )
 }
 
@@ -315,5 +314,17 @@ function RefreshButton({ disabled = false }: {
             disabled={disabled}
             text='Refresh'
         />
+    )
+}
+
+function ReportChain() {
+    return (
+        <div>Report Chain</div>
+    )
+}
+
+function DataTable() {
+    return (
+        <div>Data Table</div>
     )
 }
