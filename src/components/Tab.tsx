@@ -1,28 +1,45 @@
-'use client';
+"use client";
 
 import { useParams } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition, faClose } from "@fortawesome/free-solid-svg-icons";
 import { EItemName } from "@/lib/types";
+import { TReportChain } from "@/app/dashboard/ReportView";
 
 export type TTabType = "main" | "report";
 
 export type TTab = {
     id: string;
     itemName: EItemName;
-    type: TTabType;
+    type: "main";
     icon: IconDefinition;
     timeframe: [Date, Date];
+} | {
+    id: string;
+    itemName: EItemName;
+    type: "report";
+    icon: IconDefinition;
+    timeframe: [Date, Date];
+    reportChain: TReportChain;
 };
 
 export function newTab(itemName: EItemName, type: TTabType, icon: IconDefinition): TTab {
-    return {
-        id: crypto.randomUUID() as string,
-        itemName,
-        type,
-        icon,
-        timeframe: [new Date, new Date],
-    };
+    return type === "report"
+        ? {
+            id: crypto.randomUUID() as string,
+            itemName,
+            type,
+            icon,
+            timeframe: [new Date, new Date],
+            reportChain: [{}, null, null]
+        }
+        : {
+            id: crypto.randomUUID() as string,
+            itemName,
+            type,
+            icon,
+            timeframe: [new Date, new Date],
+        };
 }
 
 export default function Tab({ tab, onClick, onClose }: {

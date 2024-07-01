@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useState, useRef, useEffect, Fragment } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,6 +13,7 @@ import useQueryRouter from "@/hooks/useQueryRouter";
 import Tab, { TTab, newTab } from "@/components/Tab";
 import Button from "@/components/Button";
 import CalendarButton from "@/components/CalendarButton";
+import DropdownButton, { DropdownItem } from "@/components/DropdownButton";
 import { refreshAction } from "@/lib/actions";
 import { useTabsStore } from "@/lib/store";
 import { EItemName, TClick } from "@/lib/types";
@@ -23,7 +24,7 @@ export default function ReportView({ clicks, page, size }: {
     page: number;
     size: number;
 }) {
-    const { mainTab, reportTabs, updateTabById, removeReportTabById } = useTabsStore(store => store);
+    const { mainTab, reportTabs, updateTabItemNameById, removeReportTabById } = useTabsStore(store => store);
     const activeTab = useActiveTab();
     const params = useParams();
     const queryRouter = useQueryRouter();
@@ -67,7 +68,7 @@ export default function ReportView({ clicks, page, size }: {
                         <UpperControlPanel
                             items={upperCPItems}
                             groups={upperCPItemGroups}
-                            onClick={item => updateTabById(activeTab.id, { itemName: item.itemName })}
+                            onClick={item => updateTabItemNameById(activeTab.id, item.itemName)}
                         />
                         <LowerControlPanel tab={activeTab} />
                         <DataTable />
@@ -252,7 +253,7 @@ function useIsActive(group: TUpperCPItemGroup): boolean {
 function LowerControlPanel({ tab }: {
     tab: TTab;
 }) {
-    const { makeNewReportTab, updateTabById } = useTabsStore(store => store);
+    const { makeNewReportTab, updateTabTimeframeById, updateTabReportChainById } = useTabsStore(store => store);
     const queryRouter = useQueryRouter();
 
     function handleClick() {
@@ -263,16 +264,21 @@ function LowerControlPanel({ tab }: {
 
     return (
         <div
-            className='flex flex-col justify-center align-start gap-6 w-full px-8 py-6 bg-[#ebedef]'
-            style={{ borderTop: 'solid lightgrey 3px' }}
+            className="flex flex-col justify-center align-start gap-6 w-full px-8 py-6 bg-[#ebedef]"
+            style={{ borderTop: "solid lightgrey 3px" }}
         >
             <Row>
-                <CalendarButton timeframe={tab.timeframe} onChange={timeframe => updateTabById(tab.id, { timeframe })} />
+                <CalendarButton timeframe={tab.timeframe} onChange={timeframe => updateTabTimeframeById(tab.id, timeframe)} />
                 <RefreshButton />
                 {tab.type === "main" && <ReportButton onClick={handleClick} />}
             </Row>
             <Row>
-                {tab.type === "report" && <ReportChain />}
+                {tab.type === "report" &&
+                    <ReportChain
+                        reportChain={tab.reportChain}
+                        onChange={reportChain => updateTabReportChainById(tab.id, reportChain)}
+                    />
+                }
             </Row>
         </div>
     )
@@ -282,8 +288,8 @@ function Row({ children }: {
     children: React.ReactNode
 }) {
     return (
-        <div className='flex gap-6 w-full'>
-            <div className='flex flex-wrap gap-2 justify-center items-center'>
+        <div className="flex gap-6 w-full">
+            <div className="flex flex-wrap gap-2 justify-center items-center">
                 {children}
             </div>
         </div>
@@ -299,7 +305,7 @@ function ReportButton({ onClick, disabled = false }: {
             icon={faRandom}
             onClick={onClick}
             disabled={disabled}
-            text='Report'
+            text="Report"
         />
     )
 }
@@ -312,15 +318,106 @@ function RefreshButton({ disabled = false }: {
             icon={faSyncAlt}
             onClick={() => refreshAction(window.location.href)}
             disabled={disabled}
-            text='Refresh'
+            text="Refresh"
         />
     )
 }
 
-function ReportChain() {
+export type TReportChain = [TReportChainLink, TReportChainLink, TReportChainLink];
+export type TReportChainLink = null | {
+    itemName?: EItemName;
+};
+
+const MAX_REPORT_CHAIN_LENGTH = 3;
+
+function ReportChain({ reportChain, onChange }: {
+    reportChain: TReportChain;
+    onChange: (reportChain: TReportChain) => any;
+}) {
+    const { updateTabItemNameById } = useTabsStore(store => store);
+    const activeTab = useActiveTab();
+    const dropdownItems = Object.values(EItemName);
+
+    const arrayOfFalse = reportChain.map(() => false);
+    const [dropdownsActive, setDropdownsActive] = useState(arrayOfFalse);
+
+    useEffect(() => {
+        if (!activeTab?.itemName) return;
+        handleClick({ itemName: activeTab.itemName }, 0);
+    }, [activeTab?.itemName]);
+
+    function handleClick(chainlink: TReportChainLink, index: number) {
+        if (!chainlink) return;
+
+        if (index === 0 && activeTab?.id && chainlink?.itemName) {
+            updateTabItemNameById(activeTab.id, chainlink.itemName);
+        }
+
+        setDropdownsActive(arrayOfFalse);
+
+        const newReportChain = [...reportChain];
+        newReportChain.splice(
+            index,
+            MAX_REPORT_CHAIN_LENGTH,
+            { ...chainlink },
+            {},
+            ...arrayOf(null, MAX_REPORT_CHAIN_LENGTH)
+        );
+        onChange(newReportChain.slice(0, MAX_REPORT_CHAIN_LENGTH) as TReportChain);
+    }
+
+    function handleSetActive(active: boolean, index: number) {
+        setDropdownsActive(prevDropdownsActive => {
+            const newDropdownsActive = [...prevDropdownsActive];
+            newDropdownsActive.splice(index, 1, active);
+
+            return newDropdownsActive;
+        });
+    }
+
     return (
-        <div>Report Chain</div>
+        <div className="flex flex-wrap justify-center items-center">
+            {reportChain.map((chainLink, index) => (
+                <div key={index} className="p-1">
+                    <DropdownButton
+                        text={!chainLink?.itemName ? "" : ((index === 0 ? activeTab?.itemName : chainLink?.itemName) || "None")}
+                        disabled={!chainLink}
+                        active={dropdownsActive[index] !== false}
+                        setActive={(active: boolean) => handleSetActive(active, index)}
+                    >
+                        {index !== 0 &&
+                            <DropdownItem text={"None"}
+                                onClick={() => handleClick({}, index)}
+                            />
+                        }
+                        {dropdownItems.map((itemName, _index) => {
+                            const isPrevChainLink = reportChain.find(chainLink => chainLink?.itemName === itemName) != undefined;
+                            return (
+                                <Fragment key={_index}>
+                                    {!isPrevChainLink &&
+                                        <DropdownItem
+                                            key={_index}
+                                            text={itemName}
+                                            onClick={() => handleClick({ itemName }, index)}
+                                        />
+                                    }
+                                </Fragment>
+                            )
+                        })}
+                    </DropdownButton>
+                </div>
+            ))
+            }
+        </div>
     )
+}
+
+export function arrayOf<T>(any: T, length: number = 1): T[] {
+    let result = [];
+    for (let i = 0; i < length; i++) {
+        result.push(structuredClone(any));
+    }
+    return result;
 }
 
 function DataTable() {

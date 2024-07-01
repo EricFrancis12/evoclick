@@ -14,6 +14,7 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 
+// TODO: Add ability for Calendar Button to select a date down to the hour
 export default function CalendarButton({ timeframe, onChange }: {
     timeframe: [Date, Date];
     onChange: ([start, end]: [Date, Date]) => any;
