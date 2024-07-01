@@ -40,7 +40,7 @@ export default function List({ affiliateNetworks }: {
                         />
                         <span
                             className="cursor-pointer hover:underline"
-                            onClick={() => console.log(affiliateNetwork)}
+                            onClick={() => { }}
                         >
                             Name: {affiliateNetwork.name}
                         </span>

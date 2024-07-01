@@ -1,6 +1,6 @@
 import { useProtectedRoute } from "@/lib/auth";
 import { getClicks } from "@/data";
-import Dashboard from "./Dashboard";
+import ReportView from "./ReportView";
 
 export default async function DashboardPage({ searchParams }: {
     searchParams: { page?: string, size?: string, item?: string, order?: string };
@@ -16,7 +16,7 @@ export default async function DashboardPage({ searchParams }: {
     });
 
     return (
-        <Dashboard clicks={clicks} page={page} size={size} />
+        <ReportView clicks={clicks} page={page} size={size} />
     )
 }
 

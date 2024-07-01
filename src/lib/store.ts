@@ -1,16 +1,33 @@
 import { create } from "zustand";
+import { faTachometerAltFast } from '@fortawesome/free-solid-svg-icons';
 import { EItemName } from "./types";
+import { TTab } from '../components/Tab';
 
-type TTab = {
-    itemName: EItemName;
-};
+type TTab_updateProps = Partial<Omit<TTab, 'id'>>;
 
-interface ITabsState {
-    tabs: TTab[];
-    makeNew: (itemName: EItemName) => void;
+interface ITabState {
+    mainTab: TTab;
+    reportTabs: TTab[];
+    makeNewReportTab: (tab: TTab) => void;
+    updateTabById: (id: string, props: TTab_updateProps) => void;
+    removeAllReportTabs: () => void;
+    removeReportTabById: (id: string) => void;
 }
 
-export const useTabsStore = create<ITabsState>()((set) => ({
-    tabs: [],
-    makeNew: (itemName) => set((state) => ({ tabs: [...state.tabs, { itemName, yes: () => 1 }] })),
+const initialMainTab: TTab = {
+    id: '0',
+    icon: faTachometerAltFast,
+    type: "main",
+    itemName: EItemName.CAMPAIGN,
+    timeframe: [new Date, new Date],
+};
+
+export const useTabsStore = create<ITabState>()((set) => ({
+
+    mainTab: initialMainTab,
+    reportTabs: [],
+    makeNewReportTab: (tab) => set((state) => ({ reportTabs: [...state.reportTabs, tab] })),
+    updateTabById: (id, props) => set((state) => ({ mainTab: state.mainTab.id === id ? { ...state.mainTab, ...props } : state.mainTab, reportTabs: state.reportTabs.map(tab => tab.id === id ? { ...tab, ...props } : tab) })),
+    removeAllReportTabs: () => set({ reportTabs: [] }),
+    removeReportTabById: (id) => set((state) => ({ reportTabs: state.reportTabs.filter(tab => tab.id !== id) })),
 }));

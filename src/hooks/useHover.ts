@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 
-export default function useHover(ref: React.RefObject<HTMLElement>) {
+export default function useHover(ref: React.RefObject<HTMLElement>): [boolean, Dispatch<SetStateAction<boolean>>] {
     const [isHovered, setIsHovered] = useState(false);
 
     useEffect(() => {
@@ -22,5 +22,5 @@ export default function useHover(ref: React.RefObject<HTMLElement>) {
         }
     }, [ref]);
 
-    return isHovered;
+    return [isHovered, setIsHovered];
 }

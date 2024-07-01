@@ -113,7 +113,7 @@ export enum EItemName {
     LANGUAGE = ERuleName.LANGUAGE,
     COUNTRY = ERuleName.COUNTRY,
     REGION = ERuleName.REGION,
-    City = ERuleName.CITY,
+    CITY = ERuleName.CITY,
     DEVICE_TYPE = ERuleName.DEVICE_TYPE,
     DEVICE = ERuleName.DEVICE,
     SCREEN_RESOLUTION = ERuleName.SCREEN_RESOLUTION,
