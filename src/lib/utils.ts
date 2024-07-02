@@ -13,3 +13,11 @@ export function isOverflown(ref: React.RefObject<HTMLElement>) {
     if (!ref?.current) return false;
     return ref.current.scrollHeight > ref.current.clientHeight || ref.current.scrollWidth > ref.current.clientWidth;
 }
+
+export function arrayOf<T>(any: T, length: number = 1): T[] {
+    let result = [];
+    for (let i = 0; i < length; i++) {
+        result.push(structuredClone(any));
+    }
+    return result;
+}

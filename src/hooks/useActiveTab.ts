@@ -7,9 +7,9 @@ import { TTab } from "@/components/Tab";
 export default function useActiveTab(): TTab | null {
     const params = useParams();
     const { mainTab, reportTabs } = useTabsStore();
-    if (!params?.tabId) return mainTab;
+    if (!params?.id) return mainTab;
     for (const tab of reportTabs) {
-        if (tab.id === params?.tabId) return tab;
+        if (tab.id === params?.id) return tab;
     }
     return null;
 }

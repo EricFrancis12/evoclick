@@ -63,7 +63,7 @@ export default function Tab({ tab, onClick, onClose }: {
 }) {
     const { itemName, icon } = tab;
     const params = useParams();
-    const active = params?.tabId === tab.id || (!params?.tabId && tab.type === "main");
+    const active = params?.id === tab.id || (!params?.id && tab.type === "main");
 
     function handleClose(e: React.MouseEvent<HTMLOrSVGElement>) {
         e.stopPropagation();

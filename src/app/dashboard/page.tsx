@@ -4,26 +4,40 @@ import ReportView from "./ReportView";
 import { EItemName } from "@/lib/types";
 
 export default async function DashboardPage({ params, searchParams }: {
-    params: { itemName?: string };
+    params: { itemName?: string, id?: string };
     searchParams: { page?: string, size?: string, timeframe?: string };
 }) {
     await useProtectedRoute();
 
-    // TODO: Validate all params and search params used here:
+    // TODO: Validate all params and search params used here,
+    // and create default values if not valid:
     const page = Number(searchParams?.page) || 1;
     const size = Number(searchParams?.size) || 20;
     const splitOnComma = searchParams?.timeframe?.split(",");
     const timeframe: [Date, Date] = splitOnComma?.length === 2
         ? [new Date(splitOnComma[0]), new Date(splitOnComma[1])]
-        : [new Date, new Date];
+        : [new Date("2024-06-20"), new Date("2024-07-30")];
 
     const reportItemName = (params?.itemName || null) as EItemName | null;
+    const reportItemId = (params?.id || null) as EItemName | null;
 
     try {
         const clicks = await getClicks({
             skip: getSkip(page, size),
             take: size,
-            // TOOO: Filter by timeframe and itemName
+            where: {
+                AND: [
+                    {
+                        viewTime: {
+                            gte: timeframe[0],
+                            lte: timeframe[1],
+                        },
+                    },
+                    {
+                        // TODO: Add ability to filter by reportItemName and reportItemId
+                    },
+                ],
+            },
         });
 
         return (

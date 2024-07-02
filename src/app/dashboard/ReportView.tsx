@@ -8,6 +8,7 @@ import {
     IconDefinition, faBullseye, faChevronDown, faChevronUp, faFolder, faGlobe, faGlobeEurope, faHandshake,
     faLaptop, faMobile, faRandom, faSitemap, faSyncAlt, faUsers, faWifi
 } from "@fortawesome/free-solid-svg-icons";
+import useActiveTab from "@/hooks/useActiveTab";
 import useDragger from "@/hooks/useDragger";
 import useHover from "@/hooks/useHover";
 import useQueryRouter from "@/hooks/useQueryRouter";
@@ -18,7 +19,7 @@ import DropdownButton, { DropdownItem } from "@/components/DropdownButton";
 import { refreshAction } from "@/lib/actions";
 import { useTabsStore } from "@/lib/store";
 import { EItemName, TClick } from "@/lib/types";
-import useActiveTab from "@/hooks/useActiveTab";
+import { arrayOf } from "@/lib/utils";
 
 export default function ReportView({ clicks, page, size, timeframe, reportItemName }: {
     clicks: TClick[];
@@ -29,7 +30,7 @@ export default function ReportView({ clicks, page, size, timeframe, reportItemNa
 }) {
     const {
         mainTab, reportTabs, updateTabPageById, updateTabSizeById,
-        updateTabTimeframeById, updateTabReportItemNameById, updateTabItemNameById, removeReportTabById
+        updateTabTimeframeById, updateTabReportItemNameById, removeReportTabById
     } = useTabsStore(store => store);
 
     const activeTab = useActiveTab();
@@ -48,7 +49,7 @@ export default function ReportView({ clicks, page, size, timeframe, reportItemNa
     function handleTabClose(tab: TTab) {
         removeReportTabById(tab.id);
         // If the deleted tab was the current one, redirect to /dashboard
-        if (tab.id === params?.tabId) {
+        if (tab.id === params?.id) {
             queryRouter.push("/dashboard");
         }
     }
@@ -80,22 +81,55 @@ export default function ReportView({ clicks, page, size, timeframe, reportItemNa
             </div>
             <div className="width-[100vw] text-sm">
                 {activeTab
-                    ? <>
-                        <UpperControlPanel
-                            items={upperCPItems}
-                            groups={upperCPItemGroups}
-                            onClick={item => updateTabItemNameById(activeTab.id, item.itemName)}
-                        />
-                        <LowerControlPanel tab={activeTab} />
-                        <DataTable
-                            clicks={clicks}
-                            itemName={activeTab.itemName}
-                        />
-                    </>
+                    ? <Report
+                        clicks={clicks}
+                        tab={activeTab}
+                    />
                     : "Report Not Found :("
                 }
             </div>
         </div >
+    )
+}
+
+function Report({ clicks, tab }: {
+    clicks: TClick[];
+    tab: TTab;
+}) {
+    const [rows, setRows] = useState<RowsHashMap>(makeRows(clicks, tab.itemName));
+    useEffect(() => {
+        setRows(makeRows(clicks, tab.itemName));
+    }, [clicks.length, tab.itemName]);
+
+    const { makeNewReportTab, updateTabItemNameById } = useTabsStore(store => store);
+    const queryRouter = useQueryRouter();
+
+    // Finds the first row that is selected and creates a report for it
+    function handleNewReport() {
+        for (const id in rows) {
+            if (rows[id].selected) {
+                const _tab = newReportTab(EItemName.CAMPAIGN, faBullseye, tab.itemName, id);
+                makeNewReportTab(_tab);
+                queryRouter.push(`/dashboard/report/${_tab.itemName}/${_tab.id}`);
+                return;
+            }
+        }
+    }
+
+    return (
+        <>
+            <UpperControlPanel
+                items={upperCPItems}
+                groups={upperCPItemGroups}
+                onClick={item => updateTabItemNameById(tab.id, item.itemName)}
+            />
+            <LowerControlPanel tab={tab} onNewReport={handleNewReport} />
+            <DataTable
+                itemName={tab.itemName}
+                rows={rows}
+                setRows={setRows}
+            />
+        </>
     )
 }
 
@@ -269,18 +303,12 @@ function useIsActive(group: TUpperCPItemGroup): boolean {
     return false;
 }
 
-function LowerControlPanel({ tab }: {
+function LowerControlPanel({ tab, onNewReport }: {
     tab: TTab;
+    onNewReport: () => any;
 }) {
-    const { makeNewReportTab, updateTabReportChainById } = useTabsStore(store => store);
+    const { updateTabReportChainById } = useTabsStore(store => store);
     const queryRouter = useQueryRouter();
-
-    function handleClick() {
-        const id = "REPLACE"; // TODO: Pull id from the first data table row that is selected
-        const _tab = newReportTab(EItemName.CAMPAIGN, faBullseye, tab.itemName, id);
-        makeNewReportTab(_tab);
-        queryRouter.push(`/dashboard/report/${tab.itemName}/${_tab.id}`);
-    }
 
     return (
         <div
@@ -293,7 +321,7 @@ function LowerControlPanel({ tab }: {
                     onChange={timeframe => queryRouter.push(`/dashboard/report/${tab.itemName}/${tab.id}`)}
                 />
                 <RefreshButton />
-                {tab.type === "main" && <ReportButton onClick={handleClick} />}
+                {tab.type === "main" && <ReportButton onClick={onNewReport} />}
             </LowerCPRow>
             <LowerCPRow>
                 {tab.type === "report" &&
@@ -433,30 +461,29 @@ function ReportChain({ reportChain, onChange }: {
     )
 }
 
-export function arrayOf<T>(any: T, length: number = 1): T[] {
-    let result = [];
-    for (let i = 0; i < length; i++) {
-        result.push(structuredClone(any));
-    }
-    return result;
-}
-
-function DataTable({ clicks, itemName }: {
-    clicks: TClick[];
+function DataTable({ itemName, rows, setRows }: {
     itemName: EItemName;
+    rows: RowsHashMap;
+    setRows: (rhm: RowsHashMap) => any;
 }) {
-    const rows = makeRows(clicks, itemName);
     const [columns, setColumns] = useState<TColumn[]>(initialColumns);
-
-    console.log(clicks);
-    console.log(rows);
 
     return (
         <div className="relative flex flex-col min-h-[400px] max-w-[100vw] overflow-x-scroll">
             <div className="absolute top-0 left-0 h-full">
-                <TitleRow name={itemName} columns={columns} setColumns={setColumns} />
-                {Object.entries(rows).map(([name, clicks]) => (
-                    <Row key={name} name={name} clicks={clicks} columns={columns} />
+                <TitleRow
+                    name={itemName}
+                    columns={columns}
+                    setColumns={setColumns}
+                />
+                {Object.entries(rows).map(([name, row]) => (
+                    <Row
+                        key={name}
+                        name={name}
+                        row={row}
+                        onSelected={bool => setRows({ ...rows, [name]: { ...rows[name], selected: bool } })}
+                        columns={columns}
+                    />
                 ))}
             </div>
         </div>
@@ -524,17 +551,22 @@ function TitleRow({ name, columns, setColumns }: {
     )
 }
 
-type RowsHashMap = Record<string, TClick[]>
-
-function Row({ name, clicks, columns }: {
-    name: keyof RowsHashMap;
+type TRow = {
     clicks: TClick[];
+    selected: boolean;
+};
+type RowsHashMap = Record<string, TRow>;
+
+function Row({ name, row, columns, onSelected }: {
+    name: keyof RowsHashMap;
+    row: TRow;
     columns: TColumn[];
+    onSelected: (newSelected: boolean) => any;
 }) {
-    const cells = makeCells(clicks, name);
+    const cells = makeCells(row.clicks, name);
 
     return (
-        <RowWrapper>
+        <RowWrapper selected={row.selected} setSelected={onSelected}>
             {cells.map((value, index) => (
                 <Cell key={index} value={value} width={columns[index].width} />
             ))}
@@ -553,11 +585,22 @@ function Cell({ value, width }: {
     )
 }
 
-function RowWrapper({ children }: {
+function RowWrapper({ children, selected, setSelected = () => { } }: {
     children: React.ReactNode;
+    selected?: boolean;
+    setSelected?: (newSelected: boolean) => any;
 }) {
     return (
-        <div className="flex w-full px-4">
+        <div className="flex items-center w-full px-4">
+            <div className="h-full w-[22px]">
+                {selected !== undefined &&
+                    <input
+                        type="checkbox"
+                        checked={selected === true}
+                        onChange={() => setSelected(!selected)}
+                    />
+                }
+            </div>
             {children}
         </div>
     )
@@ -569,10 +612,13 @@ function makeRows(clicks: TClick[], itemName: EItemName) {
         const key = clickProp ? curr[clickProp] : null;
         if (key && (typeof key === "string" || typeof key === "number")) {
             const keyStr = key.toString();
-            if (acc[keyStr]) {
-                acc[keyStr].push(curr);
+            if (acc[keyStr]?.clicks) {
+                acc[keyStr].clicks = [...acc[keyStr].clicks, curr]
             } else {
-                acc[keyStr] = [curr];
+                acc[keyStr] = {
+                    clicks: [curr],
+                    selected: false,
+                };
             }
         }
         return acc;
