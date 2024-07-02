@@ -9,37 +9,51 @@ import { TReportChain } from "@/app/dashboard/ReportView";
 export type TTabType = "main" | "report";
 
 export type TTab = {
-    id: string;
+    id: "0";
     itemName: EItemName;
     type: "main";
     icon: IconDefinition;
     timeframe: [Date, Date];
+    reportItemName: null;
+    page: number;
+    size: number;
 } | {
     id: string;
     itemName: EItemName;
     type: "report";
     icon: IconDefinition;
     timeframe: [Date, Date];
+    reportItemName: EItemName;
     reportChain: TReportChain;
+    page: number;
+    size: number;
 };
 
-export function newTab(itemName: EItemName, type: TTabType, icon: IconDefinition): TTab {
-    return type === "report"
-        ? {
-            id: crypto.randomUUID() as string,
-            itemName,
-            type,
-            icon,
-            timeframe: [new Date, new Date],
-            reportChain: [{}, null, null]
-        }
-        : {
-            id: crypto.randomUUID() as string,
-            itemName,
-            type,
-            icon,
-            timeframe: [new Date, new Date],
-        };
+export function newMainTab(itemName: EItemName, icon: IconDefinition): TTab {
+    return {
+        id: "0",
+        itemName,
+        type: "main",
+        icon,
+        timeframe: [new Date, new Date],
+        reportItemName: null,
+        page: 1,
+        size: 50,
+    };
+}
+
+export function newReportTab(itemName: EItemName, icon: IconDefinition, reportItemName: EItemName, reportItemId: string): TTab {
+    return {
+        id: reportItemId,
+        itemName,
+        type: "report",
+        icon,
+        timeframe: [new Date, new Date],
+        reportItemName,
+        reportChain: [{}, null, null],
+        page: 1,
+        size: 50,
+    };
 }
 
 export default function Tab({ tab, onClick, onClose }: {

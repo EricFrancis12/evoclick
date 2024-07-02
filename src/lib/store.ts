@@ -9,8 +9,11 @@ interface ITabState {
     mainTab: TTab;
     reportTabs: TTab[];
     makeNewReportTab: (tab: TTab) => void;
+    updateTabPageById: (id: string, page: number) => void;
+    updateTabSizeById: (id: string, size: number) => void;
     updateTabItemNameById: (id: string, itemName: EItemName) => void;
     updateTabTimeframeById: (id: string, timeframe: [Date, Date]) => void;
+    updateTabReportItemNameById: (id: string, reportItemName: EItemName) => void;
     updateTabReportChainById: (id: string, reportChain: TReportChain) => void;
     removeAllReportTabs: () => void;
     removeReportTabById: (id: string) => void;
@@ -22,6 +25,9 @@ const initialMainTab: TTab = {
     type: "main",
     itemName: EItemName.CAMPAIGN,
     timeframe: [new Date, new Date],
+    reportItemName: null,
+    page: 1,
+    size: 50,
 };
 
 export const useTabsStore = create<ITabState>()(
@@ -30,8 +36,11 @@ export const useTabsStore = create<ITabState>()(
             mainTab: initialMainTab,
             reportTabs: [],
             makeNewReportTab: (tab) => set((state) => ({ reportTabs: [...state.reportTabs, tab] })),
+            updateTabPageById: (id, page) => set((state) => ({ mainTab: state.mainTab.id === id ? { ...state.mainTab, page } : state.mainTab, reportTabs: state.reportTabs.map(tab => tab.id === id ? { ...tab, page } : tab) })),
+            updateTabSizeById: (id, size) => set((state) => ({ mainTab: state.mainTab.id === id ? { ...state.mainTab, size } : state.mainTab, reportTabs: state.reportTabs.map(tab => tab.id === id ? { ...tab, size } : tab) })),
             updateTabItemNameById: (id, itemName) => set((state) => ({ mainTab: state.mainTab.id === id ? { ...state.mainTab, itemName } : state.mainTab, reportTabs: state.reportTabs.map(tab => tab.id === id ? { ...tab, itemName } : tab) })),
             updateTabTimeframeById: (id, timeframe) => set((state) => ({ mainTab: state.mainTab.id === id ? { ...state.mainTab, timeframe } : state.mainTab, reportTabs: state.reportTabs.map(tab => tab.id === id ? { ...tab, timeframe } : tab) })),
+            updateTabReportItemNameById: (id, reportItemName) => set((state) => ({ reportTabs: state.reportTabs.map(tab => tab.id === id && tab.type === "report" ? { ...tab, reportItemName } : tab) })),
             updateTabReportChainById: (id, reportChain) => set((state) => ({ reportTabs: state.reportTabs.map(tab => tab.id === id ? { ...tab, reportChain } : tab) })),
             removeAllReportTabs: () => set({ reportTabs: [] }),
             removeReportTabById: (id) => set((state) => ({ reportTabs: state.reportTabs.filter(tab => tab.id !== id) })),

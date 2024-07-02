@@ -8,9 +8,10 @@ import {
     IconDefinition, faBullseye, faChevronDown, faChevronUp, faFolder, faGlobe, faGlobeEurope, faHandshake,
     faLaptop, faMobile, faRandom, faSitemap, faSyncAlt, faUsers, faWifi
 } from "@fortawesome/free-solid-svg-icons";
+import useDragger from "@/hooks/useDragger";
 import useHover from "@/hooks/useHover";
 import useQueryRouter from "@/hooks/useQueryRouter";
-import Tab, { TTab, newTab } from "@/components/Tab";
+import Tab, { TTab, newReportTab } from "@/components/Tab";
 import Button from "@/components/Button";
 import CalendarButton from "@/components/CalendarButton";
 import DropdownButton, { DropdownItem } from "@/components/DropdownButton";
@@ -19,13 +20,28 @@ import { useTabsStore } from "@/lib/store";
 import { EItemName, TClick } from "@/lib/types";
 import useActiveTab from "@/hooks/useActiveTab";
 
-export default function ReportView({ clicks, page, size }: {
+export default function ReportView({ clicks, page, size, timeframe, reportItemName }: {
     clicks: TClick[];
     page: number;
     size: number;
+    timeframe: [Date, Date];
+    reportItemName: EItemName | null;
 }) {
-    const { mainTab, reportTabs, updateTabItemNameById, removeReportTabById } = useTabsStore(store => store);
+    const {
+        mainTab, reportTabs, updateTabPageById, updateTabSizeById,
+        updateTabTimeframeById, updateTabReportItemNameById, updateTabItemNameById, removeReportTabById
+    } = useTabsStore(store => store);
+
     const activeTab = useActiveTab();
+    useEffect(() => {
+        if (activeTab?.id) {
+            updateTabPageById(activeTab.id, page);
+            updateTabSizeById(activeTab.id, size);
+            updateTabTimeframeById(activeTab.id, timeframe);
+            if (reportItemName) updateTabReportItemNameById(activeTab.id, reportItemName);
+        }
+    }, [page, size, timeframe, reportItemName]);
+
     const params = useParams();
     const queryRouter = useQueryRouter();
 
@@ -33,7 +49,7 @@ export default function ReportView({ clicks, page, size }: {
         removeReportTabById(tab.id);
         // If the deleted tab was the current one, redirect to /dashboard
         if (tab.id === params?.tabId) {
-            queryRouter.push("/dashboard", {}, true)
+            queryRouter.push("/dashboard");
         }
     }
 
@@ -51,13 +67,13 @@ export default function ReportView({ clicks, page, size }: {
                 </div>
                 <Tab
                     tab={mainTab}
-                    onClick={() => queryRouter.push("/dashboard", {}, true)}
+                    onClick={() => queryRouter.push("/dashboard")}
                 />
                 {reportTabs.map(tab => (
                     <Tab
                         key={tab.id}
                         tab={tab}
-                        onClick={tab => queryRouter.push(`/dashboard/report/${tab.id}`, {}, true)}
+                        onClick={tab => queryRouter.push(`/dashboard/report/${tab.itemName}/${tab.id}`)}
                         onClose={handleTabClose}
                     />
                 ))}
@@ -71,7 +87,10 @@ export default function ReportView({ clicks, page, size }: {
                             onClick={item => updateTabItemNameById(activeTab.id, item.itemName)}
                         />
                         <LowerControlPanel tab={activeTab} />
-                        <DataTable />
+                        <DataTable
+                            clicks={clicks}
+                            itemName={activeTab.itemName}
+                        />
                     </>
                     : "Report Not Found :("
                 }
@@ -253,13 +272,14 @@ function useIsActive(group: TUpperCPItemGroup): boolean {
 function LowerControlPanel({ tab }: {
     tab: TTab;
 }) {
-    const { makeNewReportTab, updateTabTimeframeById, updateTabReportChainById } = useTabsStore(store => store);
+    const { makeNewReportTab, updateTabReportChainById } = useTabsStore(store => store);
     const queryRouter = useQueryRouter();
 
     function handleClick() {
-        const _tab = newTab(EItemName.LANDING_PAGE, "report", faBullseye);
+        const id = "REPLACE"; // TODO: Pull id from the first data table row that is selected
+        const _tab = newReportTab(EItemName.CAMPAIGN, faBullseye, tab.itemName, id);
         makeNewReportTab(_tab);
-        queryRouter.push(`/dashboard/report/${_tab.id}`, {}, true);
+        queryRouter.push(`/dashboard/report/${tab.itemName}/${_tab.id}`);
     }
 
     return (
@@ -267,24 +287,27 @@ function LowerControlPanel({ tab }: {
             className="flex flex-col justify-center align-start gap-6 w-full px-8 py-6 bg-[#ebedef]"
             style={{ borderTop: "solid lightgrey 3px" }}
         >
-            <Row>
-                <CalendarButton timeframe={tab.timeframe} onChange={timeframe => updateTabTimeframeById(tab.id, timeframe)} />
+            <LowerCPRow>
+                <CalendarButton
+                    timeframe={tab.timeframe}
+                    onChange={timeframe => queryRouter.push(`/dashboard/report/${tab.itemName}/${tab.id}`)}
+                />
                 <RefreshButton />
                 {tab.type === "main" && <ReportButton onClick={handleClick} />}
-            </Row>
-            <Row>
+            </LowerCPRow>
+            <LowerCPRow>
                 {tab.type === "report" &&
                     <ReportChain
                         reportChain={tab.reportChain}
                         onChange={reportChain => updateTabReportChainById(tab.id, reportChain)}
                     />
                 }
-            </Row>
+            </LowerCPRow>
         </div>
     )
 }
 
-function Row({ children }: {
+function LowerCPRow({ children }: {
     children: React.ReactNode
 }) {
     return (
@@ -338,8 +361,7 @@ function ReportChain({ reportChain, onChange }: {
     const activeTab = useActiveTab();
     const dropdownItems = Object.values(EItemName);
 
-    const arrayOfFalse = reportChain.map(() => false);
-    const [dropdownsActive, setDropdownsActive] = useState(arrayOfFalse);
+    const [dropdownsActive, setDropdownsActive] = useState<[boolean, boolean, boolean]>([false, false, false]);
 
     useEffect(() => {
         if (!activeTab?.itemName) return;
@@ -348,22 +370,21 @@ function ReportChain({ reportChain, onChange }: {
 
     function handleClick(chainlink: TReportChainLink, index: number) {
         if (!chainlink) return;
-
         if (index === 0 && activeTab?.id && chainlink?.itemName) {
             updateTabItemNameById(activeTab.id, chainlink.itemName);
         }
+        setDropdownsActive([false, false, false]);
 
-        setDropdownsActive(arrayOfFalse);
-
-        const newReportChain = [...reportChain];
-        newReportChain.splice(
-            index,
-            MAX_REPORT_CHAIN_LENGTH,
-            { ...chainlink },
-            {},
-            ...arrayOf(null, MAX_REPORT_CHAIN_LENGTH)
-        );
-        onChange(newReportChain.slice(0, MAX_REPORT_CHAIN_LENGTH) as TReportChain);
+        const newReportChain = [...reportChain]
+            .splice(
+                index,
+                MAX_REPORT_CHAIN_LENGTH,
+                { ...chainlink },
+                {},
+                ...arrayOf(null, MAX_REPORT_CHAIN_LENGTH)
+            )
+            .slice(0, MAX_REPORT_CHAIN_LENGTH) as TReportChain;
+        onChange(newReportChain);
     }
 
     function handleSetActive(active: boolean, index: number) {
@@ -371,7 +392,7 @@ function ReportChain({ reportChain, onChange }: {
             const newDropdownsActive = [...prevDropdownsActive];
             newDropdownsActive.splice(index, 1, active);
 
-            return newDropdownsActive;
+            return newDropdownsActive as [boolean, boolean, boolean];
         });
     }
 
@@ -420,8 +441,202 @@ export function arrayOf<T>(any: T, length: number = 1): T[] {
     return result;
 }
 
-function DataTable() {
+function DataTable({ clicks, itemName }: {
+    clicks: TClick[];
+    itemName: EItemName;
+}) {
+    const rows = makeRows(clicks, itemName);
+    const [columns, setColumns] = useState<TColumn[]>(initialColumns);
+
+    console.log(clicks);
+    console.log(rows);
+
     return (
-        <div>Data Table</div>
+        <div className="relative flex flex-col min-h-[400px] max-w-[100vw] overflow-x-scroll">
+            <div className="absolute top-0 left-0 h-full">
+                <TitleRow name={itemName} columns={columns} setColumns={setColumns} />
+                {Object.entries(rows).map(([name, clicks]) => (
+                    <Row key={name} name={name} clicks={clicks} columns={columns} />
+                ))}
+            </div>
+        </div>
     )
 }
+
+type TColumn = {
+    title: string;
+    width: string;
+};
+
+const columnTitles = [
+    "Name",
+    "Visits",
+    "Clicks",
+    "Conversions",
+    "Revenue",
+    "Cost",
+    "Profit",
+    "CPV",
+    "CPC",
+    "CPCV",
+    "CTR",
+    "CVR",
+    "ROI",
+    "EPV",
+    "EPC",
+];
+
+const initialColumns = columnTitles.map((title, i) => ({ title, width: i === 0 ? '300px' : '100px' }));
+
+function TitleRow({ name, columns, setColumns }: {
+    name: string;
+    columns: TColumn[];
+    setColumns: (cols: TColumn[]) => any;
+}) {
+    const mouseDownClientX = useRef<number>(0);
+
+    const startDrag = useDragger((e, i) => {
+        if (typeof i === "number") {
+            const newWidth = `${parseFloat(columns[i].width) + e.clientX - mouseDownClientX.current}px`;
+            setColumns(columns.map((col, index) => index === i ? { ...col, width: newWidth } : col));
+        }
+    });
+
+    function handleMouseDown(e: React.MouseEvent<HTMLDivElement>, i: number) {
+        mouseDownClientX.current = e.clientX;
+        startDrag(e, i);
+    }
+
+    return (
+        <RowWrapper>
+            {columns.map(({ title, width }, index) => (
+                <Fragment key={index}>
+                    <Cell value={index === 0 ? name : title} width={width} />
+                    <div className="relative h-auto w-[0px]">
+                        <div
+                            className="absolute top-0 left-0 h-full w-[1px] bg-blue-500 cursor-e-resize"
+                            onMouseDown={e => handleMouseDown(e, index)}
+                        />
+                    </div>
+                </Fragment>
+            ))}
+        </RowWrapper>
+    )
+}
+
+type RowsHashMap = Record<string, TClick[]>
+
+function Row({ name, clicks, columns }: {
+    name: keyof RowsHashMap;
+    clicks: TClick[];
+    columns: TColumn[];
+}) {
+    const cells = makeCells(clicks, name);
+
+    return (
+        <RowWrapper>
+            {cells.map((value, index) => (
+                <Cell key={index} value={value} width={columns[index].width} />
+            ))}
+        </RowWrapper>
+    )
+}
+
+function Cell({ value, width }: {
+    value: string | number;
+    width: string;
+}) {
+    return (
+        <div className="px-1" style={{ width }}>
+            {value}
+        </div>
+    )
+}
+
+function RowWrapper({ children }: {
+    children: React.ReactNode;
+}) {
+    return (
+        <div className="flex w-full px-4">
+            {children}
+        </div>
+    )
+}
+
+function makeRows(clicks: TClick[], itemName: EItemName) {
+    return clicks.reduce((acc: RowsHashMap, curr: TClick) => {
+        const clickProp = itemNameToClickProp(itemName);
+        const key = clickProp ? curr[clickProp] : null;
+        if (key && (typeof key === "string" || typeof key === "number")) {
+            const keyStr = key.toString();
+            if (acc[keyStr]) {
+                acc[keyStr].push(curr);
+            } else {
+                acc[keyStr] = [curr];
+            }
+        }
+        return acc;
+    }, {});
+}
+
+function makeCells(clicks: TClick[], name: string): (string | number)[] {
+    const numVisits = clicks.length;
+    const numClicks = clicks.filter(click => !!click.clickTime).length;
+    const numConversions = clicks.filter(click => !!click.convTime).length;
+    const revenue = clicks.reduce((total, click) => total + click.revenue, 0);
+    const cost = clicks.reduce((total, click) => total + click.cost, 0);
+    const profit = revenue - cost;
+    const cpv = (cost / numVisits) || 0;
+    const cpc = (cost / numClicks) || 0;
+    const cpcv = (cost / numConversions) || 0;
+    const ctr = (numClicks / numVisits) || 0;
+    const cvr = (numConversions / numVisits) || 0;
+    const roi = ((revenue - cost) / cost) || 0;
+    const epv = (revenue / numVisits) || 0;
+    const epc = (revenue / numClicks) || 0;
+
+    return [
+        name,
+        numVisits,
+        numClicks,
+        numConversions,
+        revenue,
+        cost,
+        profit,
+        cpv,              // cost per visit
+        cpc,              // cost per click
+        cpcv,             // cost per conversion
+        ctr,              // clickthrough rate
+        cvr,              // conversion rate
+        roi,              // return on investment
+        epv,              // earnings per visit
+        epc,              // earnings per click    
+    ];
+}
+
+function itemNameToClickProp(itemName: EItemName): keyof TClick | undefined {
+    return hashMap[itemName];
+}
+
+const hashMap: Record<EItemName, keyof TClick> = {
+    [EItemName.AFFILIATE_NETWORK]: "affiliateNetworkId",
+    [EItemName.CAMPAIGN]: "campaignId",
+    [EItemName.FLOW]: "flowId",
+    [EItemName.LANDING_PAGE]: "landingPageId",
+    [EItemName.OFFER]: "offerId",
+    [EItemName.TRAFFIC_SOURCE]: "trafficSourceId",
+    [EItemName.IP]: "ip",
+    [EItemName.ISP]: "isp",
+    [EItemName.USER_AGENT]: "userAgent",
+    [EItemName.LANGUAGE]: "language",
+    [EItemName.COUNTRY]: "country",
+    [EItemName.REGION]: "region",
+    [EItemName.CITY]: "city",
+    [EItemName.DEVICE_TYPE]: "deviceType",
+    [EItemName.DEVICE]: "device",
+    [EItemName.SCREEN_RESOLUTION]: "screenResolution",
+    [EItemName.OS]: "os",
+    [EItemName.OS_VERSION]: "osVersion",
+    [EItemName.BROWSER_NAME]: "browserName",
+    [EItemName.BROWSER_VERSION]: "browserVersion",
+};
