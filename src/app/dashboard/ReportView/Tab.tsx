@@ -4,11 +4,11 @@ import { useParams } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition, faClose } from "@fortawesome/free-solid-svg-icons";
 import { EItemName } from "@/lib/types";
-import { TReportChain } from "@/app/dashboard/ReportView";
+import { TReportChain } from "./ReportChain";
 
-export type TTabType = "main" | "report";
+export type TViewType = "main" | "report";
 
-export type TTab = {
+export type TView = {
     id: "0";
     itemName: EItemName;
     type: "main";
@@ -29,7 +29,7 @@ export type TTab = {
     size: number;
 };
 
-export function newMainTab(itemName: EItemName, icon: IconDefinition): TTab {
+export function newMainView(itemName: EItemName, icon: IconDefinition): TView {
     return {
         id: "0",
         itemName,
@@ -42,7 +42,7 @@ export function newMainTab(itemName: EItemName, icon: IconDefinition): TTab {
     };
 }
 
-export function newReportTab(itemName: EItemName, icon: IconDefinition, reportItemName: EItemName, reportItemId: string): TTab {
+export function newReportView(itemName: EItemName, icon: IconDefinition, reportItemName: EItemName, reportItemId: string): TView {
     return {
         id: reportItemId,
         itemName,
@@ -56,24 +56,24 @@ export function newReportTab(itemName: EItemName, icon: IconDefinition, reportIt
     };
 }
 
-export default function Tab({ tab, onClick, onClose }: {
-    tab: TTab;
-    onClick: (tab: TTab) => any;
-    onClose?: (tab: TTab) => any;
+export default function Tab({ view, onClick, onClose }: {
+    view: TView;
+    onClick: (view: TView) => any;
+    onClose?: (view: TView) => any;
 }) {
-    const { itemName, icon } = tab;
+    const { itemName, icon } = view;
     const params = useParams();
-    const active = params?.id === tab.id || (!params?.id && tab.type === "main");
+    const active = params?.id === view.id || (!params?.id && view.type === "main");
 
     function handleClose(e: React.MouseEvent<HTMLOrSVGElement>) {
         e.stopPropagation();
-        if (onClose) onClose(tab);
+        if (onClose) onClose(view);
     }
 
     return (
         <div className="flex items-end h-full mr-[8px]">
             <div
-                onClick={() => onClick(tab)}
+                onClick={() => onClick(view)}
                 className={(active ? "bg-[#ffffff] " : "bg-[#c3ccd2] hover:bg-[#d0d9de] ")
                     + " group relative h-[32px] max-w-[245px] text-[#394146] text-sm text-ellipsis overflow-hidden cursor-pointer"}
                 style={{
