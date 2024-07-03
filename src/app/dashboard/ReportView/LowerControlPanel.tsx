@@ -1,16 +1,16 @@
 "use client";
 
 import useQueryRouter from "@/hooks/useQueryRouter";
-import { TView } from "@/app/dashboard/ReportView/Tab";
 import CalendarButton from "@/components/CalendarButton";
 import RefreshButton from "@/components/RefreshButton";
 import ReportButton from "@/components/ReportButton";
 import ReportChain from "./ReportChain";
-import { useViewsStore } from "@/lib/store";
+import { TView, useViewsStore } from "@/lib/store";
 
-export default function LowerControlPanel({ view, onNewReport }: {
+export default function LowerControlPanel({ view, onNewReport, newReportDisabled }: {
     view: TView;
     onNewReport: () => any;
+    newReportDisabled?: boolean;
 }) {
     const { updateViewReportChainById } = useViewsStore(store => store);
     const queryRouter = useQueryRouter();
@@ -23,10 +23,19 @@ export default function LowerControlPanel({ view, onNewReport }: {
             <LowerCPRow>
                 <CalendarButton
                     timeframe={view.timeframe}
-                    onChange={timeframe => queryRouter.push(`/dashboard/report/${view.itemName}/${view.id}`)}
+                    onChange={timeframe => {
+                        if (view.reportItemName) {
+                            queryRouter.push(`/dashboard/report/${encodeURIComponent(view.reportItemName)}/${encodeURIComponent(view.id)}`);
+                        }
+                    }}
                 />
                 <RefreshButton />
-                {view.type === "main" && <ReportButton onClick={onNewReport} />}
+                {view.type === "main" &&
+                    <ReportButton
+                        onClick={onNewReport}
+                        disabled={newReportDisabled}
+                    />
+                }
             </LowerCPRow>
             <LowerCPRow>
                 {view.type === "report" &&

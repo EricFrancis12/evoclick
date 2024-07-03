@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
-import TagsInput from "../TagsInput";
+import TagsInput from "../../../../components/TagsInput";
 import { createNewAffiliateNetworkAction } from "@/lib/actions";
 import { TAffiliateNetwork_createRequest } from "@/lib/types";
 

@@ -4,7 +4,7 @@ import { useRef, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition, faChevronUp, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
-export default function DropdownButton({ children, disabled, active, setActive, icon, text, onClick, className }: {
+export default function DropdownButton({ children, disabled, active, setActive, icon, text, onClick, className = "" }: {
     children: React.ReactNode;
     disabled?: boolean;
     active: boolean;
@@ -19,28 +19,26 @@ export default function DropdownButton({ children, disabled, active, setActive, 
 
     useEffect(() => {
         if (!active) return;
-
         if (onClick) {
             onClick(false);
-        } else if (setActive) {
+        } else {
             setActive(false);
         }
     }, [disabled]);
 
     useEffect(() => {
         document.addEventListener("click", handleGlobalClick);
-
         return () => document.removeEventListener("click", handleGlobalClick);
 
         function handleGlobalClick(e: MouseEvent) {
-            if (setActive && !traverseParentsForRef(e.target as HTMLElement, ref)) setActive(false);
+            if (!traverseParentsForRef(e.target as HTMLElement, ref)) setActive(false);
         }
     }, []);
 
     return (
         <div
             ref={ref}
-            className={" relative whitespace-nowrap " + (className || " ") + (!disabled ? "cursor-pointer " : " ")}
+            className={" relative whitespace-nowrap " + className + (!disabled ? " cursor-pointer" : "")}
         >
             <div
                 className={(!disabled ? "hover:opacity-70 " : "opacity-40 ") + "flex justify-between px-2 py-2"}

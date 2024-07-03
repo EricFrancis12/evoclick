@@ -1,39 +1,49 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { faTachometerAltFast } from "@fortawesome/free-solid-svg-icons";
+import { IconDefinition, faTachometerAltFast } from "@fortawesome/free-solid-svg-icons";
 import { EItemName } from "./types";
-import { TView } from "../app/dashboard/ReportView/Tab";
 import { TReportChain } from "@/app/dashboard/ReportView/ReportChain";
+
+export type TView = {
+    type: "main";
+    id: "0";
+    itemName: EItemName;
+    icon: IconDefinition;
+    timeframe: [Date, Date];
+    reportItemName: null;
+    page: number;
+    size: number;
+} | {
+    type: "report";
+    id: string;
+    itemName: EItemName;
+    icon: IconDefinition;
+    timeframe: [Date, Date];
+    reportItemName: EItemName;
+    reportChain: TReportChain;
+    page: number;
+    size: number;
+};
 
 interface IViewsState {
     mainView: TView;
     reportViews: TView[];
-    makeNewReportView: (view: TView) => void;
+    addReportView: (view: TView) => void;
     updateViewOnPageLoad: (id: string, opts: { page: number, size: number, timeframe: [Date, Date] }) => void;
-    updateViewReportItemNameById: (id: string, reportItemName: EItemName) => void;
     updateViewItemNameById: (id: string, itemName: EItemName) => void;
     updateViewReportChainById: (id: string, reportChain: TReportChain) => void;
     removeReportViewById: (id: string) => void;
     removeAllReportViews: () => void;
 }
 
-const initialMainView: TView = {
-    id: "0",
-    icon: faTachometerAltFast,
-    type: "main",
-    itemName: EItemName.CAMPAIGN,
-    timeframe: [new Date, new Date],
-    reportItemName: null,
-    page: 1,
-    size: 50,
-};
+const initialMainView = newMainView(EItemName.CAMPAIGN, faTachometerAltFast);
 
 export const useViewsStore = create<IViewsState>()(
     persist(
         (set) => ({
             mainView: initialMainView,
             reportViews: [],
-            makeNewReportView: (view) => set((state) => ({ reportViews: [...state.reportViews, view] })),
+            addReportView: (view) => set((state) => ({ reportViews: [...state.reportViews, view] })),
             updateViewItemNameById: (id, itemName) => set((state) => ({
                 mainView: state.mainView.id === id
                     ? { ...state.mainView, itemName }
@@ -52,11 +62,6 @@ export const useViewsStore = create<IViewsState>()(
                         : view),
                 };
             }),
-            updateViewReportItemNameById: (id, reportItemName) => set((state) => ({
-                reportViews: state.reportViews.map(view => view.id === id && view.type === "report"
-                    ? { ...view, reportItemName }
-                    : view),
-            })),
             updateViewReportChainById: (id, reportChain) => set((state) => ({
                 reportViews: state.reportViews.map(view => view.id === id
                     ? { ...view, reportChain }
@@ -73,3 +78,30 @@ export const useViewsStore = create<IViewsState>()(
         },
     ),
 );
+
+export function newMainView(itemName: EItemName, icon: IconDefinition): TView {
+    return {
+        id: "0",
+        itemName,
+        type: "main",
+        icon,
+        timeframe: [new Date, new Date],
+        reportItemName: null,
+        page: 1,
+        size: 50,
+    };
+}
+
+export function newReportView(itemName: EItemName, icon: IconDefinition, reportItemName: EItemName, reportItemId: string): TView {
+    return {
+        id: reportItemId,
+        itemName,
+        type: "report",
+        icon,
+        timeframe: [new Date, new Date],
+        reportItemName,
+        reportChain: [{}, null, null],
+        page: 1,
+        size: 50,
+    };
+}

@@ -6,8 +6,8 @@ import { useParams } from "next/navigation";
 import useActiveView from "@/hooks/useActiveView";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import Report from "./Report";
-import Tab, { TView } from "@/app/dashboard/ReportView/Tab";
-import { useViewsStore } from "@/lib/store";
+import Tab from "@/app/dashboard/ReportView/Tab";
+import { TView, useViewsStore } from "@/lib/store";
 import { EItemName, TClick } from "@/lib/types";
 
 export default function ReportView({ clicks, page, size, timeframe, reportItemName }: {
@@ -18,23 +18,22 @@ export default function ReportView({ clicks, page, size, timeframe, reportItemNa
     reportItemName: EItemName | null;
 }) {
     const {
-        mainView, reportViews, updateViewOnPageLoad, updateViewReportItemNameById, removeReportViewById
+        mainView, reportViews, updateViewOnPageLoad, removeReportViewById
     } = useViewsStore(store => store);
 
     const activeView = useActiveView();
     useEffect(() => {
         if (activeView?.id) {
             updateViewOnPageLoad(activeView.id, { page, size, timeframe, });
-            if (reportItemName) updateViewReportItemNameById(activeView.id, reportItemName);
         }
-    }, [page, size, timeframe, reportItemName]);
+    }, [page, size, timeframe]);
 
     const params = useParams();
     const queryRouter = useQueryRouter();
 
+    // Delete view, then if the deleted view was the current one redirect to /dashboard
     function handleViewClose(view: TView) {
         removeReportViewById(view.id);
-        // If the deleted view was the current one, redirect to /dashboard
         if (view.id === params?.id) {
             queryRouter.push("/dashboard");
         }
@@ -60,7 +59,11 @@ export default function ReportView({ clicks, page, size, timeframe, reportItemNa
                     <Tab
                         key={view.id}
                         view={view}
-                        onClick={view => queryRouter.push(`/dashboard/report/${view.itemName}/${view.id}`)}
+                        onClick={view => {
+                            if (view.reportItemName) {
+                                queryRouter.push(`/dashboard/report/${encodeURIComponent(view.reportItemName)}/${encodeURIComponent(view.id)}`);
+                            }
+                        }}
                         onClose={handleViewClose}
                     />
                 ))}

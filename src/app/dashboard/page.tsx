@@ -18,8 +18,8 @@ export default async function DashboardPage({ params, searchParams }: {
         ? [new Date(splitOnComma[0]), new Date(splitOnComma[1])]
         : [new Date("2024-06-20"), new Date("2024-07-30")];
 
-    const reportItemName = (params?.itemName || null) as EItemName | null;
-    const reportItemId = (params?.id || null) as EItemName | null;
+    const reportItemName = (params.itemName ? decodeURIComponent(params.itemName) : null) as EItemName | null;
+    const reportItemId = (params.id ? decodeURIComponent(params.id) : null) as EItemName | null;
 
     try {
         const clicks = await getClicks({

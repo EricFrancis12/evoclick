@@ -1,32 +1,18 @@
 "use client";
 
-import { useState, useRef, useEffect, Fragment } from "react";
-import Image from "next/image";
-import { useParams } from "next/navigation";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-    IconDefinition, faBullseye, faChevronDown, faChevronUp, faFolder, faGlobe, faGlobeEurope, faHandshake,
-    faLaptop, faMobile, faRandom, faSitemap, faSyncAlt, faUsers, faWifi
-} from "@fortawesome/free-solid-svg-icons";
+import { useState, useEffect, Fragment } from "react";
 import useActiveView from "@/hooks/useActiveView";
-import useDragger from "@/hooks/useDragger";
-import useHover from "@/hooks/useHover";
-import useQueryRouter from "@/hooks/useQueryRouter";
-import Tab, { TView, newReportView } from "@/app/dashboard/ReportView/Tab";
-import Button from "@/components/Button";
-import CalendarButton from "@/components/CalendarButton";
 import DropdownButton, { DropdownItem } from "@/components/DropdownButton";
-import { refreshAction } from "@/lib/actions";
 import { useViewsStore } from "@/lib/store";
-import { EItemName, TClick } from "@/lib/types";
 import { arrayOf } from "@/lib/utils";
+import { EItemName } from "@/lib/types";
+
+const MAX_REPORT_CHAIN_LENGTH = 3;
 
 export type TReportChain = [TReportChainLink, TReportChainLink, TReportChainLink];
 export type TReportChainLink = null | {
     itemName?: EItemName;
 };
-
-const MAX_REPORT_CHAIN_LENGTH = 3;
 
 export default function ReportChain({ reportChain, onChange }: {
     reportChain: TReportChain;
@@ -39,8 +25,9 @@ export default function ReportChain({ reportChain, onChange }: {
     const [dropdownsActive, setDropdownsActive] = useState<[boolean, boolean, boolean]>([false, false, false]);
 
     useEffect(() => {
-        if (!activeView?.itemName) return;
-        handleClick({ itemName: activeView.itemName }, 0);
+        if (activeView?.itemName) {
+            handleClick({ itemName: activeView.itemName }, 0);
+        }
     }, [activeView?.itemName]);
 
     function handleClick(chainlink: TReportChainLink, index: number) {
@@ -66,7 +53,6 @@ export default function ReportChain({ reportChain, onChange }: {
         setDropdownsActive(prevDropdownsActive => {
             const newDropdownsActive = [...prevDropdownsActive];
             newDropdownsActive.splice(index, 1, active);
-
             return newDropdownsActive as [boolean, boolean, boolean];
         });
     }

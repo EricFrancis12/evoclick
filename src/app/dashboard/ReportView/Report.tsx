@@ -5,45 +5,47 @@ import { faBullseye } from "@fortawesome/free-solid-svg-icons";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import UpperControlPanel from "./UpperControlPanel";
 import LowerControlPanel from "./LowerControlPanel";
-import DataTable from "./DataTable";
-import { TView, newReportView } from "@/app/dashboard/ReportView/Tab";
-import { useViewsStore } from "@/lib/store";
+import DataTable, { TRow } from "./DataTable";
+import { TView, useViewsStore, newReportView } from "@/lib/store";
 import { EItemName, TClick } from "@/lib/types";
-import { RowsHashMap } from "./DataTable";
 
 export default function Report({ clicks, view }: {
     clicks: TClick[];
     view: TView;
 }) {
-    const [rows, setRows] = useState<RowsHashMap>(makeRows(clicks, view.itemName));
+    const { id, itemName } = view;
+    const [rows, setRows] = useState<TRow[]>(makeRows(clicks, itemName));
+    const selectedRows = rows.filter(row => row.selected === true);
+    console.log(selectedRows);
     useEffect(() => {
-        setRows(makeRows(clicks, view.itemName));
-    }, [clicks.length, view.itemName]);
+        setRows(makeRows(clicks, itemName));
+    }, [clicks.length, itemName]);
 
-    const { makeNewReportView, updateViewItemNameById } = useViewsStore(store => store);
+    const { reportViews, addReportView, updateViewItemNameById } = useViewsStore(store => store);
     const queryRouter = useQueryRouter();
 
     // Finds the first row that is selected and creates a report for it
     function handleNewReport() {
-        for (const id in rows) {
-            if (rows[id].selected) {
-                const _view = newReportView(EItemName.CAMPAIGN, faBullseye, view.itemName, id);
-                makeNewReportView(_view);
-                queryRouter.push(`/dashboard/report/${_view.itemName}/${_view.id}`);
-                return;
-            }
+        if (selectedRows.length < 1) return;
+        const _view = newReportView(EItemName.LANDING_PAGE, faBullseye, itemName, rows[0].name);
+        if (!reportViews.some(v => v.itemName === _view.itemName && v.id === _view.id)) {
+            addReportView(_view);
+        }
+        if (_view.reportItemName) {
+            queryRouter.push(`/dashboard/report/${encodeURIComponent(_view.reportItemName)}/${encodeURIComponent(_view.id)}`);
         }
     }
 
     return (
         <>
-            <UpperControlPanel onClick={item => updateViewItemNameById(view.id, item.itemName)} />
+            <UpperControlPanel onClick={item => updateViewItemNameById(id, item.itemName)} />
             <LowerControlPanel
                 view={view}
                 onNewReport={handleNewReport}
+                newReportDisabled={selectedRows.length < 1}
             />
             <DataTable
-                itemName={view.itemName}
+                itemName={itemName}
                 rows={rows}
                 setRows={setRows}
             />
@@ -51,30 +53,32 @@ export default function Report({ clicks, view }: {
     )
 }
 
-function makeRows(clicks: TClick[], itemName: EItemName) {
-    return clicks.reduce((acc: RowsHashMap, curr: TClick) => {
+function makeRows(clicks: TClick[], itemName: EItemName): TRow[] {
+    return clicks.reduce((acc: TRow[], curr: TClick) => {
         const clickProp = itemNameToClickProp(itemName);
         const key = clickProp ? curr[clickProp] : null;
         if (key && (typeof key === "string" || typeof key === "number")) {
-            const keyStr = key.toString();
-            if (acc[keyStr]?.clicks) {
-                acc[keyStr].clicks = [...acc[keyStr].clicks, curr]
+            const name = key.toString();
+            const i = acc.findIndex(row => row.name === name);
+            if (i !== -1) {
+                acc[i].clicks.push(curr);
             } else {
-                acc[keyStr] = {
+                acc.push({
+                    name,
                     clicks: [curr],
                     selected: false,
-                };
+                });
             }
         }
         return acc;
-    }, {});
+    }, []);
 }
 
 function itemNameToClickProp(itemName: EItemName): keyof TClick | undefined {
-    return hashMap[itemName];
+    return clickPropsMap[itemName];
 }
 
-const hashMap: Record<EItemName, keyof TClick> = {
+const clickPropsMap: Record<EItemName, keyof TClick> = {
     [EItemName.AFFILIATE_NETWORK]: "affiliateNetworkId",
     [EItemName.CAMPAIGN]: "campaignId",
     [EItemName.FLOW]: "flowId",

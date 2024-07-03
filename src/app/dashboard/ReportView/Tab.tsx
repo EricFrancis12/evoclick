@@ -2,68 +2,16 @@
 
 import { useParams } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconDefinition, faClose } from "@fortawesome/free-solid-svg-icons";
-import { EItemName } from "@/lib/types";
-import { TReportChain } from "./ReportChain";
-
-export type TViewType = "main" | "report";
-
-export type TView = {
-    id: "0";
-    itemName: EItemName;
-    type: "main";
-    icon: IconDefinition;
-    timeframe: [Date, Date];
-    reportItemName: null;
-    page: number;
-    size: number;
-} | {
-    id: string;
-    itemName: EItemName;
-    type: "report";
-    icon: IconDefinition;
-    timeframe: [Date, Date];
-    reportItemName: EItemName;
-    reportChain: TReportChain;
-    page: number;
-    size: number;
-};
-
-export function newMainView(itemName: EItemName, icon: IconDefinition): TView {
-    return {
-        id: "0",
-        itemName,
-        type: "main",
-        icon,
-        timeframe: [new Date, new Date],
-        reportItemName: null,
-        page: 1,
-        size: 50,
-    };
-}
-
-export function newReportView(itemName: EItemName, icon: IconDefinition, reportItemName: EItemName, reportItemId: string): TView {
-    return {
-        id: reportItemId,
-        itemName,
-        type: "report",
-        icon,
-        timeframe: [new Date, new Date],
-        reportItemName,
-        reportChain: [{}, null, null],
-        page: 1,
-        size: 50,
-    };
-}
+import { faClose } from "@fortawesome/free-solid-svg-icons";
+import { TView } from "@/lib/store";
 
 export default function Tab({ view, onClick, onClose }: {
     view: TView;
     onClick: (view: TView) => any;
     onClose?: (view: TView) => any;
 }) {
-    const { itemName, icon } = view;
-    const params = useParams();
-    const active = params?.id === view.id || (!params?.id && view.type === "main");
+    const { type, reportItemName, icon } = view;
+    const isActive = useIsTabActive(view);
 
     function handleClose(e: React.MouseEvent<HTMLOrSVGElement>) {
         e.stopPropagation();
@@ -74,7 +22,7 @@ export default function Tab({ view, onClick, onClose }: {
         <div className="flex items-end h-full mr-[8px]">
             <div
                 onClick={() => onClick(view)}
-                className={(active ? "bg-[#ffffff] " : "bg-[#c3ccd2] hover:bg-[#d0d9de] ")
+                className={(isActive ? "bg-[#ffffff] " : "bg-[#c3ccd2] hover:bg-[#d0d9de] ")
                     + " group relative h-[32px] max-w-[245px] text-[#394146] text-sm text-ellipsis overflow-hidden cursor-pointer"}
                 style={{
                     userSelect: "none",
@@ -84,10 +32,10 @@ export default function Tab({ view, onClick, onClose }: {
                 }}
             >
                 <FontAwesomeIcon icon={icon} className="mr-[8px]" />
-                <span>{itemName}</span>
+                <span>{type === "main" ? "Dashboard" : reportItemName}</span>
                 {onClose &&
                     <div className="absolute flex justify-end items-center top-0 left-0 h-full w-full">
-                        <div className={(active ? "bg-[#ffffff] " : "bg-[#c3ccd2] group-hover:bg-[#d0d9de] ")}>
+                        <div className={(isActive ? "bg-[#ffffff] " : "bg-[#c3ccd2] group-hover:bg-[#d0d9de] ")}>
                             <FontAwesomeIcon
                                 icon={faClose}
                                 className="mr-2 cursor-pointer"
@@ -99,4 +47,18 @@ export default function Tab({ view, onClick, onClose }: {
             </div>
         </div>
     )
+}
+
+function useIsTabActive(view: TView): boolean {
+    const params = useParams();
+
+    const isActiveMainTab = view.type === "main" && !params.id;
+    if (isActiveMainTab) return true;
+
+    const isActiveReportTab = view.type === "report"
+        && typeof params.id === "string"
+        && decodeURIComponent(params.id) === view.id;
+    if (isActiveReportTab) return true;
+
+    return false;
 }
