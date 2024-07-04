@@ -3,15 +3,16 @@
 import React, { useState, useContext, useEffect } from "react";
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
-import Button from "@/components/Button";
+import { faCheck, faTimes, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import FlowBuilder, { newRoute } from "./FlowBuilder";
 import TagsInput from "@/components/TagsInput";
+import Button from "@/components/Button";
 import { Input, Select } from "@/components/base";
 import { getAllAffiliateNetworksAction, getAllTrafficSourcesAction } from "@/lib/actions";
 import { EItemName, TAffiliateNetwork, TNamedToken, TRoute, TToken, TTrafficSource } from "@/lib/types";
 import { $Enums } from "@prisma/client";
 
-export type TActionMenu = TAffiliateNetworkActionMenu | TCampaignActionMenu | TFlowActionMenu
+export type TActionMenu = TAffiliateNetworkActionMenu | TCampaignActionMenu | TSavedFlowActionMenu
     | TLandingPageActionMenu | TOfferActionMenu | TTrafficSourceActionMenu;
 
 export type TReportViewContext = {
@@ -32,6 +33,7 @@ export function useReportView() {
 export function ReportViewProvider({ children }: {
     children: React.ReactNode;
 }) {
+    // TODO: Add ability to have multiple layer of action menus
     const [actionMenu, setActionMenu] = useState<TActionMenu | null>(null);
 
     const value = {
@@ -45,11 +47,11 @@ export function ReportViewProvider({ children }: {
                 <>
                     <div
                         className="absolute h-screen w-screen bg-black opacity-50"
-                        style={{ zIndex: 100 }}
+                        style={{ zIndex: 99 }}
                     />
                     <div
                         className="absolute flex justify-center items-center h-screen w-screen bg-transparent"
-                        style={{ zIndex: 200 }}
+                        style={{ zIndex: 100 }}
                     >
                         <ActionMenu actionMenu={actionMenu} onClose={() => setActionMenu(null)} />
                     </div>
@@ -65,13 +67,13 @@ function ActionMenu({ actionMenu, onClose }: {
     onClose: () => any;
 }) {
     return (
-        <div className="flex flex-col justify-between items-center h-[400px] w-[300px] bg-white">
+        <div className="flex flex-col justify-between items-center bg-white">
             <ActionMenuHeader
                 title={actionMenu.itemName}
                 onClose={onClose}
             />
             <ActionMenuBody actionMenu={actionMenu} />
-            <ActionMenunFooter
+            <ActionMenuFooter
                 onSave={() => console.log(actionMenu)}
                 onClose={onClose}
             />
@@ -106,7 +108,7 @@ export function ActionMenuBody({ actionMenu }: {
         case EItemName.CAMPAIGN:
             return <CampaignBody actionMenu={actionMenu} />;
         case EItemName.FLOW:
-            return <FlowBody actionMenu={actionMenu} />;
+            return <SavedFlowBody actionMenu={actionMenu} />;
         case EItemName.LANDING_PAGE:
             return <LandingPageBody actionMenu={actionMenu} />;
         case EItemName.OFFER:
@@ -208,14 +210,30 @@ function CampaignBody({ actionMenu }: {
     )
 }
 
-function FlowBody({ actionMenu }: {
-    actionMenu: TFlowActionMenu;
+function SavedFlowBody({ actionMenu }: {
+    actionMenu: TSavedFlowActionMenu;
 }) {
-    // TODO: ...
+    const { setActionMenu } = useReportView();
+
     return (
-        <div>
-            FlowBody
-        </div>
+        <ActionMenuBodyWrapper>
+            <Input
+                name="Name"
+                value={actionMenu.name || ""}
+                onChange={e => setActionMenu({ ...actionMenu, name: e.target.value })}
+            />
+            <FlowBuilder
+                value={{
+                    mainRoute: actionMenu.mainRoute || newRoute(),
+                    ruleRoutes: actionMenu.ruleRoutes || [],
+                }}
+                onChange={({ mainRoute, ruleRoutes }) => setActionMenu({ ...actionMenu, mainRoute, ruleRoutes })}
+            />
+            <TagsInput
+                tags={actionMenu.tags || []}
+                setTags={tags => setActionMenu({ ...actionMenu, tags })}
+            />
+        </ActionMenuBodyWrapper>
     )
 }
 
@@ -300,7 +318,7 @@ function TrafficSourceBody({ actionMenu }: {
     actionMenu: TTrafficSourceActionMenu;
 }) {
     const { setActionMenu } = useReportView();
-    // TODO: ...
+
     return (
         <ActionMenuBodyWrapper>
             <Input
@@ -308,12 +326,47 @@ function TrafficSourceBody({ actionMenu }: {
                 value={actionMenu.name || ""}
                 onChange={e => setActionMenu({ ...actionMenu, name: e.target.value })}
             />
-
             <Input
                 name="Postback URL"
                 value={actionMenu.postbackUrl || ""}
                 onChange={e => setActionMenu({ ...actionMenu, postbackUrl: e.target.value })}
             />
+            <TokensInputWrapper
+                onCreateNew={() => setActionMenu({
+                    ...actionMenu,
+                    customTokens: [...(actionMenu.customTokens || []), newNamedToken()]
+                })}
+            >
+                <TokenInput
+                    title="External ID"
+                    token={actionMenu.externalIdToken || newToken()}
+                    onChange={externalIdToken => setActionMenu({ ...actionMenu, externalIdToken })}
+                />
+                <TokenInput
+                    title="Cost"
+                    token={actionMenu.costToken || newToken()}
+                    onChange={costToken => setActionMenu({ ...actionMenu, costToken })}
+                />
+                {actionMenu.customTokens?.map((token, index) => (
+                    <TokenInput
+                        key={index}
+                        title={`Custom ${index + 1}`}
+                        token={token as TNamedToken}
+                        onChange={_token => setActionMenu({
+                            ...actionMenu,
+                            customTokens: actionMenu.customTokens?.map(
+                                (custToken, i) => i === index && "name" in _token
+                                    ? { ..._token }
+                                    : custToken
+                            ),
+                        })}
+                        onDelete={() => setActionMenu({
+                            ...actionMenu,
+                            customTokens: actionMenu.customTokens?.filter((_, i) => i !== index)
+                        })}
+                    />
+                ))}
+            </TokensInputWrapper>
             <TagsInput
                 tags={actionMenu.tags || []}
                 setTags={tags => setActionMenu({ ...actionMenu, tags })}
@@ -322,7 +375,7 @@ function TrafficSourceBody({ actionMenu }: {
     )
 }
 
-export function ActionMenunFooter({ onClose, onSave, disabled }: {
+export function ActionMenuFooter({ onClose, onSave, disabled }: {
     onClose: React.MouseEventHandler<Element>;
     onSave?: React.MouseEventHandler<Element>;
     disabled?: boolean;
@@ -336,6 +389,114 @@ export function ActionMenunFooter({ onClose, onSave, disabled }: {
             {onSave &&
                 <Button icon={faCheck} text="Save" disabled={disabled} onClick={onSave} />
             }
+        </div>
+    )
+}
+
+function newToken(): TToken {
+    return {
+        queryParam: "",
+        value: "",
+    };
+}
+
+function newNamedToken(): TNamedToken {
+    return {
+        ...newToken(),
+        name: "",
+    };
+}
+
+function TokensInputWrapper({ children, onCreateNew }: {
+    children: React.ReactNode;
+    onCreateNew: () => any;
+}) {
+    // TODO: Refactor token columns
+    return (
+        <div className="flex flex-col justify-start items-start w-full">
+            <div className="flex justify-between items-center p-1 w-full">
+                <div className="flex justify-center items-center h-full w-full">
+                    <span></span>
+                </div>
+                <div className="flex justify-center items-center h-full w-full">
+                    <span>Query param</span>
+                </div>
+                <div className="flex justify-center items-center h-full w-full">
+                    <span>Token</span>
+                </div>
+                <div className="flex justify-center items-center h-full w-full">
+                    <span>Name</span>
+                </div>
+                <div className="w-[50px]">
+                    <span></span>
+                </div>
+            </div>
+            {children}
+            <div
+                className="flex justify-center items-center mt-4 p-1 w-full hover:bg-gray-200 cursor-pointer"
+                style={{ border: "solid black 1px", borderRadius: "6px", userSelect: "none" }}
+                onClick={onCreateNew}
+            >
+                <div className="flex justify-center items-center p-1 w-full">
+                    <span>+ Add Custom Token</span>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function TokenInput({ token, onChange, onDelete, title = "" }: {
+    token: TToken | TNamedToken;
+    onChange: (t: typeof token) => any;
+    onDelete?: () => any;
+    title?: string;
+}) {
+    const isNamedToken = "name" in token;
+
+    return (
+        <div className="flex justify-between items-center gap-2 w-full p-2"
+            style={{ borderTop: "solid grey 1px" }}
+        >
+            <div className="flex justify-start items-center h-full w-full">
+                <span>{title}</span>
+            </div>
+            <div className="flex justify-center items-center h-full w-full">
+                <Input
+                    name=""
+                    placeholder="query parameter"
+                    value={token.queryParam}
+                    onChange={e => onChange({ ...token, queryParam: e.target.value })}
+                />
+            </div>
+            <div className="flex justify-center items-center h-full w-full">
+                <Input
+                    name=""
+                    placeholder="{value}"
+                    value={token.value}
+                    onChange={e => onChange({ ...token, value: e.target.value })}
+                />
+            </div>
+            <div className="flex justify-center items-center h-full w-full">
+                {isNamedToken &&
+                    <Input
+                        name=""
+                        placeholder="name"
+                        value={token.name}
+                        onChange={e => onChange({ ...token, name: e.target.value })}
+
+                    />
+                }
+            </div>
+            <div className="flex justify-center items-center h-full w-[50px]">
+                {isNamedToken &&
+                    <span
+                        className="cursor-pointer text-black hover:text-red-500"
+                        onClick={onDelete}
+                    >
+                        <FontAwesomeIcon icon={faTrashAlt} />
+                    </span>
+                }
+            </div>
         </div>
     )
 }
@@ -358,29 +519,12 @@ type TCampaignActionMenu = {
     trafficSourceId?: number;
 };
 
-type TFlowActionMenu = TFlowActionMenu_saved | TFlowActionMenu_builtIn | TFlowActionMenu_url;
-
-type TFlowActionMenu_saved = {
+type TSavedFlowActionMenu = {
     itemName: EItemName.FLOW;
     type: "SAVED";
     name?: string;
     mainRoute?: TRoute;
     ruleRoutes?: TRoute[];
-    tags?: string[];
-};
-
-type TFlowActionMenu_builtIn = {
-    itemName: EItemName.FLOW;
-    type: "BUILT_IN";
-    mainRoute?: TRoute;
-    ruleRoutes?: TRoute[];
-    tags?: string[];
-};
-
-type TFlowActionMenu_url = {
-    itemName: EItemName.FLOW;
-    type: "URL";
-    url?: string;
     tags?: string[];
 };
 
