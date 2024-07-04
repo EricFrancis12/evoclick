@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
+import { ReportViewProvider } from "./ReportViewContext";
 import useActiveView from "@/hooks/useActiveView";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import Report from "./Report";
@@ -40,43 +41,45 @@ export default function ReportView({ clicks, page, size, timeframe, reportItemNa
     }
 
     return (
-        <div className="h-screen w-full">
-            <div className="flex h-[40px] w-[100vw] bg-[#2f918e]">
-                <div className="flex justify-center items-center h-full">
-                    <Image
-                        src="/assets/images/logo-no-bg.png"
-                        alt="Logo"
-                        height={35}
-                        width={35}
-                        className="mx-6"
-                    />
-                </div>
-                <Tab
-                    view={mainView}
-                    onClick={() => queryRouter.push("/dashboard")}
-                />
-                {reportViews.map(view => (
+        <ReportViewProvider>
+            <div className="h-screen w-full">
+                <div className="flex h-[40px] w-[100vw] bg-[#2f918e]">
+                    <div className="flex justify-center items-center h-full">
+                        <Image
+                            src="/assets/images/logo-no-bg.png"
+                            alt="Logo"
+                            height={35}
+                            width={35}
+                            className="mx-6"
+                        />
+                    </div>
                     <Tab
-                        key={view.id}
-                        view={view}
-                        onClick={view => {
-                            if (view.reportItemName) {
-                                queryRouter.push(`/dashboard/report/${encodeURIComponent(view.reportItemName)}/${encodeURIComponent(view.id)}`);
-                            }
-                        }}
-                        onClose={handleViewClose}
+                        view={mainView}
+                        onClick={() => queryRouter.push("/dashboard")}
                     />
-                ))}
+                    {reportViews.map(view => (
+                        <Tab
+                            key={view.id}
+                            view={view}
+                            onClick={view => {
+                                if (view.reportItemName) {
+                                    queryRouter.push(`/dashboard/report/${encodeURIComponent(view.reportItemName)}/${encodeURIComponent(view.id)}`);
+                                }
+                            }}
+                            onClose={handleViewClose}
+                        />
+                    ))}
+                </div>
+                <div className="width-[100vw] text-sm">
+                    {activeView
+                        ? <Report
+                            clicks={clicks}
+                            view={activeView}
+                        />
+                        : "Report Not Found :("
+                    }
+                </div>
             </div>
-            <div className="width-[100vw] text-sm">
-                {activeView
-                    ? <Report
-                        clicks={clicks}
-                        view={activeView}
-                    />
-                    : "Report Not Found :("
-                }
-            </div>
-        </div >
+        </ReportViewProvider>
     )
 }

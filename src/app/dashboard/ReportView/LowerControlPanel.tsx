@@ -1,19 +1,41 @@
 "use client";
 
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { useReportView } from "./ReportViewContext";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import CalendarButton from "@/components/CalendarButton";
 import RefreshButton from "@/components/RefreshButton";
 import ReportButton from "@/components/ReportButton";
 import ReportChain from "./ReportChain";
 import { TView, useViewsStore } from "@/lib/store";
+import Button from "@/components/Button";
+import { EItemName } from "@/lib/types";
 
 export default function LowerControlPanel({ view, onNewReport, newReportDisabled }: {
     view: TView;
     onNewReport: () => any;
     newReportDisabled?: boolean;
 }) {
+    const { setActionMenu } = useReportView();
+
     const { updateViewReportChainById } = useViewsStore(store => store);
     const queryRouter = useQueryRouter();
+
+    function handleAddNew() {
+        if (view.itemName === EItemName.FLOW) {
+            setActionMenu({ itemName: EItemName.FLOW, type: "SAVED" });
+        } else if (
+            view.itemName === EItemName.AFFILIATE_NETWORK
+            || view.itemName === EItemName.CAMPAIGN
+            || view.itemName === EItemName.LANDING_PAGE
+            || view.itemName === EItemName.OFFER
+            || view.itemName === EItemName.TRAFFIC_SOURCE
+        ) {
+            setActionMenu({ itemName: view.itemName });
+        } else {
+            setActionMenu({ itemName: EItemName.CAMPAIGN });
+        }
+    }
 
     return (
         <div
@@ -31,10 +53,17 @@ export default function LowerControlPanel({ view, onNewReport, newReportDisabled
                 />
                 <RefreshButton />
                 {view.type === "main" &&
-                    <ReportButton
-                        onClick={onNewReport}
-                        disabled={newReportDisabled}
-                    />
+                    <>
+                        <ReportButton
+                            onClick={onNewReport}
+                            disabled={newReportDisabled}
+                        />
+                        <Button
+                            text="Add New"
+                            icon={faPlus}
+                            onClick={handleAddNew}
+                        />
+                    </>
                 }
             </LowerCPRow>
             <LowerCPRow>
