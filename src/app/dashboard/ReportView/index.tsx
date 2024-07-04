@@ -24,18 +24,22 @@ export default function ReportView({ clicks, page, size, timeframe, reportItemNa
 
     const activeView = useActiveView();
     useEffect(() => {
-        if (activeView?.id) {
-            updateViewOnPageLoad(activeView.id, { page, size, timeframe, });
-        }
+        if (!activeView?.id) return;
+        updateViewOnPageLoad(activeView.id, { page, size, timeframe, });
     }, [page, size, timeframe]);
 
     const params = useParams();
     const queryRouter = useQueryRouter();
 
+    function handleReportTabClick(view: TView) {
+        if (!view.reportItemName) return;
+        queryRouter.push(`/dashboard/report/${encodeURIComponent(view.reportItemName)}/${encodeURIComponent(view.id)}`);
+    }
+
     // Delete view, then if the deleted view was the current one redirect to /dashboard
-    function handleViewClose(view: TView) {
+    function handleReportTabClose(view: TView) {
         removeReportViewById(view.id);
-        if (view.id === params?.id) {
+        if (view.id === params.id) {
             queryRouter.push("/dashboard");
         }
     }
@@ -61,12 +65,8 @@ export default function ReportView({ clicks, page, size, timeframe, reportItemNa
                         <Tab
                             key={view.id}
                             view={view}
-                            onClick={view => {
-                                if (view.reportItemName) {
-                                    queryRouter.push(`/dashboard/report/${encodeURIComponent(view.reportItemName)}/${encodeURIComponent(view.id)}`);
-                                }
-                            }}
-                            onClose={handleViewClose}
+                            onClick={handleReportTabClick}
+                            onClose={handleReportTabClose}
                         />
                     ))}
                 </div>

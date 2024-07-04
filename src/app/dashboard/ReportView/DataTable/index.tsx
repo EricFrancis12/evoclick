@@ -22,9 +22,8 @@ export default function DataTable({ itemName, rows, setRows }: {
     setRows: (newRows: TRow[]) => any;
 }) {
     const [columns, setColumns] = useState<TColumn[]>(columnTitles.map((title, i) => ({
-        title, width: i === 0
-            ? '300px'
-            : '100px'
+        title,
+        width: i === 0 ? "300px" : "100px",
     })));
 
     return (

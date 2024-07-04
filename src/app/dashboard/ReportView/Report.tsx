@@ -16,7 +16,6 @@ export default function Report({ clicks, view }: {
     const { id, itemName } = view;
     const [rows, setRows] = useState<TRow[]>(makeRows(clicks, itemName));
     const selectedRows = rows.filter(row => row.selected === true);
-    console.log(selectedRows);
     useEffect(() => {
         setRows(makeRows(clicks, itemName));
     }, [clicks.length, itemName]);
@@ -27,12 +26,12 @@ export default function Report({ clicks, view }: {
     // Finds the first row that is selected and creates a report for it
     function handleNewReport() {
         if (selectedRows.length < 1) return;
-        const _view = newReportView(EItemName.LANDING_PAGE, faBullseye, itemName, rows[0].name);
-        if (!reportViews.some(v => v.itemName === _view.itemName && v.id === _view.id)) {
-            addReportView(_view);
+        const newView = newReportView(EItemName.CAMPAIGN, faBullseye, itemName, selectedRows[0].name);
+        if (!reportViews.some(v => v.itemName === newView.itemName && v.id === newView.id)) {
+            addReportView(newView);
         }
-        if (_view.reportItemName) {
-            queryRouter.push(`/dashboard/report/${encodeURIComponent(_view.reportItemName)}/${encodeURIComponent(_view.id)}`);
+        if (newView.reportItemName) {
+            queryRouter.push(`/dashboard/report/${encodeURIComponent(newView.reportItemName)}/${encodeURIComponent(newView.id)}`);
         }
     }
 

@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
@@ -74,9 +76,9 @@ export default function TagsInput({ tags, setTags, tagSuggestions }: {
                         {tagSuggestionsVisible &&
                             <div className="absolute">
                                 {tagSuggestions && tagSuggestions
-                                    .filter((tag: string) => (
+                                    .filter(tag => (
                                         (!inputSearchQuery || tag.includes(inputSearchQuery)) && !tags.includes(tag)
-                                    )).map((tag: string, index: number) => (
+                                    )).map((tag, index) => (
                                         <div key={index} onMouseDown={e => handleMouseDown(tag)}>
                                             {tag}
                                         </div>

@@ -45,11 +45,8 @@ export default function LowerControlPanel({ view, onNewReport, newReportDisabled
             <LowerCPRow>
                 <CalendarButton
                     timeframe={view.timeframe}
-                    onChange={timeframe => {
-                        if (view.reportItemName) {
-                            queryRouter.push(`/dashboard/report/${encodeURIComponent(view.reportItemName)}/${encodeURIComponent(view.id)}`);
-                        }
-                    }}
+                    // TODO: Pass timeframe to server via query params:
+                    onChange={timeframe => queryRouter.push(window.location.href)}
                 />
                 <RefreshButton />
                 {view.type === "main" &&
