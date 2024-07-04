@@ -26,7 +26,6 @@ export default function LowerControlPanel({ view, onNewReport, newReportDisabled
             setActionMenu({ itemName: EItemName.FLOW, type: "SAVED" });
         } else if (
             view.itemName === EItemName.AFFILIATE_NETWORK
-            || view.itemName === EItemName.CAMPAIGN
             || view.itemName === EItemName.LANDING_PAGE
             || view.itemName === EItemName.OFFER
             || view.itemName === EItemName.TRAFFIC_SOURCE
@@ -45,8 +44,11 @@ export default function LowerControlPanel({ view, onNewReport, newReportDisabled
             <LowerCPRow>
                 <CalendarButton
                     timeframe={view.timeframe}
-                    // TODO: Pass timeframe to server via query params:
-                    onChange={timeframe => queryRouter.push(window.location.href)}
+                    onChange={timeframe => queryRouter.push(
+                        window.location.href,
+                        { timeframe: timeframeQueryParam(timeframe) },
+                        true
+                    )}
                 />
                 <RefreshButton />
                 {view.type === "main" &&
@@ -85,4 +87,8 @@ function LowerCPRow({ children }: {
             </div>
         </div>
     )
+}
+
+function timeframeQueryParam(timeframe: [Date, Date]): string {
+    return timeframe.map(date => date.getTime()).join(",");
 }
