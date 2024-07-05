@@ -50,6 +50,8 @@ export default function Creator() {
                 />
             ))}
             <TagsInput
+                title="Tags"
+                placeholder="Type to add tags"
                 tags={creationRequest.tags}
                 setTags={newTags => setCreationRequest(prev => ({ ...prev, tags: newTags }))}
             />

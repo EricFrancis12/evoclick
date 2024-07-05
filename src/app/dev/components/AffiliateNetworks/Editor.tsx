@@ -48,6 +48,8 @@ export default function Editor({ affiliateNetwork, setAffiliateNetwork }: {
                 onChange={e => setUpdateRequest({ ...updateRequest, defaultNewOfferString: e.target.value })}
             />
             <TagsInput
+                title="Tags"
+                placeholder="Type to add tags"
                 tags={updateRequest.tags || []}
                 setTags={newTags => setUpdateRequest({ ...updateRequest, tags: newTags })}
             />

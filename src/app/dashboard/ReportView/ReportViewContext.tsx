@@ -186,6 +186,8 @@ function AffiliateNetworkBody({ actionMenu }: {
                 onChange={e => setActionMenu({ ...actionMenu, defaultNewOfferString: e.target.value })}
             />
             <TagsInput
+                title="Tags"
+                placeholder="Type to add tags"
                 tags={actionMenu.tags || []}
                 setTags={tags => setActionMenu({ ...actionMenu, tags })}
             />
@@ -379,6 +381,8 @@ function CampaignBody({ actionMenu }: {
                 }
             </SelectionButtons>
             <TagsInput
+                title="Tags"
+                placeholder="Type to add tags"
                 tags={actionMenu.tags || []}
                 setTags={tags => setActionMenu({ ...actionMenu, tags })}
             />
@@ -453,6 +457,8 @@ function SavedFlowBody({ actionMenu }: {
             />
             <Button text="Edit Flow" onClick={() => setFlowBuilderOpen(prev => !prev)} />
             <TagsInput
+                title="Tags"
+                placeholder="Type to add tags"
                 tags={actionMenu.tags || []}
                 setTags={tags => setActionMenu({ ...actionMenu, tags })}
             />
@@ -519,6 +525,8 @@ function LandingPageBody({ actionMenu }: {
                 onChange={e => setActionMenu({ ...actionMenu, url: e.target.value })}
             />
             <TagsInput
+                title="Tags"
+                placeholder="Type to add tags"
                 tags={actionMenu.tags || []}
                 setTags={tags => setActionMenu({ ...actionMenu, tags })}
             />
@@ -595,6 +603,8 @@ function OfferBody({ actionMenu }: {
                 onChange={e => setActionMenu({ ...actionMenu, payout: Number(e.target.value) || 0 })}
             />
             <TagsInput
+                title="Tags"
+                placeholder="Type to add tags"
                 tags={actionMenu.tags || []}
                 setTags={tags => setActionMenu({ ...actionMenu, tags })}
             />
@@ -648,6 +658,8 @@ function TrafficSourceBody({ actionMenu }: {
             />
             <Button text="Edit Tokens" onClick={() => setTokensMenuOpen(prev => !prev)} />
             <TagsInput
+                title="Tags"
+                placeholder="Type to add tags"
                 tags={actionMenu.tags || []}
                 setTags={tags => setActionMenu({ ...actionMenu, tags })}
             />

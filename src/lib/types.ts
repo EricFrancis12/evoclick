@@ -123,6 +123,26 @@ export enum EItemName {
     BROWSER_VERSION = ERuleName.BROWSER_VERSION,
 };
 
+export enum EDeviceType {
+    DESKTOP = "desktop",
+    MOBILE = "mobile",
+    TABLET = "tablet",
+    UNKNOWN = "unknown",
+};
+
+export enum EBrowserName {
+    OPERA = "Opera",
+    OPERA_MINI = "Opera Mini",
+    OPERA_TOUCH = "Opera Touch",
+    CHROME = "Chrome",
+    HEADLESS_CHROME = "Headless Chrome",
+    FIREFOX = "Firefox",
+    INTERNET_EXPLORER = "Internet Explorer",
+    SAFARI = "Safari",
+    EDGE = "Edge",
+    VIVALDI = "Vivaldi",
+}
+
 export enum ECookieName {
     JWT = "jwt",
     CAMPAIGN_PUBLIC_ID = "campaignPublicID",

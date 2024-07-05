@@ -4,9 +4,11 @@ import { useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 
-export default function TagsInput({ tags, setTags, tagSuggestions }: {
+export default function TagsInput({ tags, setTags, title, placeholder, tagSuggestions }: {
     tags: string[];
     setTags: (newTags: string[]) => any;
+    title?: string;
+    placeholder?: string;
     tagSuggestions?: string[];
 }) {
     const tagInputElement = useRef<HTMLInputElement>(null);
@@ -40,9 +42,7 @@ export default function TagsInput({ tags, setTags, tagSuggestions }: {
 
     return (
         <div className="flex flex-col justify-start items-start w-full">
-            <span>
-                Tags
-            </span>
+            {title && <span>{title}</span>}
             <div className="w-full p-1 bg-white" style={{ border: "solid 1px grey", borderRadius: "6px" }}>
                 <span>
                     {tags.map((tag, index) => (
@@ -62,7 +62,7 @@ export default function TagsInput({ tags, setTags, tagSuggestions }: {
                     ))}
                     <span className="relative inline-block w-full">
                         <form className="w-full" onSubmit={handleSubmit}>
-                            <input ref={tagInputElement} placeholder="Type To Add Tags"
+                            <input ref={tagInputElement} placeholder={placeholder}
                                 className="w-full m-1 p-1 bg-transparent"
                                 style={{
                                     border: "none",
