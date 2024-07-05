@@ -158,6 +158,7 @@ model TrafficSource {
 }
 
 enum GeoName {
+  NONE
   AFGHANISTAN
   ALGERIA
   ARGENTINA

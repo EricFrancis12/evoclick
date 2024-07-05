@@ -8,19 +8,22 @@ import { EItemName } from "@/lib/types";
 import UpperCPItem, { TUpperCPItem } from "./UpperCPItem";
 import UpperCPItemGroup, { TUpperCPItemGroup } from "./UpperCPItemGroup";
 
-export default function UpperControlPanel({ onClick = () => { } }: {
+export default function UpperControlPanel({ onClick = () => { }, reportItemName }: {
     onClick?: (item: TUpperCPItem) => any;
+    reportItemName?: EItemName;
 }) {
     return (
         <div className="flex flex-col justify-center gap-6 w-full px-8 py-6 bg-[#ffffff]">
             <div className="flex flex-wrap gap-6 w-full">
-                {upperCPItems.map((item, _index) => (
-                    <UpperCPItem
-                        key={_index}
-                        item={item}
-                        onClick={onClick}
-                    />
-                ))}
+                {upperCPItems
+                    .filter(item => item.itemName !== reportItemName)
+                    .map((item, _index) => (
+                        <UpperCPItem
+                            key={_index}
+                            item={item}
+                            onClick={onClick}
+                        />
+                    ))}
             </div>
             <div className="flex flex-wrap gap-6 w-full">
                 {upperCPItemGroups.map((group, index) => (
@@ -28,6 +31,7 @@ export default function UpperControlPanel({ onClick = () => { } }: {
                         key={index}
                         itemGroup={group}
                         onClick={onClick}
+                        reportItemName={reportItemName}
                     />
                 ))}
             </div>

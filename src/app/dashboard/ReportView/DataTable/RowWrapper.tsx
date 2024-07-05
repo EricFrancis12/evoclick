@@ -1,21 +1,15 @@
 "use client";
 
-export default function RowWrapper({ children, selected, setSelected = () => { } }: {
+export default function RowWrapper({ children, selected, onClick = () => { } }: {
     children: React.ReactNode;
     selected?: boolean;
-    setSelected?: (newSelected: boolean) => any;
+    onClick?: (bool: boolean) => any;
 }) {
     return (
-        <div className="flex items-center w-full px-4">
-            <div className="h-full w-[22px]">
-                {selected !== undefined &&
-                    <input
-                        type="checkbox"
-                        checked={selected === true}
-                        onChange={() => setSelected(!selected)}
-                    />
-                }
-            </div>
+        <div
+            className={(selected ? "bg-blue-300" : "bg-white") + " flex items-center w-full px-4"}
+            onClick={() => onClick(!selected)}
+        >
             {children}
         </div>
     )

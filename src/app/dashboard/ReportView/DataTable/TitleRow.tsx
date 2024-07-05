@@ -30,7 +30,7 @@ export default function TitleRow({ name, columns, setColumns }: {
             {columns.map(({ title, width }, index) => (
                 <Fragment key={index}>
                     <Cell value={index === 0 ? name : title} width={width} />
-                    <div className="relative h-auto w-[0px]">
+                    <div className="relative h-auto w-[0px] overflow-visible">
                         <div
                             className="absolute top-0 left-0 h-full w-[1px] bg-blue-500 cursor-e-resize"
                             onMouseDown={e => handleMouseDown(e, index)}

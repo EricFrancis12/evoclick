@@ -1,6 +1,6 @@
 "use client";
 
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPencil, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useReportView } from "./ReportViewContext";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import CalendarButton from "@/components/CalendarButton";
@@ -10,18 +10,22 @@ import ReportChain from "./ReportChain";
 import { TView, useViewsStore } from "@/lib/store";
 import Button from "@/components/Button";
 import { EItemName } from "@/lib/types";
+import { TRow } from "./DataTable";
 
-export default function LowerControlPanel({ view, onNewReport, newReportDisabled }: {
+export default function LowerControlPanel({ view, onNewReport, reportItemName, rows }: {
     view: TView;
     onNewReport: () => any;
-    newReportDisabled?: boolean;
+    reportItemName?: EItemName;
+    rows: TRow[];
 }) {
     const { setActionMenu } = useReportView();
 
     const { updateViewReportChainById } = useViewsStore(store => store);
     const queryRouter = useQueryRouter();
 
-    function handleAddNew() {
+    const selectedRows = rows.filter(row => row.selected === true);
+
+    function handleCreateNewItem() {
         if (view.itemName === EItemName.FLOW) {
             setActionMenu({ itemName: EItemName.FLOW, type: "SAVED" });
         } else if (
@@ -34,6 +38,11 @@ export default function LowerControlPanel({ view, onNewReport, newReportDisabled
         } else {
             setActionMenu({ itemName: EItemName.CAMPAIGN });
         }
+    }
+
+    function handleEditItem() {
+        // TODO: ...
+        console.log("Edit button clicked");
     }
 
     return (
@@ -55,13 +64,20 @@ export default function LowerControlPanel({ view, onNewReport, newReportDisabled
                     <>
                         <ReportButton
                             onClick={onNewReport}
-                            disabled={newReportDisabled}
+                            disabled={selectedRows.length < 1}
                         />
-                        <Button
-                            text="Add New"
-                            icon={faPlus}
-                            onClick={handleAddNew}
-                        />
+                        {selectedRows.length > 0 && isPrimary(view.itemName)
+                            ? <Button
+                                text={`Edit ${view.itemName}`}
+                                icon={faPencil}
+                                onClick={handleEditItem}
+                            />
+                            : <Button
+                                text={`Create New ${isPrimary(view.itemName) ? view.itemName : EItemName.CAMPAIGN}`}
+                                icon={faPlus}
+                                onClick={handleCreateNewItem}
+                            />
+                        }
                     </>
                 }
             </LowerCPRow>
@@ -70,6 +86,7 @@ export default function LowerControlPanel({ view, onNewReport, newReportDisabled
                     <ReportChain
                         reportChain={view.reportChain}
                         onChange={reportChain => updateViewReportChainById(view.id, reportChain)}
+                        omissions={reportItemName ? [view.itemName, reportItemName] : [view.itemName]}
                     />
                 }
             </LowerCPRow>
@@ -91,4 +108,13 @@ function LowerCPRow({ children }: {
 
 function timeframeQueryParam(timeframe: [Date, Date]): string {
     return timeframe.map(date => date.getTime()).join(",");
+}
+
+function isPrimary(itemName: EItemName): boolean {
+    return itemName === EItemName.AFFILIATE_NETWORK
+        || itemName === EItemName.CAMPAIGN
+        || itemName === EItemName.FLOW
+        || itemName === EItemName.LANDING_PAGE
+        || itemName === EItemName.OFFER
+        || itemName === EItemName.TRAFFIC_SOURCE;
 }

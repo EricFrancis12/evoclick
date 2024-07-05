@@ -46,7 +46,7 @@ export default async function DashboardPage({ params, searchParams }: {
                 page={page}
                 size={size}
                 timeframe={timeframe}
-                reportItemName={reportItemName}
+                reportItemName={reportItemName ?? undefined}
             />
         )
     } catch (err) {

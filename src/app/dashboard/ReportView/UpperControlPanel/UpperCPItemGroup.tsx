@@ -7,6 +7,7 @@ import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import useActiveView from "@/hooks/useActiveView";
 import useHover from "@/hooks/useHover";
 import { TUpperCPItem } from "./UpperCPItem";
+import { EItemName } from "@/lib/types";
 
 export type TUpperCPItemGroup = {
     name: string;
@@ -14,9 +15,10 @@ export type TUpperCPItemGroup = {
     children: TUpperCPItem[];
 };
 
-export default function UpperCPItemGroup({ itemGroup, onClick = () => { } }: {
+export default function UpperCPItemGroup({ itemGroup, onClick = () => { }, reportItemName }: {
     itemGroup: TUpperCPItemGroup;
     onClick?: (item: TUpperCPItem) => any;
+    reportItemName?: EItemName;
 }) {
     const ref = useRef(null);
     const [isHovered, setHover] = useHover(ref);
@@ -44,17 +46,19 @@ export default function UpperCPItemGroup({ itemGroup, onClick = () => { } }: {
                 <FontAwesomeIcon icon={isHovered ? faChevronUp : faChevronDown} />
                 {isHovered &&
                     <div className="absolute top-[100%] bg-white text-black border border-black rounded-sm">
-                        {itemGroup.children.map((item, index) => (
-                            <div
-                                key={index}
-                                className="p-1 bg-white hover:bg-blue-300"
-                                onClick={e => handleClick(e, item)}
-                            >
-                                <span style={{ whiteSpace: "nowrap" }}>
-                                    {item.itemName}
-                                </span>
-                            </div>
-                        ))}
+                        {itemGroup.children
+                            .filter(item => item.itemName !== reportItemName)
+                            .map((item, index) => (
+                                <div
+                                    key={index}
+                                    className="p-1 bg-white hover:bg-blue-300"
+                                    onClick={e => handleClick(e, item)}
+                                >
+                                    <span style={{ whiteSpace: "nowrap" }}>
+                                        {item.itemName}
+                                    </span>
+                                </div>
+                            ))}
                     </div>
                 }
             </div>

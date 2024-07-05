@@ -16,7 +16,7 @@ export default function ReportView({ clicks, page, size, timeframe, reportItemNa
     page: number;
     size: number;
     timeframe: [Date, Date];
-    reportItemName: EItemName | null;
+    reportItemName?: EItemName;
 }) {
     const {
         mainView, reportViews, updateViewOnPageLoad, removeReportViewById
@@ -75,6 +75,7 @@ export default function ReportView({ clicks, page, size, timeframe, reportItemNa
                         ? <Report
                             clicks={clicks}
                             view={activeView}
+                            reportItemName={reportItemName}
                         />
                         : "Report Not Found :("
                     }

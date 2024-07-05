@@ -1,23 +1,64 @@
 "use client";
 
+import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronUp, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import RowWrapper from "./RowWrapper";
 import Cell from "./Cell";
+import HeadlessDataTable from "./HeadlessDataTable";
 import { TClick } from "@/lib/types";
+import { TView } from "@/lib/store";
 import { TColumn, TRow } from ".";
 
-export default function Row({ row, columns, onSelected }: {
+export default function Row({ row, columns, onSelected, view, depth }: {
     row: TRow;
     columns: TColumn[];
     onSelected: (newSelected: boolean) => any;
+    view: TView;
+    depth: number;
 }) {
+    const [open, setOpen] = useState<boolean>(false);
     const cells = makeCells(row.clicks, row.name);
 
+    function handleClick(bool: boolean) {
+        if (view.type === "report" && view.reportChain[0]?.itemName) return;
+        onSelected(bool);
+    }
+
     return (
-        <RowWrapper selected={row.selected} setSelected={onSelected}>
-            {cells.map((value, index) => (
-                <Cell key={index} value={value} width={columns[index].width} />
-            ))}
-        </RowWrapper>
+        <>
+            <RowWrapper selected={row.selected} onClick={handleClick}>
+                <div className="h-full w-[22px]">
+                    {view?.type === "report" && view.reportChain[depth]?.itemName
+                        ? <FontAwesomeIcon
+                            icon={open ? faChevronUp : faChevronDown}
+                            onClick={() => setOpen(prev => !prev)}
+                        />
+                        : <>
+                            {row.selected !== undefined &&
+                                <input type="checkbox" checked={row.selected} />
+                            }
+                        </>
+                    }
+                </div>
+                {cells.map((value, index) => (
+                    <Cell
+                        key={index}
+                        value={value}
+                        width={columns[index].width}
+                    />
+                ))}
+            </RowWrapper >
+            {open && view?.type === "report" && view.reportChain[depth]?.itemName &&
+                <HeadlessDataTable
+                    clicks={row.clicks}
+                    itemName={view.reportChain[depth].itemName}
+                    columns={columns}
+                    view={view}
+                    depth={depth}
+                />
+            }
+        </>
     )
 }
 

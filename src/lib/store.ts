@@ -11,6 +11,7 @@ export type TView = {
     icon: IconDefinition;
     timeframe: [Date, Date];
     reportItemName: null;
+    reportChain: null;
     page: number;
     size: number;
 } | {
@@ -63,7 +64,7 @@ export const useViewsStore = create<IViewsState>()(
                 };
             }),
             updateViewReportChainById: (id, reportChain) => set((state) => ({
-                reportViews: state.reportViews.map(view => view.id === id
+                reportViews: state.reportViews.map(view => view.id === id && view.type === "report"
                     ? { ...view, reportChain }
                     : view),
             })),
@@ -87,6 +88,7 @@ export function newMainView(itemName: EItemName, icon: IconDefinition): TView {
         icon,
         timeframe: [new Date, new Date],
         reportItemName: null,
+        reportChain: null,
         page: 1,
         size: 50,
     };
@@ -100,7 +102,7 @@ export function newReportView(itemName: EItemName, icon: IconDefinition, reportI
         icon,
         timeframe: [new Date, new Date],
         reportItemName,
-        reportChain: [{}, null, null],
+        reportChain: [{}, null],
         page: 1,
         size: 50,
     };
