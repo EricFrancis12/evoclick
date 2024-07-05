@@ -19,7 +19,6 @@ export default function CalendarButton({ timeframe, onChange }: {
     timeframe: [Date, Date];
     onChange: ([start, end]: [Date, Date]) => any;
 }) {
-    console.log(timeframe);
     return (
         <DateRangePicker initialTimeframe={timeframe} onChange={onChange} />
     )

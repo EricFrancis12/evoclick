@@ -58,7 +58,7 @@ export function ReportViewProvider({ children }: {
     )
 }
 
-function PopoverLayer({ children, layer = 1, dark = true }: {
+export function PopoverLayer({ children, layer = 1, dark = true }: {
     children: React.ReactNode;
     layer?: number;
     dark?: boolean;
