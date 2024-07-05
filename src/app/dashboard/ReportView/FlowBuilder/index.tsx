@@ -21,19 +21,17 @@ export default function FlowBuilder({ value, onChange }: {
     const { mainRoute, ruleRoutes } = value;
     const [rulesMenuOpen, setRulesMenuOpen] = useState<boolean>(false);
 
-    function handleReorder(dir: TReorderDirection, index: number) {
-        if (!ruleRoutes[index]) return;
+    function handleReorder(direc: TReorderDirection, index: number) {
+        if (!isValidIndex(ruleRoutes, index)) return;
 
-        const clone = structuredClone(ruleRoutes);
-        const rule = clone.splice(index, 1)[0];
+        const newIndex = direc === "up" ? index - 1 : index + 1;
+        if (!isValidIndex(ruleRoutes, newIndex)) return;
 
-        if (dir === "up" && ruleRoutes[index - 1]) {
-            clone.splice(index - 1, 0, rule);
-            onChange({ ...value, ruleRoutes: clone });
-        } else if (dir === "down" && ruleRoutes[index + 1]) {
-            clone.splice(index + 1, 0, rule);
-            onChange({ ...value, ruleRoutes: clone });
-        }
+        const newRuleRoutes = structuredClone(ruleRoutes);
+        const [rule] = newRuleRoutes.splice(index, 1);
+        newRuleRoutes.splice(newIndex, 0, rule);
+
+        onChange({ ...value, ruleRoutes: newRuleRoutes });
     }
 
     return (
@@ -41,18 +39,21 @@ export default function FlowBuilder({ value, onChange }: {
             <Route
                 type="main"
                 route={mainRoute}
-                onChange={route => onChange({ ...value, mainRoute: route })}
+                onChange={mainRoute => onChange({ ...value, mainRoute })}
             />
             {ruleRoutes.map((route, index) => (
                 <Route
-                    type="rule"
                     key={index}
+                    type="rule"
                     route={route}
                     onChange={route => onChange({
                         ...value,
                         ruleRoutes: ruleRoutes.map((r, i) => i === index ? route : r),
                     })}
-                    onDelete={() => onChange({ ...value, ruleRoutes: ruleRoutes.filter((_, i) => i !== index) })}
+                    onDelete={() => onChange({
+                        ...value,
+                        ruleRoutes: ruleRoutes.filter((_, i) => i !== index),
+                    })}
                     onReorder={dir => handleReorder(dir, index)}
                 />
             ))}
@@ -66,10 +67,7 @@ export default function FlowBuilder({ value, onChange }: {
                     <div className="px-6 py-4 bg-white border">
                         <RulesMenu
                             route={mainRoute}
-                            onChange={route => onChange({
-                                ...value,
-                                mainRoute: route,
-                            })}
+                            onChange={mainRoute => onChange({ ...value, mainRoute })}
                         />
                         <div
                             className="flex justify-center items-center w-full mt-6 px-2 py-4"
@@ -89,28 +87,26 @@ function RulesMenu({ route, onChange }: {
     onChange: (r: TRoute) => any;
 }) {
     return (
-        <div className='flex flex-col justify-start items-between h-full w-full max-h-[90vh] max-w-[700px] bg-white'
+        <div
+            className='flex flex-col justify-start items-between h-full w-full max-h-[90vh] max-w-[700px] bg-white'
             style={{ borderRadius: '5px' }}
         >
-            <div className='flex flex-col justify-start items-start gap-2 px-4 overflow-y-scroll'
+            <div
+                className='flex flex-col justify-start items-start gap-2 px-4 overflow-y-scroll'
                 style={{ height: 'inherit' }}
             >
                 <div className='flex justify-start items-center w-full'>
-                    <span>
-                        Logical Relation
-                    </span>
+                    <span>Logical Relation</span>
                 </div>
                 <div className='flex justify-start items-center gap-2 w-full'>
-                    {Object.values(ELogicalRelation).map((lr, index) => (
+                    {Object.values(ELogicalRelation).map((logicalRelation, index) => (
                         <div key={index} className='flex justify-start items-center'>
                             <input
                                 type="checkbox"
-                                checked={lr === route.logicalRelation}
-                                onChange={() => onChange({ ...route, logicalRelation: lr })}
+                                checked={logicalRelation === route.logicalRelation}
+                                onChange={() => onChange({ ...route, logicalRelation })}
                             />
-                            <span>
-                                {lr}
-                            </span>
+                            <span>{logicalRelation}</span>
                         </div>
                     ))}
                 </div>
@@ -158,9 +154,10 @@ function Rule(props: {
     rule: TRule;
     onChange: (ru: TRule) => any;
 }) {
-    if (userInputRules.includes(props.rule.ruleName)) {
+    const { ruleName } = props.rule;
+    if (userInputRules.includes(ruleName)) {
         return <UserInputRuleLayout {...props} />;
-    } else if (checkboxesRules.includes(props.rule.ruleName)) {
+    } else if (checkboxesRules.includes(ruleName)) {
         return <CheckboxesRuleLayout {...props} />;
     }
     return "";
@@ -234,7 +231,7 @@ function CheckboxesInput({ items, value, onChange, className = "" }: {
     className?: string;
 }) {
     function handleChange(e: React.ChangeEvent<HTMLInputElement>, item: string) {
-        const checked = e.target.checked;
+        const { checked } = e.target;
         if (checked && !value.includes(item)) {
             onChange([...value, item]);
         } else if (!checked && value.includes(item)) {
@@ -452,7 +449,9 @@ function Path({ path, route, onChange, onDelete }: {
                             <span>
                                 Weight:
                             </span>
-                            <input className="w-[40px] p-1" style={{ borderRadius: "6px" }}
+                            <input
+                                className="w-[40px] p-1"
+                                style={{ borderRadius: "6px" }}
                                 value={path.weight}
                                 onChange={e => onChange({ ...path, weight: Number(e.target.value) || 0 })}
                             />
@@ -462,7 +461,7 @@ function Path({ path, route, onChange, onDelete }: {
                         {path.isActive &&
                             <>
                                 <span>
-                                    {calcWeightResult(path.weight, route.paths.map(p => p.weight))}
+                                    {calcWeight(path.weight, route.paths.map(p => p.weight))}
                                 </span>
                                 <FontAwesomeIcon
                                     icon={faTrashAlt}
@@ -481,8 +480,8 @@ function Path({ path, route, onChange, onDelete }: {
             </div>
             {path.isActive &&
                 <>
-                    <Section itemName={EItemName.LANDING_PAGE} path={path} onChange={onChange} />
-                    <Section itemName={EItemName.OFFER} path={path} onChange={onChange} />
+                    <Section path={path} onChange={onChange} itemName={EItemName.LANDING_PAGE} />
+                    <Section path={path} onChange={onChange} itemName={EItemName.OFFER} />
                 </>
             }
         </div>
@@ -547,7 +546,8 @@ function Section({ itemName, path, onChange }: {
                                     </div>
                                     <div className="flex justify-end items-center gap-1">
                                         <a
-                                            href="https://bing.com?source=1"
+                                            // TODO: This is supposed to be the URL of the landing page or offer:
+                                            href={window.location.href}
                                             target="_blank"
                                             rel="noreferrer"
                                         >
@@ -569,9 +569,7 @@ function Section({ itemName, path, onChange }: {
                             className="flex justify-center items-center h-full w-[50%] cursor-pointer"
                             style={{ borderRight: "solid 1px grey" }}
                         >
-                            <span>
-                                {"Create New " + itemName}
-                            </span>
+                            <span>{"Create New " + itemName}</span>
                         </div>
                         <div
                             // TODO: ...
@@ -579,9 +577,7 @@ function Section({ itemName, path, onChange }: {
                             className="flex justify-center items-center h-full w-[50%] cursor-pointer"
                             style={{ borderLeft: "solid 1px grey" }}
                         >
-                            <span>
-                                {"+ New " + itemName}
-                            </span>
+                            <span>{"+ New " + itemName}</span>
                         </div>
                     </div>
                 </>
@@ -609,7 +605,11 @@ export function newRoute(): TRoute {
     };
 }
 
-function calcWeightResult(weight: number, weights: number[]): number {
+function isValidIndex(arr: unknown[], index: number): boolean {
+    return index > 0 && index < arr.length;
+}
+
+function calcWeight(weight: number, weights: number[]): number {
     const total = weights.reduce((sum, num) => sum + num, 0);
     return weight / total;
 }
