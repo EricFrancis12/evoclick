@@ -20,14 +20,14 @@ export default function Row({ row, columns, onSelected, view, depth }: {
     const [open, setOpen] = useState<boolean>(false);
     const cells = makeCells(row.clicks, row.name);
 
-    function handleClick(bool: boolean) {
+    function handleSelectionChange(bool: boolean) {
         if (view.type === "report" && view.reportChain[0]?.itemName) return;
         onSelected(bool);
     }
 
     return (
         <>
-            <RowWrapper selected={row.selected} onClick={handleClick}>
+            <RowWrapper selected={row.selected} onClick={handleSelectionChange}>
                 <div className="h-full w-[22px]">
                     {view?.type === "report" && view.reportChain[depth]?.itemName
                         ? <FontAwesomeIcon
@@ -36,7 +36,11 @@ export default function Row({ row, columns, onSelected, view, depth }: {
                         />
                         : <>
                             {row.selected !== undefined &&
-                                <input type="checkbox" checked={row.selected} />
+                                <input
+                                    type="checkbox"
+                                    checked={row.selected}
+                                    onChange={() => handleSelectionChange(!row.selected)}
+                                />
                             }
                         </>
                     }

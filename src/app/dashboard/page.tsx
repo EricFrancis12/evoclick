@@ -13,7 +13,7 @@ export default async function DashboardPage({ params, searchParams }: {
     // and create default values if not valid:
     const page = Number(searchParams?.page) || 1;
     const size = Number(searchParams?.size) || 20;
-    const splitOnComma = searchParams?.timeframe?.split(",");
+    const splitOnComma = searchParams.timeframe ? decodeURIComponent(searchParams.timeframe).split(",") : null;
     const timeframe: [Date, Date] = splitOnComma?.length === 2
         ? [new Date(splitOnComma[0]), new Date(splitOnComma[1])]
         : [new Date("2024-06-20"), new Date("2024-07-30")];
