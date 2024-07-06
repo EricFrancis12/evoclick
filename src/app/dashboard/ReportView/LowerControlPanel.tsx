@@ -11,6 +11,7 @@ import { TView, useViewsStore } from "@/lib/store";
 import Button from "@/components/Button";
 import { EItemName } from "@/lib/types";
 import { TRow } from "./DataTable";
+import { useEffect } from "react";
 
 export default function LowerControlPanel({ view, onNewReport, reportItemName, rows }: {
     view: TView;
@@ -19,11 +20,13 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
     rows: TRow[];
 }) {
     const { setActionMenu } = useReportView();
+    const queryRouter = useQueryRouter();
+    const selectedRows = rows.filter(row => row.selected === true);
 
     const { updateViewReportChainById } = useViewsStore(store => store);
-    const queryRouter = useQueryRouter();
-
-    const selectedRows = rows.filter(row => row.selected === true);
+    useEffect(() => {
+        updateViewReportChainById(view.id, [{}, null]);
+    }, [view.itemName]);
 
     function handleCreateNewItem() {
         if (view.itemName === EItemName.FLOW) {

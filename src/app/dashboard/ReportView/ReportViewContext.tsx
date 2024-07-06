@@ -389,7 +389,7 @@ function CampaignBody({ actionMenu }: {
             <ActionMenuFooter onSave={handleSave} />
             {flowBuilderOpen &&
                 <PopoverLayer layer={2}>
-                    <div className="px-6 py-4 bg-white border">
+                    <PopoverContainer>
                         <FlowBuilder
                             value={{
                                 mainRoute: actionMenu.flowData?.mainRoute || newRoute(),
@@ -404,16 +404,36 @@ function CampaignBody({ actionMenu }: {
                                 },
                             })}
                         />
-                        <div
-                            className="flex justify-center items-center w-full mt-6 px-2 py-4"
-                            style={{ borderTop: "solid 1px #cfcfcf" }}
-                        >
+                        <PopoverFooter>
                             <Button text="Done" onClick={() => setFlowBuilderOpen(false)} />
-                        </div>
-                    </div>
+                        </PopoverFooter>
+                    </PopoverContainer>
                 </PopoverLayer>
             }
         </ActionMenuBodyWrapper>
+    )
+}
+
+export function PopoverContainer({ children }: {
+    children: React.ReactNode;
+}) {
+    return (
+        <div className="max-h-[90vh] px-6 py-4 bg-white border overflow-y-scroll">
+            {children}
+        </div>
+    )
+}
+
+export function PopoverFooter({ children }: {
+    children: React.ReactNode;
+}) {
+    return (
+        <div
+            className="flex justify-center items-center w-full mt-6 px-2 py-4"
+            style={{ borderTop: "solid 1px #cfcfcf" }}
+        >
+            {children}
+        </div>
     )
 }
 
@@ -465,7 +485,7 @@ function SavedFlowBody({ actionMenu }: {
             <ActionMenuFooter onSave={handleSave} />
             {flowBuilderOpen &&
                 <PopoverLayer layer={2}>
-                    <div className="px-6 py-4 bg-white border">
+                    <PopoverContainer>
                         <FlowBuilder
                             value={{
                                 mainRoute: actionMenu.mainRoute || newRoute(),
@@ -473,13 +493,10 @@ function SavedFlowBody({ actionMenu }: {
                             }}
                             onChange={({ mainRoute, ruleRoutes }) => setActionMenu({ ...actionMenu, mainRoute, ruleRoutes })}
                         />
-                        <div
-                            className="flex justify-center items-center w-full mt-6 px-2 py-4"
-                            style={{ borderTop: "solid 1px #cfcfcf" }}
-                        >
+                        <PopoverFooter>
                             <Button text="Done" onClick={() => setFlowBuilderOpen(false)} />
-                        </div>
-                    </div>
+                        </PopoverFooter>
+                    </PopoverContainer>
                 </PopoverLayer>
             }
         </ActionMenuBodyWrapper>
@@ -666,7 +683,7 @@ function TrafficSourceBody({ actionMenu }: {
             <ActionMenuFooter onSave={handleSave} />
             {tokensMenuOpen &&
                 <PopoverLayer layer={2}>
-                    <div className="px-6 py-4 bg-white border">
+                    <PopoverContainer>
                         <TokensInputWrapper
                             onCreateNew={() => setActionMenu({
                                 ...actionMenu,
@@ -703,13 +720,10 @@ function TrafficSourceBody({ actionMenu }: {
                                 />
                             ))}
                         </TokensInputWrapper>
-                        <div
-                            className="flex justify-center items-center w-full mt-6 px-2 py-4"
-                            style={{ borderTop: "solid 1px #cfcfcf" }}
-                        >
+                        <PopoverFooter>
                             <Button text="Done" onClick={() => setTokensMenuOpen(false)} />
-                        </div>
-                    </div>
+                        </PopoverFooter>
+                    </PopoverContainer>
                 </PopoverLayer>
             }
         </ActionMenuBodyWrapper>
@@ -744,34 +758,29 @@ function newNamedToken(): TNamedToken {
     };
 }
 
+const tokenColumns = ["", "Query param", "Token", "Name", ""];
+
 function TokensInputWrapper({ children, onCreateNew }: {
     children: React.ReactNode;
     onCreateNew: () => any;
 }) {
-    // TODO: Refactor token columns
     return (
         <div className="flex flex-col justify-start items-start w-full">
             <div className="flex justify-between items-center p-1 w-full">
-                <div className="flex justify-center items-center h-full w-full">
-                    <span></span>
-                </div>
-                <div className="flex justify-center items-center h-full w-full">
-                    <span>Query param</span>
-                </div>
-                <div className="flex justify-center items-center h-full w-full">
-                    <span>Token</span>
-                </div>
-                <div className="flex justify-center items-center h-full w-full">
-                    <span>Name</span>
-                </div>
-                <div className="w-[50px]">
-                    <span></span>
-                </div>
+                {tokenColumns.map((col, index) => (
+                    <div key={index} className="flex justify-center items-center h-full w-full">
+                        <span>{col}</span>
+                    </div>
+                ))}
             </div>
             {children}
             <div
                 className="flex justify-center items-center mt-4 p-1 w-full hover:bg-gray-200 cursor-pointer"
-                style={{ border: "solid black 1px", borderRadius: "6px", userSelect: "none" }}
+                style={{
+                    border: "solid black 1px",
+                    borderRadius: "6px",
+                    userSelect: "none",
+                }}
                 onClick={onCreateNew}
             >
                 <div className="flex justify-center items-center p-1 w-full">

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp, faExternalLink, faPencilAlt, faPlus, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-import { PopoverLayer } from "../ReportViewContext";
+import { PopoverContainer, PopoverFooter, PopoverLayer, TActionMenu } from "../ReportViewContext";
 import TagsInput from "@/components/TagsInput";
 import Button from "@/components/Button";
 import { Select } from "@/components/base";
@@ -64,18 +64,15 @@ export default function FlowBuilder({ value, onChange }: {
             />
             {rulesMenuOpen &&
                 <PopoverLayer layer={3}>
-                    <div className="px-6 py-4 bg-white border">
+                    <PopoverContainer>
                         <RulesMenu
                             route={mainRoute}
                             onChange={mainRoute => onChange({ ...value, mainRoute })}
                         />
-                        <div
-                            className="flex justify-center items-center w-full mt-6 px-2 py-4"
-                            style={{ borderTop: "solid 1px #cfcfcf" }}
-                        >
+                        <PopoverFooter>
                             <Button text="Done" onClick={() => setRulesMenuOpen(false)} />
-                        </div>
-                    </div>
+                        </PopoverFooter>
+                    </PopoverContainer>
                 </PopoverLayer>
             }
         </>
@@ -401,18 +398,15 @@ function Route({ type, route, onChange, onDelete, onReorder = () => { } }: {
             </div>
             {rulesMenuOpen &&
                 <PopoverLayer layer={3}>
-                    <div className="px-6 py-4 bg-white border">
+                    <PopoverContainer>
                         <RulesMenu
                             route={route}
                             onChange={onChange}
                         />
-                        <div
-                            className="flex justify-center items-center w-full mt-6 px-2 py-4"
-                            style={{ borderTop: "solid 1px #cfcfcf" }}
-                        >
+                        <PopoverFooter>
                             <Button text="Done" onClick={() => setRulesMenuOpen(false)} />
-                        </div>
-                    </div>
+                        </PopoverFooter>
+                    </PopoverContainer>
                 </PopoverLayer>
             }
         </>
@@ -488,12 +482,16 @@ function Path({ path, route, onChange, onDelete }: {
     )
 }
 
+// A section represents either the list of landing pages,
+// or the list of offers contained within the path
 function Section({ itemName, path, onChange }: {
     itemName: EItemName.LANDING_PAGE | EItemName.OFFER;
     path: TPath;
     onChange: (p: TPath) => any;
 }) {
     const ids = itemName === EItemName.LANDING_PAGE ? path.landingPageIds : path.offerIds;
+
+    const [actionMenu, setActionMenu] = useState<TActionMenu | null>(null);
 
     function handleDelete(_id: number) {
         const newItems = ids.filter(id => id !== id);
@@ -505,84 +503,96 @@ function Section({ itemName, path, onChange }: {
     }
 
     return (
-        <div className="my-2">
-            <div className="relative flex justify-between items-center bg-white h-[40px] my-1 px-2">
-                <div className="flex justify-between items-center gap-2 w-full">
-                    <span
-                        className={itemName === EItemName.LANDING_PAGE && path.directLinkingEnabled ? "line-through" : ""}
-                        style={{ whiteSpace: "nowrap" }}
-                    >
-                        {itemName}
-                    </span>
-                    {itemName === EItemName.LANDING_PAGE &&
-                        <input
-                            type="checkbox"
-                            checked={!path.directLinkingEnabled}
-                            onChange={() => onChange({ ...path, directLinkingEnabled: !path.directLinkingEnabled })}
-                        />
-                    }
+        <>
+            <div className="my-2">
+                <div className="relative flex justify-between items-center bg-white h-[40px] my-1 px-2">
+                    <div className="flex justify-between items-center gap-2 w-full">
+                        <span
+                            className={itemName === EItemName.LANDING_PAGE && path.directLinkingEnabled ? "line-through" : ""}
+                            style={{ whiteSpace: "nowrap" }}
+                        >
+                            {itemName}
+                        </span>
+                        {itemName === EItemName.LANDING_PAGE &&
+                            <input
+                                type="checkbox"
+                                checked={!path.directLinkingEnabled}
+                                onChange={() => onChange({ ...path, directLinkingEnabled: !path.directLinkingEnabled })}
+                            />
+                        }
+                    </div>
                 </div>
+                {itemName === EItemName.LANDING_PAGE && path.directLinkingEnabled
+                    ? <div className="flex justify-center items-center bg-white h-[40px] my-1 px-2">
+                        <span>
+                            Direct Linking Enabled
+                        </span>
+                    </div>
+                    : <>
+                        <div className="flex flex-col justify-center items-center min-h-[40px] bg-white">
+                            {ids.length === 0
+                                ? <span className="text-xs">
+                                    {`No ${itemName} Added`}
+                                </span>
+                                : ids.map((id, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex justify-between items-center gap-2 bg-white h-[40px] my-1 px-2"
+                                    >
+                                        <div className="flex justify-start items-center gap-2">
+                                            <span>{index + 1}</span>
+                                            <WrappableSelect />
+                                        </div>
+                                        <div className="flex justify-end items-center gap-1">
+                                            <a
+                                                // TODO: This is supposed to be the URL of the landing page or offer:
+                                                href={window.location.href}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                            >
+                                                <FontAwesomeIcon icon={faExternalLink} />
+                                            </a>
+                                            <FontAwesomeIcon icon={faPencilAlt} className="cursor-pointer" />
+                                            <FontAwesomeIcon
+                                                icon={faTrashAlt}
+                                                className="cursor-pointer hover:text-red-500"
+                                                onClick={() => handleDelete(id)} />
+                                        </div>
+                                    </div>
+                                ))}
+                        </div>
+                        <div className="flex justify-between items-center bg-white h-[40px] my-1 px-2">
+                            <div
+                                // TODO: ...
+                                onClick={() => setActionMenu({ itemName })}
+                                className="flex justify-center items-center h-full w-[50%] cursor-pointer"
+                                style={{ borderRight: "solid 1px grey" }}
+                            >
+                                <span>{"Create New " + itemName}</span>
+                            </div>
+                            <div
+                                // TODO: ...
+                                onClick={() => console.log("+ New")}
+                                className="flex justify-center items-center h-full w-[50%] cursor-pointer"
+                                style={{ borderLeft: "solid 1px grey" }}
+                            >
+                                <span>{"+ New " + itemName}</span>
+                            </div>
+                        </div>
+                    </>
+                }
             </div>
-            {itemName === EItemName.LANDING_PAGE && path.directLinkingEnabled
-                ? <div className="flex justify-center items-center bg-white h-[40px] my-1 px-2">
-                    <span>
-                        Direct Linking Enabled
-                    </span>
-                </div>
-                : <>
-                    <div className="flex flex-col justify-center items-center min-h-[40px] bg-white">
-                        {ids.length === 0
-                            ? <span className="text-xs">
-                                {`No ${itemName} Added`}
-                            </span>
-                            : ids.map((id, index) => (
-                                <div
-                                    key={index}
-                                    className="flex justify-between items-center gap-2 bg-white h-[40px] my-1 px-2"
-                                >
-                                    <div className="flex justify-start items-center gap-2">
-                                        <span>{index + 1}</span>
-                                        <WrappableSelect />
-                                    </div>
-                                    <div className="flex justify-end items-center gap-1">
-                                        <a
-                                            // TODO: This is supposed to be the URL of the landing page or offer:
-                                            href={window.location.href}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                        >
-                                            <FontAwesomeIcon icon={faExternalLink} />
-                                        </a>
-                                        <FontAwesomeIcon icon={faPencilAlt} className="cursor-pointer" />
-                                        <FontAwesomeIcon
-                                            icon={faTrashAlt}
-                                            className="cursor-pointer hover:text-red-500"
-                                            onClick={() => handleDelete(id)} />
-                                    </div>
-                                </div>
-                            ))}
-                    </div>
-                    <div className="flex justify-between items-center bg-white h-[40px] my-1 px-2">
-                        <div
-                            // TODO: ...
-                            onClick={() => console.log("Create new")}
-                            className="flex justify-center items-center h-full w-[50%] cursor-pointer"
-                            style={{ borderRight: "solid 1px grey" }}
-                        >
-                            <span>{"Create New " + itemName}</span>
-                        </div>
-                        <div
-                            // TODO: ...
-                            onClick={() => console.log("+ New")}
-                            className="flex justify-center items-center h-full w-[50%] cursor-pointer"
-                            style={{ borderLeft: "solid 1px grey" }}
-                        >
-                            <span>{"+ New " + itemName}</span>
-                        </div>
-                    </div>
-                </>
+            {actionMenu &&
+                <PopoverLayer layer={4}>
+                    <PopoverContainer>
+                        ~ Action Menu ~
+                        <PopoverFooter>
+                            <Button text="Done" onClick={() => setActionMenu(null)} />
+                        </PopoverFooter>
+                    </PopoverContainer>
+                </PopoverLayer>
             }
-        </div>
+        </>
     )
 }
 

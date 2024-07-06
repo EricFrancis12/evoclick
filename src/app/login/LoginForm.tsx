@@ -45,7 +45,6 @@ function Input({ name, type }: {
 }) {
     return (
         <input
-            key={name}
             type={type}
             name={name}
             placeholder={name}
