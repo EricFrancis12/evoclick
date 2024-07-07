@@ -63,9 +63,6 @@ export default function Report({ view, reportItemName }: {
 export function useRows(clicks: TClick[], itemName: EItemName) {
     const { primaryData } = useReportView();
 
-    console.log(primaryData);
-    console.log(clicks);
-
     const enrichWith = itemNameInPrimaryData(itemName, primaryData)?.map(d => d.id.toString());
     const [rows, setRows] = useState<TRow[]>([]);
 
@@ -78,23 +75,24 @@ export function useRows(clicks: TClick[], itemName: EItemName) {
 }
 
 function makeRows(clicks: TClick[], itemName: EItemName, enrichWith?: string[]): TRow[] {
-    const rows = clicks.reduce((acc: TRow[], curr: TClick) => {
+    const rows = clicks.reduce((rows: TRow[], click: TClick) => {
         const clickProp = itemNameToClickProp(itemName);
-        const key = clickProp ? curr[clickProp] : null;
+        const key = clickProp ? click[clickProp] : null;
         if (key && (typeof key === "string" || typeof key === "number")) {
             const name = key.toString();
-            const i = acc.findIndex(row => row.name === name);
+
+            const i = rows.findIndex(row => row.name === name);
             if (i !== -1) {
-                acc[i].clicks.push(curr);
+                rows[i].clicks.push(click);
             } else {
-                acc.push({
+                rows.push({
                     name,
-                    clicks: [curr],
+                    clicks: [click],
                     selected: false,
                 });
             }
         }
-        return acc;
+        return rows;
     }, []);
 
     if (enrichWith) {
