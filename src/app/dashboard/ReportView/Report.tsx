@@ -2,20 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { faBullseye } from "@fortawesome/free-solid-svg-icons";
-import useFetchPrimaryData from "@/hooks/useFetchPrimaryData";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import UpperControlPanel from "./UpperControlPanel";
 import LowerControlPanel from "./LowerControlPanel";
 import DataTable, { TRow } from "./DataTable";
 import { TView, useViewsStore, newReportView } from "@/lib/store";
 import { EItemName, TClick, } from "@/lib/types";
+import { TPrimaryData, useReportView } from "./ReportViewContext";
 
-export default function Report({ clicks, view, reportItemName }: {
-    clicks: TClick[];
+export default function Report({ view, reportItemName }: {
     view: TView;
     reportItemName?: EItemName;
 }) {
     const { id, itemName } = view;
+    const { clicks } = useReportView();
     const [rows, setRows] = useRows(clicks, itemName);
 
     useEffect(() => {
@@ -61,16 +61,17 @@ export default function Report({ clicks, view, reportItemName }: {
 }
 
 export function useRows(clicks: TClick[], itemName: EItemName) {
-    const [rows, setRows] = useState<TRow[]>(makeRows(clicks, itemName));
+    const { primaryData } = useReportView();
+
+    console.log(primaryData);
+    console.log(clicks);
+
+    const enrichWith = itemNameInPrimaryData(itemName, primaryData)?.map(d => d.id.toString());
+    const [rows, setRows] = useState<TRow[]>([]);
 
     useEffect(() => {
-        setRows(makeRows(clicks, itemName));
+        setRows(makeRows(clicks, itemName, enrichWith));
     }, [clicks.length, itemName]);
-
-    useFetchPrimaryData(itemName, (data) => {
-        const names = data.map(d => d.id.toString());
-        setRows(makeRows(clicks, itemName, names));
-    });
 
     const value: [TRow[], React.Dispatch<React.SetStateAction<TRow[]>>] = [rows, setRows];
     return value;
@@ -108,6 +109,25 @@ function makeRows(clicks: TClick[], itemName: EItemName, enrichWith?: string[]):
     }
 
     return rows;
+}
+
+function itemNameInPrimaryData(itemName: EItemName, primaryData: TPrimaryData) {
+    switch (itemName) {
+        case EItemName.AFFILIATE_NETWORK:
+            return primaryData.affiliateNetworks;
+        case EItemName.CAMPAIGN:
+            return primaryData.campaigns;
+        case EItemName.FLOW:
+            return primaryData.flows;
+        case EItemName.LANDING_PAGE:
+            return primaryData.landingPages;
+        case EItemName.OFFER:
+            return primaryData.offers;
+        case EItemName.TRAFFIC_SOURCE:
+            return primaryData.trafficSources;
+        default:
+            return undefined;
+    }
 }
 
 function itemNameToClickProp(itemName: EItemName): keyof TClick | undefined {

@@ -15,13 +15,24 @@ import {
     updateAffiliateNetworkAction, updateCampaignAction, updateFlowAction,
     updateLandingPageAction, updateOfferAction, updateTrafficSourceAction
 } from "@/lib/actions";
-import { EItemName, TAffiliateNetwork, TClick, TFlow, TNamedToken, TRoute, TToken, TTrafficSource } from "@/lib/types";
+import { EItemName, TAffiliateNetwork, TCampaign, TClick, TFlow, TLandingPage, TNamedToken, TOffer, TRoute, TToken, TTrafficSource } from "@/lib/types";
 import { $Enums } from "@prisma/client";
 
 export type TActionMenu = TAffiliateNetworkActionMenu | TCampaignActionMenu | TSavedFlowActionMenu
     | TLandingPageActionMenu | TOfferActionMenu | TTrafficSourceActionMenu;
 
+export type TPrimaryData = {
+    affiliateNetworks: TAffiliateNetwork[];
+    campaigns: TCampaign[];
+    flows: TFlow[];
+    landingPages: TLandingPage[];
+    offers: TOffer[];
+    trafficSources: TTrafficSource[];
+};
+
 export type TReportViewContext = {
+    primaryData: TPrimaryData;
+    clicks: TClick[];
     actionMenu: TActionMenu | null;
     setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 };
@@ -36,12 +47,16 @@ export function useReportView() {
     return context;
 }
 
-export function ReportViewProvider({ children }: {
+export function ReportViewProvider({ primaryData, clicks, children }: {
+    primaryData: TPrimaryData;
+    clicks: TClick[];
     children: React.ReactNode;
 }) {
     const [actionMenu, setActionMenu] = useState<TActionMenu | null>(null);
 
     const value = {
+        primaryData,
+        clicks,
         actionMenu,
         setActionMenu,
     };
@@ -50,7 +65,7 @@ export function ReportViewProvider({ children }: {
         <ReportViewContext.Provider value={value}>
             {actionMenu &&
                 <PopoverLayer layer={1}>
-                    <ActionMenu actionMenu={actionMenu} onClose={() => setActionMenu(null)} />
+                    <ActionMenu actionMenu={actionMenu} setActionMenu={setActionMenu} />
                 </PopoverLayer>
             }
             {children}
@@ -83,17 +98,17 @@ export function PopoverLayer({ children, layer = 1, dark = true }: {
     )
 }
 
-function ActionMenu({ actionMenu, onClose }: {
+export function ActionMenu({ actionMenu, setActionMenu }: {
     actionMenu: TActionMenu;
-    onClose: () => any;
+    setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 }) {
     return (
         <div className="flex flex-col items-center bg-white">
             <ActionMenuHeader
                 title={actionMenu.itemName}
-                onClose={onClose}
+                onClose={() => setActionMenu(null)}
             />
-            <ActionMenuBody actionMenu={actionMenu} />
+            <ActionMenuBody actionMenu={actionMenu} setActionMenu={setActionMenu} />
         </div>
     )
 }
@@ -116,22 +131,23 @@ export function ActionMenuHeader({ title, onClose }: {
     )
 }
 
-export function ActionMenuBody({ actionMenu }: {
+export function ActionMenuBody({ actionMenu, setActionMenu }: {
     actionMenu: TActionMenu;
+    setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 }) {
     switch (actionMenu.itemName) {
         case EItemName.AFFILIATE_NETWORK:
-            return <AffiliateNetworkBody actionMenu={actionMenu} />;
+            return <AffiliateNetworkBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
         case EItemName.CAMPAIGN:
-            return <CampaignBody actionMenu={actionMenu} />;
+            return <CampaignBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
         case EItemName.FLOW:
-            return <SavedFlowBody actionMenu={actionMenu} />;
+            return <SavedFlowBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
         case EItemName.LANDING_PAGE:
-            return <LandingPageBody actionMenu={actionMenu} />;
+            return <LandingPageBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
         case EItemName.OFFER:
-            return <OfferBody actionMenu={actionMenu} />;
+            return <OfferBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
         case EItemName.TRAFFIC_SOURCE:
-            return <TrafficSourceBody actionMenu={actionMenu} />;
+            return <TrafficSourceBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
         default:
             return "";
     }
@@ -147,11 +163,10 @@ function ActionMenuBodyWrapper({ children }: {
     )
 }
 
-function AffiliateNetworkBody({ actionMenu }: {
+function AffiliateNetworkBody({ actionMenu, setActionMenu }: {
     actionMenu: TAffiliateNetworkActionMenu;
+    setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 }) {
-    const { setActionMenu } = useReportView();
-
     async function handleSave() {
         try {
             const { id, name, defaultNewOfferString, tags } = actionMenu;
@@ -196,11 +211,10 @@ function AffiliateNetworkBody({ actionMenu }: {
     )
 }
 
-function CampaignBody({ actionMenu }: {
+function CampaignBody({ actionMenu, setActionMenu }: {
     actionMenu: TCampaignActionMenu;
+    setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 }) {
-    const { setActionMenu } = useReportView();
-
     const [flows, setFlows] = useState<TFlow[]>([]);
     const [trafficSources, setTrafficSources] = useState<TTrafficSource[]>([]);
 
@@ -364,7 +378,10 @@ function CampaignBody({ actionMenu }: {
                     </Select>
                 }
                 {actionMenu.flowData?.type === "BUILT_IN" &&
-                    <Button text="Edit Built-In Flow" onClick={() => setFlowBuilderOpen(prev => !prev)} />
+                    <Button
+                        text="Edit Built-In Flow"
+                        onClick={() => setFlowBuilderOpen(true)}
+                    />
                 }
                 {actionMenu.flowData?.type === "URL" &&
                     <Input
@@ -405,7 +422,10 @@ function CampaignBody({ actionMenu }: {
                             })}
                         />
                         <PopoverFooter>
-                            <Button text="Done" onClick={() => setFlowBuilderOpen(false)} />
+                            <Button
+                                text="Done"
+                                onClick={() => setFlowBuilderOpen(false)}
+                            />
                         </PopoverFooter>
                     </PopoverContainer>
                 </PopoverLayer>
@@ -437,11 +457,10 @@ export function PopoverFooter({ children }: {
     )
 }
 
-function SavedFlowBody({ actionMenu }: {
+function SavedFlowBody({ actionMenu, setActionMenu }: {
     actionMenu: TSavedFlowActionMenu;
+    setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 }) {
-    const { setActionMenu } = useReportView();
-
     const [flowBuilderOpen, setFlowBuilderOpen] = useState<boolean>(false);
 
     async function handleSave() {
@@ -475,7 +494,10 @@ function SavedFlowBody({ actionMenu }: {
                 value={actionMenu.name || ""}
                 onChange={e => setActionMenu({ ...actionMenu, name: e.target.value })}
             />
-            <Button text="Edit Flow" onClick={() => setFlowBuilderOpen(prev => !prev)} />
+            <Button
+                text="Edit Flow"
+                onClick={() => setFlowBuilderOpen(true)}
+            />
             <TagsInput
                 title="Tags"
                 placeholder="Type to add tags"
@@ -494,7 +516,10 @@ function SavedFlowBody({ actionMenu }: {
                             onChange={({ mainRoute, ruleRoutes }) => setActionMenu({ ...actionMenu, mainRoute, ruleRoutes })}
                         />
                         <PopoverFooter>
-                            <Button text="Done" onClick={() => setFlowBuilderOpen(false)} />
+                            <Button
+                                text="Done"
+                                onClick={() => setFlowBuilderOpen(false)}
+                            />
                         </PopoverFooter>
                     </PopoverContainer>
                 </PopoverLayer>
@@ -503,11 +528,10 @@ function SavedFlowBody({ actionMenu }: {
     )
 }
 
-function LandingPageBody({ actionMenu }: {
+function LandingPageBody({ actionMenu, setActionMenu }: {
     actionMenu: TLandingPageActionMenu;
+    setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 }) {
-    const { setActionMenu } = useReportView();
-
     async function handleSave() {
         try {
             const { id, name, url, tags } = actionMenu;
@@ -552,11 +576,10 @@ function LandingPageBody({ actionMenu }: {
     )
 }
 
-function OfferBody({ actionMenu }: {
+function OfferBody({ actionMenu, setActionMenu }: {
     actionMenu: TOfferActionMenu;
+    setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 }) {
-    const { setActionMenu } = useReportView();
-
     const [affiliateNetworks, setAffiliateNetworks] = useState<TAffiliateNetwork[]>([]);
 
     useEffect(() => {
@@ -630,11 +653,10 @@ function OfferBody({ actionMenu }: {
     )
 }
 
-function TrafficSourceBody({ actionMenu }: {
+function TrafficSourceBody({ actionMenu, setActionMenu }: {
     actionMenu: TTrafficSourceActionMenu;
+    setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 }) {
-    const { setActionMenu } = useReportView();
-
     const [tokensMenuOpen, setTokensMenuOpen] = useState<boolean>(false);
 
     async function handleSave() {
@@ -673,7 +695,10 @@ function TrafficSourceBody({ actionMenu }: {
                 value={actionMenu.postbackUrl || ""}
                 onChange={e => setActionMenu({ ...actionMenu, postbackUrl: e.target.value })}
             />
-            <Button text="Edit Tokens" onClick={() => setTokensMenuOpen(prev => !prev)} />
+            <Button
+                text="Edit Tokens"
+                onClick={() => setTokensMenuOpen(true)}
+            />
             <TagsInput
                 title="Tags"
                 placeholder="Type to add tags"
@@ -721,7 +746,10 @@ function TrafficSourceBody({ actionMenu }: {
                             ))}
                         </TokensInputWrapper>
                         <PopoverFooter>
-                            <Button text="Done" onClick={() => setTokensMenuOpen(false)} />
+                            <Button
+                                text="Done"
+                                onClick={() => setTokensMenuOpen(false)}
+                            />
                         </PopoverFooter>
                     </PopoverContainer>
                 </PopoverLayer>

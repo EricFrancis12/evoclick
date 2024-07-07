@@ -1,7 +1,8 @@
 import { useProtectedRoute } from "@/lib/auth";
-import { getClicks } from "@/data";
+import { getAllAffiliateNetworks, getAllCampaigns, getAllClicks, getAllFlows, getAllLandingPages, getAllOffers, getAllTrafficSources } from "@/data";
 import ReportView from "./ReportView";
 import { EItemName } from "@/lib/types";
+import { TPrimaryData } from "./ReportView/ReportViewContext";
 
 export default async function DashboardPage({ params, searchParams }: {
     params: { itemName?: string, id?: string };
@@ -21,27 +22,50 @@ export default async function DashboardPage({ params, searchParams }: {
     const reportItemName = (params.itemName ? decodeURIComponent(params.itemName) : null) as EItemName | null;
     const reportItemId = (params.id ? decodeURIComponent(params.id) : null) as EItemName | null;
 
+    const affilaiteNetworksProm = getAllAffiliateNetworks();
+    const campaignsProm = getAllCampaigns();
+    const flowsProm = getAllFlows();
+    const landingPagesProm = getAllLandingPages();
+    const offersProm = getAllOffers();
+    const trafficSourcesProm = getAllTrafficSources();
+
+    const clicksProm = getAllClicks({
+        skip: getSkip(page, size),
+        take: size,
+        where: {
+            AND: [
+                {
+                    viewTime: {
+                        gte: timeframe[0],
+                        lte: timeframe[1],
+                    },
+                },
+                {
+                    // TODO: Add ability to filter by reportItemName and reportItemId
+                },
+            ],
+        },
+    });
+
     try {
-        const clicks = await getClicks({
-            skip: getSkip(page, size),
-            take: size,
-            where: {
-                AND: [
-                    {
-                        viewTime: {
-                            gte: timeframe[0],
-                            lte: timeframe[1],
-                        },
-                    },
-                    {
-                        // TODO: Add ability to filter by reportItemName and reportItemId
-                    },
-                ],
-            },
-        });
+        const affiliateNetworks = await affilaiteNetworksProm;
+        const campaigns = await campaignsProm;
+        const flows = await flowsProm;
+        const landingPages = await landingPagesProm;
+        const offers = await offersProm;
+        const trafficSources = await trafficSourcesProm;
+        const clicks = await clicksProm;
 
         return (
             <ReportView
+                primaryData={{
+                    affiliateNetworks,
+                    campaigns,
+                    flows,
+                    landingPages,
+                    offers,
+                    trafficSources,
+                }}
                 clicks={clicks}
                 page={page}
                 size={size}

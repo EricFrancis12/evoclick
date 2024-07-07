@@ -3,7 +3,7 @@ import db from "../lib/db";
 import { parseTokens } from ".";
 import { TClick } from "../lib/types";
 
-export async function getClicks(args: Prisma.ClickFindManyArgs = {}): Promise<TClick[]> {
+export async function getAllClicks(args: Prisma.ClickFindManyArgs = {}): Promise<TClick[]> {
     const clicks: Click[] = await db.click.findMany(args);
     const proms: Promise<TClick>[] = clicks.map(cl => makeClientClick(cl));
     return Promise.all(proms);

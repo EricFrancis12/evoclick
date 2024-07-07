@@ -61,12 +61,12 @@ export async function loginAction(formData: FormData): Promise<TUser | null> {
     }
 }
 
-export async function refreshAction(url: string) {
+export async function revalidatePathAction(url: string) {
     revalidatePath(url);
 }
 
 export async function getClicksAction(args: Prisma.ClickFindManyArgs = {}, pathname?: string): Promise<TClick[]> {
-    const prom = data.getClicks(args);
+    const prom = data.getAllClicks(args);
     refreshUrl(prom, pathname);
     return prom;
 }

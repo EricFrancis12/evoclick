@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp, faExternalLink, faPencilAlt, faPlus, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-import { PopoverContainer, PopoverFooter, PopoverLayer, TActionMenu } from "../ReportViewContext";
+import { ActionMenu, PopoverContainer, PopoverFooter, PopoverLayer, TActionMenu, useReportView } from "../ReportViewContext";
 import TagsInput from "@/components/TagsInput";
 import Button from "@/components/Button";
 import { Select } from "@/components/base";
-import { TRoute, ELogicalRelation, TPath, EItemName, TRule, ERuleName, EDeviceType, EBrowserName } from "@/lib/types";
+import { TRoute, ELogicalRelation, TPath, EItemName, TRule, ERuleName, EDeviceType, EBrowserName, TLandingPage, TOffer } from "@/lib/types";
 
 type TFlowBuilder = {
     mainRoute: TRoute;
@@ -19,7 +19,6 @@ export default function FlowBuilder({ value, onChange }: {
     onChange: (fb: TFlowBuilder) => any;
 }) {
     const { mainRoute, ruleRoutes } = value;
-    const [rulesMenuOpen, setRulesMenuOpen] = useState<boolean>(false);
 
     function handleReorder(direc: TReorderDirection, index: number) {
         if (!isValidIndex(ruleRoutes, index)) return;
@@ -60,21 +59,8 @@ export default function FlowBuilder({ value, onChange }: {
             <Button
                 text="Add New Rule"
                 icon={faPlus}
-                onClick={() => setRulesMenuOpen(true)}
+                onClick={() => onChange({ ...value, ruleRoutes: [...value.ruleRoutes, newRoute()] })}
             />
-            {rulesMenuOpen &&
-                <PopoverLayer layer={3}>
-                    <PopoverContainer>
-                        <RulesMenu
-                            route={mainRoute}
-                            onChange={mainRoute => onChange({ ...value, mainRoute })}
-                        />
-                        <PopoverFooter>
-                            <Button text="Done" onClick={() => setRulesMenuOpen(false)} />
-                        </PopoverFooter>
-                    </PopoverContainer>
-                </PopoverLayer>
-            }
         </>
     )
 }
@@ -396,7 +382,7 @@ function Route({ type, route, onChange, onDelete, onReorder = () => { } }: {
                     </>
                 }
             </div>
-            {rulesMenuOpen &&
+            {type === "rule" && rulesMenuOpen &&
                 <PopoverLayer layer={3}>
                     <PopoverContainer>
                         <RulesMenu
@@ -429,6 +415,19 @@ function Path({ path, route, onChange, onDelete }: {
     onChange: (p: TPath) => any;
     onDelete: () => any;
 }) {
+    const { landingPages, offers } = useReportView().primaryData;
+
+    const sections: TSection[] = [
+        {
+            itemName: EItemName.LANDING_PAGE,
+            options: landingPages,
+        },
+        {
+            itemName: EItemName.OFFER,
+            options: offers,
+        },
+    ];
+
     return (
         <div className="w-full bg-gray-300 px-2" style={{ borderRadius: "5px" }}>
             <div className="flex justify-between items-center py-3">
@@ -472,33 +471,50 @@ function Path({ path, route, onChange, onDelete }: {
                     </div>
                 </div>
             </div>
-            {path.isActive &&
-                <>
-                    <Section path={path} onChange={onChange} itemName={EItemName.LANDING_PAGE} />
-                    <Section path={path} onChange={onChange} itemName={EItemName.OFFER} />
-                </>
-            }
+            {path.isActive && sections.map((section, index) => (
+                <Section key={index} section={section} path={path} onChange={onChange} />
+            ))}
         </div>
     )
 }
 
 // A section represents either the list of landing pages,
 // or the list of offers contained within the path
-function Section({ itemName, path, onChange }: {
-    itemName: EItemName.LANDING_PAGE | EItemName.OFFER;
+type TSection = {
+    itemName: EItemName.LANDING_PAGE;
+    options: TLandingPage[];
+} | {
+    itemName: EItemName.OFFER;
+    options: TOffer[];
+};
+
+function Section({ section, path, onChange }: {
+    section: TSection;
     path: TPath;
     onChange: (p: TPath) => any;
 }) {
-    const ids = itemName === EItemName.LANDING_PAGE ? path.landingPageIds : path.offerIds;
+    const { itemName, options } = section;
+    const items = makeItems(
+        section.itemName === EItemName.LANDING_PAGE ? path.landingPageIds : path.offerIds,
+        section
+    );
 
-    const [actionMenu, setActionMenu] = useState<TActionMenu | null>(null);
+    const [outerActionMenu, setOuterActionMenu] = useState<TActionMenu | null>(null);
 
-    function handleDelete(_id: number) {
-        const newItems = ids.filter(id => id !== id);
+    function handleAddNew(id: number) {
+        console.log(id);
         if (itemName === EItemName.LANDING_PAGE) {
-            onChange({ ...path, landingPageIds: newItems });
+            onChange({ ...path, landingPageIds: [...path.landingPageIds, id] });
         } else if (itemName === EItemName.OFFER) {
-            onChange({ ...path, offerIds: newItems });
+            onChange({ ...path, offerIds: [...path.offerIds, id] });
+        }
+    }
+
+    function handleDelete(index: number) {
+        if (itemName === EItemName.LANDING_PAGE) {
+            onChange({ ...path, landingPageIds: path.landingPageIds.filter((_, i) => i !== index) });
+        } else if (itemName === EItemName.OFFER) {
+            onChange({ ...path, offerIds: path.offerIds.filter((_, i) => i !== index) });
         }
     }
 
@@ -530,80 +546,81 @@ function Section({ itemName, path, onChange }: {
                     </div>
                     : <>
                         <div className="flex flex-col justify-center items-center min-h-[40px] bg-white">
-                            {ids.length === 0
+                            {items.length === 0
                                 ? <span className="text-xs">
                                     {`No ${itemName} Added`}
                                 </span>
-                                : ids.map((id, index) => (
+                                : items.map((item, index) => (
                                     <div
                                         key={index}
-                                        className="flex justify-between items-center gap-2 bg-white h-[40px] my-1 px-2"
+                                        className="flex justify-between items-center gap-2 bg-white h-[40px] w-full my-1 px-2"
                                     >
                                         <div className="flex justify-start items-center gap-2">
                                             <span>{index + 1}</span>
-                                            <WrappableSelect />
+                                            <span>{item.name}</span>
                                         </div>
                                         <div className="flex justify-end items-center gap-1">
                                             <a
-                                                // TODO: This is supposed to be the URL of the landing page or offer:
-                                                href={window.location.href}
+                                                href={item.url}
                                                 target="_blank"
                                                 rel="noreferrer"
                                             >
                                                 <FontAwesomeIcon icon={faExternalLink} />
                                             </a>
-                                            <FontAwesomeIcon icon={faPencilAlt} className="cursor-pointer" />
+                                            <FontAwesomeIcon
+                                                icon={faPencilAlt}
+                                                className="cursor-pointer"
+                                                onClick={() => console.log("Pencil clicked")} // TODO
+                                            />
                                             <FontAwesomeIcon
                                                 icon={faTrashAlt}
                                                 className="cursor-pointer hover:text-red-500"
-                                                onClick={() => handleDelete(id)} />
+                                                onClick={() => handleDelete(index)} />
                                         </div>
                                     </div>
                                 ))}
                         </div>
                         <div className="flex justify-between items-center bg-white h-[40px] my-1 px-2">
                             <div
-                                // TODO: ...
-                                onClick={() => setActionMenu({ itemName })}
+                                onClick={() => setOuterActionMenu({ itemName })}
                                 className="flex justify-center items-center h-full w-[50%] cursor-pointer"
                                 style={{ borderRight: "solid 1px grey" }}
                             >
                                 <span>{"Create New " + itemName}</span>
                             </div>
                             <div
-                                // TODO: ...
-                                onClick={() => console.log("+ New")}
                                 className="flex justify-center items-center h-full w-[50%] cursor-pointer"
                                 style={{ borderLeft: "solid 1px grey" }}
                             >
-                                <span>{"+ New " + itemName}</span>
+                                <Select value="" onChange={e => handleAddNew(Number(e.target.value))}>
+                                    <option value="">{"+ New " + itemName}</option>
+                                    {options.map(({ id, name }) => (
+                                        <option key={id} value={id}>
+                                            {name}
+                                        </option>
+                                    ))}
+                                </Select>
                             </div>
                         </div>
                     </>
                 }
             </div>
-            {actionMenu &&
+            {outerActionMenu &&
                 <PopoverLayer layer={4}>
-                    <PopoverContainer>
-                        ~ Action Menu ~
-                        <PopoverFooter>
-                            <Button text="Done" onClick={() => setActionMenu(null)} />
-                        </PopoverFooter>
-                    </PopoverContainer>
+                    <ActionMenu actionMenu={outerActionMenu} setActionMenu={setOuterActionMenu} />
                 </PopoverLayer>
             }
         </>
     )
 }
 
-function WrappableSelect() {
-    // TODO: ...
-
-    return (
-        <div>
-            WrappableSelect
-        </div>
-    )
+function makeItems(ids: number[], section: TSection): typeof section.options {
+    const result = [];
+    for (const id of ids) {
+        const item = section.options.find(option => option.id === id);
+        if (item) result.push(item);
+    }
+    return result;
 }
 
 export function newRoute(): TRoute {

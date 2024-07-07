@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { ReportViewProvider } from "./ReportViewContext";
+import { ReportViewProvider, TPrimaryData } from "./ReportViewContext";
 import useActiveView from "@/hooks/useActiveView";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import Report from "./Report";
@@ -11,7 +11,8 @@ import Tab from "@/app/dashboard/ReportView/Tab";
 import { TView, useViewsStore } from "@/lib/store";
 import { EItemName, TClick } from "@/lib/types";
 
-export default function ReportView({ clicks, page, size, timeframe, reportItemName }: {
+export default function ReportView({ primaryData, clicks, page, size, timeframe, reportItemName }: {
+    primaryData: TPrimaryData;
     clicks: TClick[];
     page: number;
     size: number;
@@ -45,7 +46,7 @@ export default function ReportView({ clicks, page, size, timeframe, reportItemNa
     }
 
     return (
-        <ReportViewProvider>
+        <ReportViewProvider primaryData={primaryData} clicks={clicks}>
             <div className="h-screen w-full">
                 <div className="flex h-[40px] w-[100vw] bg-[#2f918e]">
                     <div className="flex justify-center items-center h-full">
@@ -73,7 +74,6 @@ export default function ReportView({ clicks, page, size, timeframe, reportItemNa
                 <div className="width-[100vw] text-sm">
                     {activeView
                         ? <Report
-                            clicks={clicks}
                             view={activeView}
                             reportItemName={reportItemName}
                         />
