@@ -9,6 +9,7 @@ import useQueryRouter from "@/hooks/useQueryRouter";
 import Report from "./Report";
 import Tab from "@/app/dashboard/ReportView/Tab";
 import { TView, useViewsStore } from "@/lib/store";
+import { encodeTimeframe } from "@/lib/utils";
 import { EItemName, TClick } from "@/lib/types";
 
 export default function ReportView({ primaryData, clicks, timeframe, reportItemName }: {
@@ -30,14 +31,17 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
 
     function handleReportTabClick(view: TView) {
         if (!view.reportItemName) return;
-        queryRouter.push(`/dashboard/report/${encodeURIComponent(view.reportItemName)}/${encodeURIComponent(view.id)}`);
+        queryRouter.push(
+            `/dashboard/report/${encodeURIComponent(view.reportItemName)}/${encodeURIComponent(view.id)}`,
+            { timeframe: encodeTimeframe(view.timeframe) }
+        );
     }
 
     // Delete view, then if the deleted view was the current one redirect to /dashboard
     function handleReportTabClose(view: TView) {
         removeReportViewById(view.id);
         if (view.id === params.id) {
-            queryRouter.push("/dashboard");
+            queryRouter.push("/dashboard", { timeframe: encodeTimeframe(mainView.timeframe) });
         }
     }
 
@@ -56,7 +60,7 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
                     </div>
                     <Tab
                         view={mainView}
-                        onClick={() => queryRouter.push("/dashboard")}
+                        onClick={() => queryRouter.push("/dashboard", { timeframe: encodeTimeframe(mainView.timeframe) })}
                     />
                     {reportViews.map(view => (
                         <Tab

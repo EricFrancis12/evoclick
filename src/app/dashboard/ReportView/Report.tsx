@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { faBullseye } from "@fortawesome/free-solid-svg-icons";
+import { TPrimaryData, useReportView } from "./ReportViewContext";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import UpperControlPanel from "./UpperControlPanel";
 import LowerControlPanel from "./LowerControlPanel";
 import DataTable, { TRow } from "./DataTable";
 import { TView, useViewsStore, newReportView } from "@/lib/store";
+import { encodeTimeframe } from "@/lib/utils";
 import { EItemName, TClick, } from "@/lib/types";
-import { TPrimaryData, useReportView } from "./ReportViewContext";
 
 export default function Report({ view, reportItemName }: {
     view: TView;
@@ -35,7 +36,10 @@ export default function Report({ view, reportItemName }: {
             addReportView(newView);
         }
         if (newView.reportItemName) {
-            queryRouter.push(`/dashboard/report/${encodeURIComponent(newView.reportItemName)}/${encodeURIComponent(newView.id)}`);
+            queryRouter.push(
+                `/dashboard/report/${encodeURIComponent(newView.reportItemName)}/${encodeURIComponent(newView.id)}`,
+                { timeframe: encodeTimeframe(view.timeframe) }
+            );
         }
     }
 

@@ -1,8 +1,10 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { IconDefinition, faTachometerAltFast } from "@fortawesome/free-solid-svg-icons";
-import { EItemName } from "./types";
 import { TReportChain } from "@/app/dashboard/ReportView/ReportChain";
+import { defaultTimeframe } from "./constants";
+import { EItemName } from "./types";
+import { parseISO } from "date-fns";
 
 export type TView = {
     type: "main";
@@ -22,6 +24,32 @@ export type TView = {
     reportChain: TReportChain;
 };
 
+export function newMainView(itemName: EItemName, icon: IconDefinition): TView {
+    return {
+        id: "0",
+        itemName,
+        type: "main",
+        icon,
+        timeframe: defaultTimeframe,
+        reportItemName: null,
+        reportChain: null,
+    };
+}
+
+export function newReportView(itemName: EItemName, icon: IconDefinition, reportItemName: EItemName, reportItemId: string): TView {
+    return {
+        id: reportItemId,
+        itemName,
+        type: "report",
+        icon,
+        timeframe: defaultTimeframe,
+        reportItemName,
+        reportChain: [{}, null],
+    };
+}
+
+const initialMainView = newMainView(EItemName.CAMPAIGN, faTachometerAltFast);
+
 interface IViewsState {
     mainView: TView;
     reportViews: TView[];
@@ -32,8 +60,6 @@ interface IViewsState {
     removeReportViewById: (id: string) => void;
     removeAllReportViews: () => void;
 }
-
-const initialMainView = newMainView(EItemName.CAMPAIGN, faTachometerAltFast);
 
 export const useViewsStore = create<IViewsState>()(
     persist(
@@ -70,32 +96,58 @@ export const useViewsStore = create<IViewsState>()(
             removeAllReportViews: () => set({ reportViews: [] }),
         }),
         {
-            name: "views-storage", // name of the item in the storage (must be unique)
-            storage: createJSONStorage(() => sessionStorage), // (optional) by default, "localStorage" is used
+            name: "views-storage",
+            storage: createJSONStorage(() => sessionStorage, {
+                replacer: (_, value) => {
+                    const val = replacerTypeCheck(value);
+                    if (val) {
+                        return { type: "ZUSTAND_TIMEFRAME_REPLACER", value: datesToISO(val) };
+                    }
+                    return value;
+                },
+                reviver: (_, value) => {
+                    const val = reviverTypeCheck(value);
+                    if (val) {
+                        return datesParseISO(val);
+                    }
+                    return value;
+                },
+            }),
         },
     ),
 );
 
-export function newMainView(itemName: EItemName, icon: IconDefinition): TView {
-    return {
-        id: "0",
-        itemName,
-        type: "main",
-        icon,
-        timeframe: [new Date, new Date],
-        reportItemName: null,
-        reportChain: null,
-    };
+function replacerTypeCheck(value: unknown): Date[] | null {
+    if (Array.isArray(value)
+        && value.length === 2
+        && value[0] instanceof Date
+        && value[1] instanceof Date
+    ) {
+        return value as Date[];
+    }
+    return null;
 }
 
-export function newReportView(itemName: EItemName, icon: IconDefinition, reportItemName: EItemName, reportItemId: string): TView {
-    return {
-        id: reportItemId,
-        itemName,
-        type: "report",
-        icon,
-        timeframe: [new Date, new Date],
-        reportItemName,
-        reportChain: [{}, null],
-    };
+function reviverTypeCheck(value: unknown): string[] | null {
+    if (!!value
+        && typeof value === "object"
+        && "type" in value
+        && value.type === "ZUSTAND_TIMEFRAME_REPLACER"
+        && "value" in value
+        && Array.isArray(value.value)
+        && value.value.length === 2
+        && typeof value.value[0] === "string"
+        && typeof value.value[1] === "string"
+    ) {
+        return value.value as string[];
+    }
+    return null;
+}
+
+function datesToISO(dates: Date[]): string[] {
+    return dates.map(date => date.toISOString());
+}
+
+function datesParseISO(strings: string[]): Date[] {
+    return strings.map(str => parseISO(str));
 }

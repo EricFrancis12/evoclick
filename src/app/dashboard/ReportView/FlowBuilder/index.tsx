@@ -502,7 +502,6 @@ function Section({ section, path, onChange }: {
     const [outerActionMenu, setOuterActionMenu] = useState<TActionMenu | null>(null);
 
     function handleAddNew(id: number) {
-        console.log(id);
         if (itemName === EItemName.LANDING_PAGE) {
             onChange({ ...path, landingPageIds: [...path.landingPageIds, id] });
         } else if (itemName === EItemName.OFFER) {

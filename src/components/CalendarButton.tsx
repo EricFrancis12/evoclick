@@ -11,16 +11,23 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
-import { format } from "date-fns";
+import { format, endOfDay } from "date-fns";
 import { DateRange } from "react-day-picker";
 
-// TODO: Add ability for Calendar Button to select a date down to the hour
 export default function CalendarButton({ timeframe, onChange }: {
     timeframe: [Date, Date];
     onChange: ([start, end]: [Date, Date]) => void;
 }) {
+    // Change end date to the end of day
+    function handleChange([start, end]: [Date, Date]) {
+        onChange([start, endOfDay(end)]);
+    }
+
     return (
-        <DateRangePicker initialTimeframe={timeframe} onChange={onChange} />
+        <DateRangePicker
+            initialTimeframe={timeframe}
+            onChange={handleChange}
+        />
     )
 }
 
