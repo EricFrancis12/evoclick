@@ -20,7 +20,7 @@ export default function Report({ view, reportItemName }: {
 
     useEffect(() => {
         setRows(prev => prev.map(row => ({ ...row, selected: false })));
-    }, [view.reportChain?.[0]]);
+    }, [itemName]);
 
     const { reportViews, addReportView, updateViewItemNameById } = useViewsStore(store => store);
     const queryRouter = useQueryRouter();
@@ -30,7 +30,7 @@ export default function Report({ view, reportItemName }: {
         const selectedRows = rows.filter(row => row.selected === true);
         if (selectedRows.length < 1) return;
         const newViewItemName = itemName !== EItemName.CAMPAIGN ? EItemName.CAMPAIGN : EItemName.OFFER;
-        const newView = newReportView(newViewItemName, faBullseye, itemName, selectedRows[0].name);
+        const newView = newReportView(newViewItemName, faBullseye, itemName, selectedRows[0].id.toString());
         if (!reportViews.some(v => v.itemName === newView.itemName && v.id === newView.id)) {
             addReportView(newView);
         }
@@ -63,7 +63,7 @@ export default function Report({ view, reportItemName }: {
 export function useRows(clicks: TClick[], itemName: EItemName) {
     const { primaryData } = useReportView();
 
-    const enrichWith = itemNameInPrimaryData(itemName, primaryData)?.map(d => d.id.toString());
+    const enrichWith = itemNameInPrimaryData(itemName, primaryData)?.map(({ id, name }) => ({ id, name: name || "" }));
     const [rows, setRows] = useState<TRow[]>([]);
 
     useEffect(() => {
@@ -74,19 +74,23 @@ export function useRows(clicks: TClick[], itemName: EItemName) {
     return value;
 }
 
-function makeRows(clicks: TClick[], itemName: EItemName, enrichWith?: string[]): TRow[] {
+type TEnrichWith = {
+    id: number;
+    name: string;
+};
+
+function makeRows(clicks: TClick[], itemName: EItemName, enrichWith?: TEnrichWith[]): TRow[] {
     const rows = clicks.reduce((rows: TRow[], click: TClick) => {
         const clickProp = itemNameToClickProp(itemName);
-        const key = clickProp ? click[clickProp] : null;
-        if (key && (typeof key === "string" || typeof key === "number")) {
-            const name = key.toString();
-
-            const i = rows.findIndex(row => row.name === name);
-            if (i !== -1) {
-                rows[i].clicks.push(click);
+        const value = clickProp ? click[clickProp] : null;
+        if (value && (typeof value === "number" || typeof value === "string")) {
+            const index = rows.findIndex(row => row.id === value);
+            if (index !== -1) {
+                rows[index].clicks.push(click);
             } else {
                 rows.push({
-                    name,
+                    id: value,
+                    name: typeof value === "string" ? value : "",
                     clicks: [click],
                     selected: false,
                 });
@@ -96,11 +100,13 @@ function makeRows(clicks: TClick[], itemName: EItemName, enrichWith?: string[]):
     }, []);
 
     if (enrichWith) {
-        for (const name of enrichWith) {
-            if (rows.some(row => row.name === name)) continue;
+        for (let i = 0; i < enrichWith.length; i++) {
+            const { id, name } = enrichWith[i];
+            if (rows.some(row => row.id === id)) continue;
             rows.push({
-                clicks: [],
+                id,
                 name,
+                clicks: [],
                 selected: false,
             });
         }

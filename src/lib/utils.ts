@@ -21,3 +21,17 @@ export function arrayOf<T>(any: T, length: number = 1): T[] {
     }
     return result;
 }
+
+export function encodeTimeframe(timeframe: [Date, Date]): string {
+    return timeframe.map(date => date.getTime()).join(",");
+}
+
+export function decodeTimeframe(str: string): [Date, Date] | null {
+    const splitOnComma = decodeURIComponent(str).split(",");
+    if (splitOnComma?.length !== 2) return null;
+
+    const nums = splitOnComma.map(a => Number(a));
+    if (nums.includes(NaN)) return null;
+
+    return [new Date(nums[0]), new Date(nums[1])];
+}

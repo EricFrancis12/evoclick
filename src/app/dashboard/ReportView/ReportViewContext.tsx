@@ -232,7 +232,7 @@ function CampaignBody({ actionMenu, setActionMenu }: {
                 const flow = _flows.find(_flow => _flow.id === actionMenu.flowId);
                 if (!flow) return;
 
-                const { type, id, name, url, mainRoute, ruleRoutes, tags } = flow;
+                const { type, name, url, mainRoute, ruleRoutes, tags } = flow;
                 setActionMenu({
                     ...actionMenu,
                     flowData: {
@@ -297,7 +297,7 @@ function CampaignBody({ actionMenu, setActionMenu }: {
                     geoName,
                     tags,
                     flowId,
-                    trafficSourceId
+                    trafficSourceId,
                 }, window.location.href);
                 toast.success("Campaign was updated successfully");
             } else if (trafficSourceId !== undefined) {
@@ -308,7 +308,7 @@ function CampaignBody({ actionMenu, setActionMenu }: {
                     geoName: geoName ?? $Enums.GeoName.NONE,
                     tags: tags ?? [],
                     flowId: flowId,
-                    trafficSourceId
+                    trafficSourceId,
                 }, window.location.href);
                 toast.success("Successfully created new Campaign");
             }

@@ -570,7 +570,7 @@ function Section({ section, path, onChange }: {
                                             <FontAwesomeIcon
                                                 icon={faPencilAlt}
                                                 className="cursor-pointer"
-                                                onClick={() => console.log("Pencil clicked")} // TODO: ...
+                                                onClick={() => setOuterActionMenu({ itemName, ...item })}
                                             />
                                             <FontAwesomeIcon
                                                 icon={faTrashAlt}

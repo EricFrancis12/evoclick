@@ -12,8 +12,6 @@ export type TView = {
     timeframe: [Date, Date];
     reportItemName: null;
     reportChain: null;
-    page: number;
-    size: number;
 } | {
     type: "report";
     id: string;
@@ -22,15 +20,13 @@ export type TView = {
     timeframe: [Date, Date];
     reportItemName: EItemName;
     reportChain: TReportChain;
-    page: number;
-    size: number;
 };
 
 interface IViewsState {
     mainView: TView;
     reportViews: TView[];
     addReportView: (view: TView) => void;
-    updateViewOnPageLoad: (id: string, opts: { page: number, size: number, timeframe: [Date, Date] }) => void;
+    updateViewOnPageLoad: (id: string, opts: { timeframe: [Date, Date] }) => void;
     updateViewItemNameById: (id: string, itemName: EItemName) => void;
     updateViewReportChainById: (id: string, reportChain: TReportChain) => void;
     removeReportViewById: (id: string) => void;
@@ -89,8 +85,6 @@ export function newMainView(itemName: EItemName, icon: IconDefinition): TView {
         timeframe: [new Date, new Date],
         reportItemName: null,
         reportChain: null,
-        page: 1,
-        size: 50,
     };
 }
 
@@ -103,7 +97,5 @@ export function newReportView(itemName: EItemName, icon: IconDefinition, reportI
         timeframe: [new Date, new Date],
         reportItemName,
         reportChain: [{}, null],
-        page: 1,
-        size: 50,
     };
 }

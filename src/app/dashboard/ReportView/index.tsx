@@ -11,23 +11,19 @@ import Tab from "@/app/dashboard/ReportView/Tab";
 import { TView, useViewsStore } from "@/lib/store";
 import { EItemName, TClick } from "@/lib/types";
 
-export default function ReportView({ primaryData, clicks, page, size, timeframe, reportItemName }: {
+export default function ReportView({ primaryData, clicks, timeframe, reportItemName }: {
     primaryData: TPrimaryData;
     clicks: TClick[];
-    page: number;
-    size: number;
     timeframe: [Date, Date];
     reportItemName?: EItemName;
 }) {
-    const {
-        mainView, reportViews, updateViewOnPageLoad, removeReportViewById
-    } = useViewsStore(store => store);
+    const { mainView, reportViews, updateViewOnPageLoad, removeReportViewById } = useViewsStore(store => store);
 
     const activeView = useActiveView();
     useEffect(() => {
         if (!activeView?.id) return;
-        updateViewOnPageLoad(activeView.id, { page, size, timeframe, });
-    }, [page, size, timeframe]);
+        updateViewOnPageLoad(activeView.id, { timeframe });
+    }, [timeframe]);
 
     const params = useParams();
     const queryRouter = useQueryRouter();

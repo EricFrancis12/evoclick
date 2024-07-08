@@ -66,7 +66,7 @@ export default function Row({ row, columns, onSelected, view, depth }: {
     )
 }
 
-function makeCells(clicks: TClick[], name: string): (string | number)[] {
+function makeCells(clicks: TClick[], name: string): (number | string)[] {
     const numVisits = clicks.length;
     const numClicks = clicks.filter(click => !!click.clickTime).length;
     const numConversions = clicks.filter(click => !!click.convTime).length;

@@ -12,6 +12,7 @@ export type TColumn = {
 };
 
 export type TRow = {
+    id: number | string;
     name: string;
     clicks: TClick[];
     selected: boolean;
@@ -23,8 +24,6 @@ export default function DataTable({ view, rows, setRows, depth = 0 }: {
     setRows: (newRows: TRow[]) => any;
     depth?: number;
 }) {
-    // TODO: Loop over all rows and find their corresponding item from useReportView -> primaryData
-
     const [columns, setColumns] = useState<TColumn[]>(columnTitles.map((title, index) => ({
         title,
         width: index === 0 ? "300px" : "100px",
@@ -32,7 +31,7 @@ export default function DataTable({ view, rows, setRows, depth = 0 }: {
 
     return (
         <div className="relative flex flex-col min-h-[400px] max-w-[100vw] overflow-x-scroll">
-            <div className="absolute top-0 left-0 h-full">
+            <div className="absolute top-0 left-0">
                 <TitleRow
                     name={view?.itemName}
                     columns={columns}

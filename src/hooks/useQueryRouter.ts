@@ -1,30 +1,23 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import useActiveView from "./useActiveView";
+import { encodeTimeframe } from "@/lib/utils";
 
-export default function useQueryRouter() {
+export default function useViewRouter() {
     const router = useRouter();
+    const view = useActiveView();
+
     return {
         push: (pathname: string, query?: Record<string, string>, preserve?: boolean) => {
             const url = new URL(pathname, window.location.origin);
             const params = new URLSearchParams(
-                preserve
-                    ? { ...getCurrentQuery(), ...query } // new query overrides current query
+                preserve && view
+                    ? { timeframe: encodeTimeframe(view.timeframe), ...query } // new query overrides current query
                     : query
             );
             url.search = params.toString();
             router.push(url.toString());
-        }
+        },
     };
 }
-
-function getCurrentQuery() {
-    const currentQuery: Record<string, string> = {};
-    if (typeof window !== "undefined") {
-        const searchParams = new URLSearchParams(window.location.search);
-        searchParams.forEach((value, key) => {
-            currentQuery[key] = value;
-        });
-    }
-    return currentQuery;
-};

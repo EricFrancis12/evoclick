@@ -1,7 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import { faPencil, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { useReportView } from "./ReportViewContext";
+import { TActionMenu, TPrimaryData, useReportView } from "./ReportViewContext";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import CalendarButton from "@/components/CalendarButton";
 import RefreshButton from "@/components/RefreshButton";
@@ -9,9 +10,9 @@ import ReportButton from "@/components/ReportButton";
 import ReportChain from "./ReportChain";
 import { TView, useViewsStore } from "@/lib/store";
 import Button from "@/components/Button";
+import { encodeTimeframe } from "@/lib/utils";
 import { EItemName } from "@/lib/types";
 import { TRow } from "./DataTable";
-import { useEffect } from "react";
 
 export default function LowerControlPanel({ view, onNewReport, reportItemName, rows }: {
     view: TView;
@@ -44,8 +45,9 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
     }
 
     function handleEditItem() {
-        // TODO: ...
-        console.log("Edit button clicked");
+        if (selectedRows.length < 1) return;
+        if (typeof selectedRows[0].id !== "number") return;
+        setActionMenu(makeActionMenu(view.itemName, selectedRows[0].id));
     }
 
     return (
@@ -58,7 +60,7 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
                     timeframe={view.timeframe}
                     onChange={timeframe => queryRouter.push(
                         window.location.href,
-                        { timeframe: timeframeQueryParam(timeframe) },
+                        { timeframe: encodeTimeframe(timeframe) },
                         true
                     )}
                 />
@@ -109,11 +111,35 @@ function LowerCPRow({ children }: {
     )
 }
 
-function timeframeQueryParam(timeframe: [Date, Date]): string {
-    return timeframe.map(date => date.getTime()).join(",");
+function makeActionMenu(itemName: EItemName, id: number): TActionMenu | null {
+    // TODO: ...
+    console.log("makeActionMenu not yet implimented");
+    return null;
 }
 
-function isPrimary(itemName: EItemName): boolean {
+function getPrimaryItemById(primaryData: TPrimaryData, itemName: EItemName, id: number) {
+    if (!isPrimary(itemName)) return null;
+
+    const { affiliateNetworks, campaigns, flows, landingPages, offers, trafficSources } = primaryData;
+    switch (itemName) {
+        case EItemName.AFFILIATE_NETWORK:
+            return affiliateNetworks.find(an => an.id === id) ?? null;
+        case EItemName.CAMPAIGN:
+            return campaigns.find(ca => ca.id === id) ?? null;
+        case EItemName.FLOW:
+            return flows.find(fl => fl.id === id) ?? null;
+        case EItemName.LANDING_PAGE:
+            return landingPages.find(lp => lp.id === id) ?? null;
+        case EItemName.OFFER:
+            return offers.find(o => o.id === id) ?? null;
+        case EItemName.TRAFFIC_SOURCE:
+            return trafficSources.find(ts => ts.id === id) ?? null;
+        default:
+            return null;
+    }
+}
+
+export function isPrimary(itemName: EItemName): boolean {
     return itemName === EItemName.AFFILIATE_NETWORK
         || itemName === EItemName.CAMPAIGN
         || itemName === EItemName.FLOW
