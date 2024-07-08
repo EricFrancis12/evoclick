@@ -12,7 +12,7 @@ export type TUpperCPItem = {
 
 export default function UpperCPItem({ item, onClick = () => { } }: {
     item: TUpperCPItem;
-    onClick?: (item: TUpperCPItem) => any;
+    onClick?: (item: TUpperCPItem) => void;
 }) {
     const activeView = useActiveView()
     const isActive = activeView?.itemName === item.itemName;

@@ -3,7 +3,7 @@
 export default function RowWrapper({ children, selected, onClick = () => { } }: {
     children: React.ReactNode;
     selected?: boolean;
-    onClick?: (bool: boolean) => any;
+    onClick?: (bool: boolean) => void;
 }) {
     return (
         <div

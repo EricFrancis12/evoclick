@@ -6,7 +6,7 @@ import { TRow, TColumn } from ".";
 
 export default function Rows({ rows, setRows, columns, view, depth }: {
     rows: TRow[];
-    setRows: (rows: TRow[]) => any;
+    setRows: (rows: TRow[]) => void;
     columns: TColumn[];
     view: TView;
     depth: number;

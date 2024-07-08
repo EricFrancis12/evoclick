@@ -9,7 +9,7 @@ import { TColumn } from ".";
 export default function TitleRow({ name, columns, setColumns }: {
     name: string;
     columns: TColumn[];
-    setColumns: (cols: TColumn[]) => any;
+    setColumns: (cols: TColumn[]) => void;
 }) {
     const mouseDownClientX = useRef<number>(0);
 

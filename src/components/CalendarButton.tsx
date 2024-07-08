@@ -17,7 +17,7 @@ import { DateRange } from "react-day-picker";
 // TODO: Add ability for Calendar Button to select a date down to the hour
 export default function CalendarButton({ timeframe, onChange }: {
     timeframe: [Date, Date];
-    onChange: ([start, end]: [Date, Date]) => any;
+    onChange: ([start, end]: [Date, Date]) => void;
 }) {
     return (
         <DateRangePicker initialTimeframe={timeframe} onChange={onChange} />
@@ -26,7 +26,7 @@ export default function CalendarButton({ timeframe, onChange }: {
 
 export function DateRangePicker({ initialTimeframe, onChange, className }: {
     initialTimeframe: [Date, Date];
-    onChange: ([start, end]: [Date, Date]) => any;
+    onChange: ([start, end]: [Date, Date]) => void;
     className?: string;
 }) {
     const [date, setDate] = useState<DateRange | undefined>({

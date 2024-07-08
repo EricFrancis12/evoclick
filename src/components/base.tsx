@@ -58,7 +58,7 @@ export function SelectionButtons({ name = "", options, value, onClick, children 
     name: string;
     options: string[];
     value: string;
-    onClick: (val: string) => any;
+    onClick: (val: string) => void;
     children?: React.ReactNode;
 }) {
     return (

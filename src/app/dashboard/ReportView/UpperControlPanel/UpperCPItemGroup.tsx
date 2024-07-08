@@ -17,7 +17,7 @@ export type TUpperCPItemGroup = {
 
 export default function UpperCPItemGroup({ itemGroup, onClick = () => { }, reportItemName }: {
     itemGroup: TUpperCPItemGroup;
-    onClick?: (item: TUpperCPItem) => any;
+    onClick?: (item: TUpperCPItem) => void;
     reportItemName?: EItemName;
 }) {
     const ref = useRef(null);

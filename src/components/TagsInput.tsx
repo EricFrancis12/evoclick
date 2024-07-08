@@ -6,7 +6,7 @@ import { faX } from "@fortawesome/free-solid-svg-icons";
 
 export default function TagsInput({ tags, setTags, title, placeholder, tagSuggestions }: {
     tags: string[];
-    setTags: (newTags: string[]) => any;
+    setTags: (newTags: string[]) => void;
     title?: string;
     placeholder?: string;
     tagSuggestions?: string[];

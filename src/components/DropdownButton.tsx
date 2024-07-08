@@ -8,7 +8,7 @@ export default function DropdownButton({ disabled, options, value, onClick }: {
     disabled?: boolean;
     options: string[];
     value: string;
-    onClick: (val: string) => any;
+    onClick: (val: string) => void;
 }) {
     const [active, setActive] = useState<boolean>(false);
 

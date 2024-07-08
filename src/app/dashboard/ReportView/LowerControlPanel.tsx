@@ -11,12 +11,12 @@ import ReportChain from "./ReportChain";
 import { TView, useViewsStore } from "@/lib/store";
 import Button from "@/components/Button";
 import { encodeTimeframe } from "@/lib/utils";
-import { EItemName, TFlow } from "@/lib/types";
+import { EItemName } from "@/lib/types";
 import { TRow } from "./DataTable";
 
 export default function LowerControlPanel({ view, onNewReport, reportItemName, rows }: {
     view: TView;
-    onNewReport: () => any;
+    onNewReport: () => void;
     reportItemName?: EItemName;
     rows: TRow[];
 }) {

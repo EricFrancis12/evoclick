@@ -8,7 +8,7 @@ import { TAffiliateNetwork, TAffiliateNetwork_updateRequest } from "@/lib/types"
 
 export default function Editor({ affiliateNetwork, setAffiliateNetwork }: {
     affiliateNetwork: TAffiliateNetwork;
-    setAffiliateNetwork: (an: TAffiliateNetwork | null) => any;
+    setAffiliateNetwork: (an: TAffiliateNetwork | null) => void;
 }) {
     const [updateRequest, setUpdateRequest] = useState<TAffiliateNetwork_updateRequest>({
         name: affiliateNetwork.name,

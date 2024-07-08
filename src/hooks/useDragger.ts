@@ -1,6 +1,6 @@
 
 
-export default function useDragger(onMouseMove: (e: MouseEvent, u?: unknown) => any) {
+export default function useDragger(onMouseMove: (e: MouseEvent, u?: unknown) => void) {
     let boundHandleMouseMove: (e: MouseEvent) => void;
 
     function handleMouseDown(e?: React.MouseEvent<Element, MouseEvent>, u?: unknown) {

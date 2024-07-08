@@ -13,7 +13,7 @@ import { TColumn, TRow } from ".";
 export default function Row({ row, columns, onSelected, view, depth }: {
     row: TRow;
     columns: TColumn[];
-    onSelected: (newSelected: boolean) => any;
+    onSelected: (newSelected: boolean) => void;
     view: TView;
     depth: number;
 }) {

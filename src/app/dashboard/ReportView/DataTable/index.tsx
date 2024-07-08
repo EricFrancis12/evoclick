@@ -21,7 +21,7 @@ export type TRow = {
 export default function DataTable({ view, rows, setRows, depth = 0 }: {
     view: TView;
     rows: TRow[];
-    setRows: (newRows: TRow[]) => any;
+    setRows: (newRows: TRow[]) => void;
     depth?: number;
 }) {
     const [columns, setColumns] = useState<TColumn[]>(columnTitles.map((title, index) => ({

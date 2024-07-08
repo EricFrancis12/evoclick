@@ -10,7 +10,7 @@ export type TReportChainLink = null | {
 
 export default function ReportChain({ reportChain, onChange, omissions = [] }: {
     reportChain: TReportChain;
-    onChange: (reportChain: TReportChain) => any;
+    onChange: (reportChain: TReportChain) => void;
     omissions?: EItemName[];
 }) {
     function handleChange(e: React.ChangeEvent<HTMLSelectElement>, index: number) {

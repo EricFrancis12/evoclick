@@ -759,7 +759,7 @@ function TrafficSourceBody({ actionMenu, setActionMenu }: {
 }
 
 function ActionMenuFooter({ onSave, disabled }: {
-    onSave: () => any;
+    onSave: () => void;
     disabled?: boolean;
 }) {
     return (
@@ -790,7 +790,7 @@ const tokenColumns = ["", "Query param", "Token", "Name", ""];
 
 function TokensInputWrapper({ children, onCreateNew }: {
     children: React.ReactNode;
-    onCreateNew: () => any;
+    onCreateNew: () => void;
 }) {
     return (
         <div className="flex flex-col justify-start items-start w-full">
@@ -821,8 +821,8 @@ function TokensInputWrapper({ children, onCreateNew }: {
 
 function TokenInput({ token, onChange, onDelete, title = "" }: {
     token: TToken | TNamedToken;
-    onChange: (t: typeof token) => any;
-    onDelete?: () => any;
+    onChange: (t: typeof token) => void;
+    onDelete?: () => void;
     title?: string;
 }) {
     const isNamedToken = "name" in token;

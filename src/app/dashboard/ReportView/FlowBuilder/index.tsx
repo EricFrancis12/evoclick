@@ -16,7 +16,7 @@ type TFlowBuilder = {
 
 export default function FlowBuilder({ value, onChange }: {
     value: TFlowBuilder;
-    onChange: (fb: TFlowBuilder) => any;
+    onChange: (fb: TFlowBuilder) => void;
 }) {
     const { mainRoute, ruleRoutes } = value;
 
@@ -67,7 +67,7 @@ export default function FlowBuilder({ value, onChange }: {
 
 function RulesMenu({ route, onChange }: {
     route: TRoute;
-    onChange: (r: TRoute) => any;
+    onChange: (r: TRoute) => void;
 }) {
     return (
         <div
@@ -135,7 +135,7 @@ function RulesMenu({ route, onChange }: {
 
 function Rule(props: {
     rule: TRule;
-    onChange: (ru: TRule) => any;
+    onChange: (ru: TRule) => void;
 }) {
     const { ruleName } = props.rule;
     if (userInputRules.includes(ruleName)) {
@@ -168,7 +168,7 @@ const checkboxesRules: ERuleName[] = [
 
 function UserInputRuleLayout({ rule, onChange }: {
     rule: TRule;
-    onChange: (ru: TRule) => any;
+    onChange: (ru: TRule) => void;
 }) {
     return (
         <RuleLayoutWrapper title={rule.ruleName}>
@@ -188,7 +188,7 @@ function UserInputRuleLayout({ rule, onChange }: {
 
 function CheckboxesRuleLayout({ rule, onChange }: {
     rule: TRule;
-    onChange: (ru: TRule) => any;
+    onChange: (ru: TRule) => void;
 }) {
     return (
         <RuleLayoutWrapper title={rule.ruleName}>
@@ -210,7 +210,7 @@ function CheckboxesRuleLayout({ rule, onChange }: {
 function CheckboxesInput({ items, value, onChange, className = "" }: {
     items: string[];
     value: string[];
-    onChange: (newValue: string[]) => any;
+    onChange: (newValue: string[]) => void;
     className?: string;
 }) {
     function handleChange(e: React.ChangeEvent<HTMLInputElement>, item: string) {
@@ -266,7 +266,7 @@ function RuleLayoutWrapper({ children, title }: {
 function BooleanCheckboxesToggle({ items, value, onChange }: {
     items: [trueItem: string, falseItem: string];
     value: boolean;
-    onChange: (bool: boolean) => any;
+    onChange: (bool: boolean) => void;
 }) {
     return (
         <div className="flex flex-col justify-center h-full p-2">
@@ -286,7 +286,7 @@ function BooleanCheckboxesToggle({ items, value, onChange }: {
 
 function ToggleButton({ active, onChange, size = 50 }: {
     active: boolean;
-    onChange: (newActive: boolean) => any;
+    onChange: (newActive: boolean) => void;
     size?: number;
 }) {
     return (
@@ -321,9 +321,9 @@ type TReorderDirection = "up" | "down";
 function Route({ type, route, onChange, onDelete, onReorder = () => { } }: {
     type: "main" | "rule";
     route: TRoute;
-    onChange: (r: TRoute) => any;
-    onDelete?: () => any;
-    onReorder?: (dir: TReorderDirection) => any;
+    onChange: (r: TRoute) => void;
+    onDelete?: () => void;
+    onReorder?: (dir: TReorderDirection) => void;
 }) {
     const [rulesMenuOpen, setRulesMenuOpen] = useState<boolean>(false);
 
@@ -412,8 +412,8 @@ function newPath(): TPath {
 function Path({ path, route, onChange, onDelete }: {
     path: TPath;
     route: TRoute;
-    onChange: (p: TPath) => any;
-    onDelete: () => any;
+    onChange: (p: TPath) => void;
+    onDelete: () => void;
 }) {
     const { landingPages, offers } = useReportView().primaryData;
 
@@ -491,7 +491,7 @@ type TSection = {
 function Section({ section, path, onChange }: {
     section: TSection;
     path: TPath;
-    onChange: (p: TPath) => any;
+    onChange: (p: TPath) => void;
 }) {
     const { itemName, options } = section;
     const items = makeItems(

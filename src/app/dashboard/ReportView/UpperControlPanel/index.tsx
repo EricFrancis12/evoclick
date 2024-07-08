@@ -9,7 +9,7 @@ import UpperCPItem, { TUpperCPItem } from "./UpperCPItem";
 import UpperCPItemGroup, { TUpperCPItemGroup } from "./UpperCPItemGroup";
 
 export default function UpperControlPanel({ onClick = () => { }, reportItemName }: {
-    onClick?: (item: TUpperCPItem) => any;
+    onClick?: (item: TUpperCPItem) => void;
     reportItemName?: EItemName;
 }) {
     return (

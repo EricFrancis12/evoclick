@@ -7,8 +7,8 @@ import { TView } from "@/lib/store";
 
 export default function Tab({ view, onClick, onClose }: {
     view: TView;
-    onClick: (view: TView) => any;
-    onClose?: (view: TView) => any;
+    onClick: (view: TView) => void;
+    onClose?: (view: TView) => void;
 }) {
     const { type, reportItemName, icon } = view;
     const isActive = useIsTabActive(view);
