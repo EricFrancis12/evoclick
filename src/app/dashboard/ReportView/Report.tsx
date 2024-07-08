@@ -54,6 +54,7 @@ export default function Report({ view, reportItemName }: {
                 onNewReport={handleNewReport}
                 reportItemName={reportItemName}
                 rows={rows}
+                setRows={setRows}
             />
             <DataTable
                 view={view}

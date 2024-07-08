@@ -14,13 +14,15 @@ export default function HeadlessDataTable({ clicks, itemName, columns, view, dep
     depth: number;
 }) {
     return itemName
-        ? <_Rows
-            clicks={clicks}
-            itemName={itemName}
-            columns={columns}
-            view={view}
-            depth={depth}
-        />
+        ? <div className="py-4 bg-blue-200">
+            <_Rows
+                clicks={clicks}
+                itemName={itemName}
+                columns={columns}
+                view={view}
+                depth={depth}
+            />
+        </div>
         : "";
 }
 
@@ -34,14 +36,12 @@ function _Rows({ clicks, itemName, columns, view, depth }: {
     const [rows, setRows] = useRows(clicks, itemName);
 
     return (
-        <div className="py-4 bg-red-400">
-            <Rows
-                rows={rows}
-                setRows={setRows}
-                columns={columns}
-                view={view}
-                depth={depth + 1}
-            />
-        </div>
+        <Rows
+            rows={rows}
+            setRows={setRows}
+            columns={columns}
+            view={view}
+            depth={depth + 1}
+        />
     )
 }

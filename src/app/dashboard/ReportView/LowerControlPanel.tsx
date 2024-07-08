@@ -7,18 +7,19 @@ import useQueryRouter from "@/hooks/useQueryRouter";
 import CalendarButton from "@/components/CalendarButton";
 import RefreshButton from "@/components/RefreshButton";
 import ReportButton from "@/components/ReportButton";
-import ReportChain from "./ReportChain";
+import ReportChain, { TReportChain } from "./ReportChain";
 import { TView, useViewsStore } from "@/lib/store";
 import Button from "@/components/Button";
 import { encodeTimeframe } from "@/lib/utils";
 import { EItemName } from "@/lib/types";
 import { TRow } from "./DataTable";
 
-export default function LowerControlPanel({ view, onNewReport, reportItemName, rows }: {
+export default function LowerControlPanel({ view, onNewReport, reportItemName, rows, setRows }: {
     view: TView;
     onNewReport: () => void;
     reportItemName?: EItemName;
     rows: TRow[];
+    setRows: (newRows: TRow[]) => void;
 }) {
     const { setActionMenu, primaryData } = useReportView();
     const queryRouter = useQueryRouter();
@@ -48,6 +49,11 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
         if (selectedRows.length < 1) return;
         if (typeof selectedRows[0].id !== "number") return;
         setActionMenu(makeActionMenu(primaryData, view.itemName, selectedRows[0].id));
+    }
+
+    function handleReportChainChange(reportChain: TReportChain) {
+        setRows(rows.map(row => ({ ...row, selected: false }))); // Deselect all rows on report chain change
+        updateViewReportChainById(view.id, reportChain)
     }
 
     return (
@@ -89,7 +95,7 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
                 {view.type === "report" &&
                     <ReportChain
                         reportChain={view.reportChain}
-                        onChange={reportChain => updateViewReportChainById(view.id, reportChain)}
+                        onChange={handleReportChainChange}
                         omissions={reportItemName ? [view.itemName, reportItemName] : [view.itemName]}
                     />
                 }
