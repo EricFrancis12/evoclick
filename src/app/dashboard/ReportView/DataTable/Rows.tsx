@@ -13,7 +13,7 @@ export default function Rows({ rows, setRows, columns, view, depth }: {
 }) {
     return rows.map(row => (
         <Row
-            key={row.name}
+            key={row.id}
             row={row}
             onSelected={selected => setRows(rows.map(_row => _row.id === row.id ? { ..._row, selected } : _row))}
             columns={columns}

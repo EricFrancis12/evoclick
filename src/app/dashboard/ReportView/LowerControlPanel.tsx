@@ -11,7 +11,7 @@ import ReportChain from "./ReportChain";
 import { TView, useViewsStore } from "@/lib/store";
 import Button from "@/components/Button";
 import { encodeTimeframe } from "@/lib/utils";
-import { EItemName } from "@/lib/types";
+import { EItemName, TFlow } from "@/lib/types";
 import { TRow } from "./DataTable";
 
 export default function LowerControlPanel({ view, onNewReport, reportItemName, rows }: {
@@ -20,7 +20,7 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
     reportItemName?: EItemName;
     rows: TRow[];
 }) {
-    const { setActionMenu } = useReportView();
+    const { setActionMenu, primaryData } = useReportView();
     const queryRouter = useQueryRouter();
     const selectedRows = rows.filter(row => row.selected === true);
 
@@ -47,7 +47,7 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
     function handleEditItem() {
         if (selectedRows.length < 1) return;
         if (typeof selectedRows[0].id !== "number") return;
-        setActionMenu(makeActionMenu(view.itemName, selectedRows[0].id));
+        setActionMenu(makeActionMenu(primaryData, view.itemName, selectedRows[0].id));
     }
 
     return (
@@ -111,32 +111,93 @@ function LowerCPRow({ children }: {
     )
 }
 
-function makeActionMenu(itemName: EItemName, id: number): TActionMenu | null {
-    // TODO: ...
-    console.log("makeActionMenu not yet implimented");
-    return null;
+function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: number): TActionMenu | null {
+    let actionMenu: TActionMenu | null = null;
+    if (itemName === EItemName.AFFILIATE_NETWORK) {
+        const an = getPrimaryItemById(primaryData, "affiliateNetworks", id);
+        actionMenu = {
+            itemName,
+            id: an?.id,
+            name: an?.name,
+            defaultNewOfferString: an?.defaultNewOfferString,
+            tags: an?.tags,
+        };
+    } else if (itemName === EItemName.CAMPAIGN) {
+        const ca = getPrimaryItemById(primaryData, "campaigns", id);
+        const fl = getPrimaryItemById(primaryData, "flows", id);
+        actionMenu = {
+            itemName,
+            id: ca?.id,
+            name: ca?.name,
+            landingPageRotationType: ca?.landingPageRotationType,
+            offerRotationType: ca?.offerRotationType,
+            geoName: ca?.geoName,
+            tags: ca?.tags,
+            flowId: ca?.flowId,
+            flowData: {
+                type: fl?.type ?? undefined,
+                name: fl?.name ?? undefined,
+                url: fl?.url ?? undefined,
+                mainRoute: fl?.mainRoute ?? undefined,
+                ruleRoutes: fl?.ruleRoutes ?? undefined,
+                tags: fl?.tags ?? undefined,
+            },
+            trafficSourceId: ca?.trafficSourceId,
+        };
+    } else if (itemName === EItemName.FLOW) {
+        const fl = getPrimaryItemById(primaryData, "flows", id);
+        actionMenu = {
+            itemName,
+            id: fl?.id,
+            type: "SAVED",
+            name: fl?.name ?? undefined,
+            mainRoute: fl?.mainRoute ?? undefined,
+            ruleRoutes: fl?.ruleRoutes ?? undefined,
+            tags: fl?.tags ?? undefined,
+        };
+    } else if (itemName === EItemName.LANDING_PAGE) {
+        const lp = getPrimaryItemById(primaryData, "landingPages", id);
+        actionMenu = {
+            itemName,
+            id: lp?.id,
+            name: lp?.name,
+            url: lp?.url,
+            tags: lp?.tags,
+        };
+    } else if (itemName === EItemName.OFFER) {
+        const o = getPrimaryItemById(primaryData, "offers", id);
+        actionMenu = {
+            itemName,
+            id: o?.id,
+            name: o?.name,
+            payout: o?.payout,
+            url: o?.url,
+            tags: o?.tags,
+            affiliateNetworkId: o?.affiliateNetworkId,
+        };
+    } else if (itemName === EItemName.TRAFFIC_SOURCE) {
+        const ts = getPrimaryItemById(primaryData, "trafficSources", id);
+        actionMenu = {
+            itemName,
+            id: ts?.id,
+            name: ts?.name,
+            externalIdToken: ts?.externalIdToken,
+            costToken: ts?.costToken,
+            customTokens: ts?.customTokens,
+            postbackUrl: ts?.postbackUrl,
+            tags: ts?.tags,
+        };
+    }
+    return actionMenu;
 }
 
-function getPrimaryItemById(primaryData: TPrimaryData, itemName: EItemName, id: number) {
-    if (!isPrimary(itemName)) return null;
-
-    const { affiliateNetworks, campaigns, flows, landingPages, offers, trafficSources } = primaryData;
-    switch (itemName) {
-        case EItemName.AFFILIATE_NETWORK:
-            return affiliateNetworks.find(an => an.id === id) ?? null;
-        case EItemName.CAMPAIGN:
-            return campaigns.find(ca => ca.id === id) ?? null;
-        case EItemName.FLOW:
-            return flows.find(fl => fl.id === id) ?? null;
-        case EItemName.LANDING_PAGE:
-            return landingPages.find(lp => lp.id === id) ?? null;
-        case EItemName.OFFER:
-            return offers.find(o => o.id === id) ?? null;
-        case EItemName.TRAFFIC_SOURCE:
-            return trafficSources.find(ts => ts.id === id) ?? null;
-        default:
-            return null;
-    }
+function getPrimaryItemById<T extends keyof TPrimaryData>(
+    primaryData: TPrimaryData,
+    itemName: T,
+    id: number
+): TPrimaryData[T][number] | null {
+    const items = primaryData[itemName];
+    return items.find(item => item.id === id) ?? null;
 }
 
 export function isPrimary(itemName: EItemName): boolean {
