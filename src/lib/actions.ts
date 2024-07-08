@@ -201,7 +201,7 @@ export const createNewTrafficSourceAction = trafficSourceActions.createAction;
 export const updateTrafficSourceAction = trafficSourceActions.updateAction;
 export const deleteTrafficSourceAction = trafficSourceActions.deleteAction;
 
-function refreshUrl(prom: Promise<any>, pathname?: string): void {
+function refreshUrl(prom: Promise<unknown>, pathname?: string): void {
     if (pathname) prom.then(() => revalidatePath(pathname));
 }
 

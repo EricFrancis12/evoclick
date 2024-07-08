@@ -14,14 +14,6 @@ export function isOverflown(ref: React.RefObject<HTMLElement>) {
     return ref.current.scrollHeight > ref.current.clientHeight || ref.current.scrollWidth > ref.current.clientWidth;
 }
 
-export function arrayOf<T>(any: T, length: number = 1): T[] {
-    let result = [];
-    for (let i = 0; i < length; i++) {
-        result.push(structuredClone(any));
-    }
-    return result;
-}
-
 export function encodeTimeframe(timeframe: [Date, Date]): string {
     return timeframe.map(date => date.getTime()).join(",");
 }
