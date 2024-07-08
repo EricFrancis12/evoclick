@@ -53,10 +53,10 @@ export default function Row({ row, columns, onSelected, view, depth }: {
                     />
                 ))}
             </RowWrapper >
-            {open && view?.type === "report" && view.reportChain[depth]?.itemName &&
+            {open && view?.type === "report" &&
                 <HeadlessDataTable
                     clicks={row.clicks}
-                    itemName={view.reportChain[depth].itemName}
+                    itemName={view?.reportChain?.[depth]?.itemName}
                     columns={columns}
                     view={view}
                     depth={depth}

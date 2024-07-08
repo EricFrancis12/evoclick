@@ -8,6 +8,24 @@ import { TColumn } from ".";
 
 export default function HeadlessDataTable({ clicks, itemName, columns, view, depth }: {
     clicks: TClick[];
+    itemName?: EItemName;
+    columns: TColumn[];
+    view: TView;
+    depth: number;
+}) {
+    return itemName
+        ? <_Rows
+            clicks={clicks}
+            itemName={itemName}
+            columns={columns}
+            view={view}
+            depth={depth}
+        />
+        : "";
+}
+
+function _Rows({ clicks, itemName, columns, view, depth }: {
+    clicks: TClick[];
     itemName: EItemName;
     columns: TColumn[];
     view: TView;
