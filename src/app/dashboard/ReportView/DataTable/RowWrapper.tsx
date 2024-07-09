@@ -7,7 +7,8 @@ export default function RowWrapper({ children, selected, onClick = () => { } }: 
 }) {
     return (
         <div
-            className={(selected ? "bg-blue-300" : "bg-white") + " flex items-center w-full px-4"}
+            className={(selected ? "bg-blue-300" : "bg-white hover:bg-blue-200")
+                + " flex items-center w-full px-4 cursor-pointer"}
             onClick={() => onClick(!selected)}
         >
             {children}

@@ -1,11 +1,13 @@
 import { Prisma } from "@prisma/client";
 import { useProtectedRoute } from "@/lib/auth";
-import { getAllAffiliateNetworks, getAllCampaigns, getAllClicks, getAllFlows, getAllLandingPages, getAllOffers, getAllTrafficSources } from "@/data";
+import {
+    getAllAffiliateNetworks, getAllCampaigns, getAllClicks, getAllFlows,
+    getAllLandingPages, getAllOffers, getAllTrafficSources
+} from "@/data";
 import ReportView from "./ReportView";
 import { defaultTimeframe } from "@/lib/constants";
 import { decodeTimeframe } from "@/lib/utils";
 import { EItemName } from "@/lib/types";
-import { isPrimary } from "./ReportView/LowerControlPanel";
 
 export default async function DashboardPage({ params, searchParams }: {
     params: { itemName?: string, id?: string };
