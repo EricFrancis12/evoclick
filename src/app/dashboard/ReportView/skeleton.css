@@ -1,0 +1,13 @@
+.skeleton {
+    animation: skeleton-loading 1s linear infinite alternate;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        opacity: 45%;
+    }
+
+    100% {
+        opacity: 100%;
+    }
+}

@@ -2,16 +2,19 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useParams } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircle } from "@fortawesome/free-solid-svg-icons";
 import { ReportViewProvider, TPrimaryData } from "./ReportViewContext";
 import useActiveView from "@/hooks/useActiveView";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import Report from "./Report";
-import Tab from "@/app/dashboard/ReportView/Tab";
+import ReportSkeleton from "./ReportSkeleton";
+import Tab, { TabContainer } from "@/app/dashboard/ReportView/Tab";
 import { TView, useViewsStore } from "@/lib/store";
 import { encodeTimeframe } from "@/lib/utils";
 import { EItemName, TClick } from "@/lib/types";
-import Link from "next/link";
 
 export default function ReportView({ primaryData, clicks, timeframe, reportItemName }: {
     primaryData: TPrimaryData;
@@ -61,18 +64,23 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
                             />
                         </Link>
                     </div>
-                    <Tab
-                        view={mainView}
-                        onClick={() => queryRouter.push("/dashboard", { timeframe: encodeTimeframe(mainView.timeframe) })}
-                    />
-                    {reportViews.map(view => (
-                        <Tab
-                            key={view.id}
-                            view={view}
-                            onClick={handleReportTabClick}
-                            onClose={handleReportTabClose}
-                        />
-                    ))}
+                    {activeView
+                        ? <>
+                            <Tab
+                                view={mainView}
+                                onClick={() => queryRouter.push("/dashboard", { timeframe: encodeTimeframe(mainView.timeframe) })}
+                            />
+                            {reportViews.map(view => (
+                                <Tab
+                                    key={view.id}
+                                    view={view}
+                                    onClick={handleReportTabClick}
+                                    onClose={handleReportTabClose}
+                                />
+                            ))}
+                        </>
+                        : <TabSkeleton />
+                    }
                 </div>
                 <div className="width-[100vw] text-sm">
                     {activeView
@@ -80,10 +88,28 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
                             view={activeView}
                             reportItemName={reportItemName}
                         />
-                        : "Report Not Found :("
+                        : <ReportSkeleton reportItemName={reportItemName} />
                     }
                 </div>
             </div>
-        </ReportViewProvider>
+        </ReportViewProvider >
+    )
+}
+
+function TabSkeleton() {
+    return (
+        <TabContainer>
+            <div
+                className="flex items-center gap-2 h-[32px] w-[100px] bg-gray-100"
+                style={{
+                    userSelect: "none",
+                    padding: "6px 8px 6px 8px",
+                    borderRadius: "6px 6px 0 0",
+                }}
+            >
+                <FontAwesomeIcon icon={faCircle} className="text-md text-gray-200" />
+                <div className="h-2 w-full bg-gray-200 rounded-full" />
+            </div>
+        </TabContainer>
     )
 }

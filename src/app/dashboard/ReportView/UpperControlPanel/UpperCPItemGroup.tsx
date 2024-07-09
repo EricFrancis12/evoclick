@@ -41,7 +41,7 @@ export default function UpperCPItemGroup({ itemGroup, onClick = () => { }, repor
             >
                 <FontAwesomeIcon icon={itemGroup.icon} className="mr-[4px]" />
                 <span className="mr-[4px]">
-                    {isActive ? activeView?.itemName : itemGroup.name}
+                    {isActive && activeView?.itemName ? activeView.itemName : itemGroup.name}
                 </span>
                 <FontAwesomeIcon icon={isHovered ? faChevronUp : faChevronDown} />
                 {isHovered &&

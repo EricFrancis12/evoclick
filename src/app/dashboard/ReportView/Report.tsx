@@ -7,6 +7,7 @@ import useQueryRouter from "@/hooks/useQueryRouter";
 import UpperControlPanel from "./UpperControlPanel";
 import LowerControlPanel from "./LowerControlPanel";
 import DataTable, { TRow } from "./DataTable";
+import ReportSkeleton from "./ReportSkeleton";
 import { TView, useViewsStore, newReportView } from "@/lib/store";
 import { encodeTimeframe } from "@/lib/utils";
 import { EItemName, TClick, } from "@/lib/types";
@@ -20,7 +21,8 @@ export default function Report({ view, reportItemName }: {
     const [rows, setRows] = useRows(clicks, itemName);
 
     useEffect(() => {
-        setRows(prev => prev.map(row => ({ ...row, selected: false })));
+        if (!rows) return;
+        setRows(rows.map(row => ({ ...row, selected: false })));
     }, [itemName]);
 
     const { reportViews, addReportView, updateViewItemNameById } = useViewsStore(store => store);
@@ -28,6 +30,7 @@ export default function Report({ view, reportItemName }: {
 
     // Finds the first row that is selected and creates a report for it
     function handleNewReport() {
+        if (!rows) return;
         const selectedRows = rows.filter(row => row.selected === true);
         if (selectedRows.length < 1) return;
         const newViewItemName = itemName !== EItemName.CAMPAIGN ? EItemName.CAMPAIGN : EItemName.OFFER;
@@ -43,8 +46,8 @@ export default function Report({ view, reportItemName }: {
         }
     }
 
-    return (
-        <>
+    return rows
+        ? <>
             <UpperControlPanel
                 onClick={item => updateViewItemNameById(id, item.itemName)}
                 reportItemName={reportItemName}
@@ -62,20 +65,20 @@ export default function Report({ view, reportItemName }: {
                 setRows={setRows}
             />
         </>
-    )
+        : <ReportSkeleton />
 }
 
 export function useRows(clicks: TClick[], itemName: EItemName) {
     const { primaryData } = useReportView();
 
     const enrichWith = itemNameInPrimaryData(itemName, primaryData)?.map(({ id, name }) => ({ id, name: name || "" }));
-    const [rows, setRows] = useState<TRow[]>([]);
+    const [rows, setRows] = useState<TRow[] | null>(null);
 
     useEffect(() => {
         setRows(makeRows(clicks, itemName, enrichWith));
     }, [clicks.length, itemName]);
 
-    const value: [TRow[], React.Dispatch<React.SetStateAction<TRow[]>>] = [rows, setRows];
+    const value: [TRow[] | null, React.Dispatch<React.SetStateAction<TRow[] | null>>] = [rows, setRows];
     return value;
 }
 

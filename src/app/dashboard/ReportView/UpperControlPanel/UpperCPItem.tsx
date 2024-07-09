@@ -14,7 +14,7 @@ export default function UpperCPItem({ item, onClick = () => { } }: {
     item: TUpperCPItem;
     onClick?: (item: TUpperCPItem) => void;
 }) {
-    const activeView = useActiveView()
+    const activeView = useActiveView();
     const isActive = activeView?.itemName === item.itemName;
 
     function handleClick(e: React.MouseEvent<HTMLDivElement>, item: TUpperCPItem) {

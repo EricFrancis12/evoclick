@@ -19,11 +19,11 @@ export default function Tab({ view, onClick, onClose }: {
     }
 
     return (
-        <div className="flex items-end h-full mr-[8px]">
+        <TabContainer>
             <div
                 onClick={() => onClick(view)}
                 className={(isActive ? "bg-[#ffffff] " : "bg-[#c3ccd2] hover:bg-[#d0d9de] ")
-                    + " group relative h-[32px] max-w-[245px] text-[#394146] text-sm text-ellipsis overflow-hidden cursor-pointer"}
+                    + " flex gap-2 items-center h-[32px] text-[#394146] text-sm text-ellipsis overflow-hidden cursor-pointer"}
                 style={{
                     userSelect: "none",
                     padding: "6px 8px 6px 8px",
@@ -31,20 +31,26 @@ export default function Tab({ view, onClick, onClose }: {
                     whiteSpace: "nowrap",
                 }}
             >
-                <FontAwesomeIcon icon={icon} className="mr-[8px]" />
+                <FontAwesomeIcon icon={icon} />
                 <span>{type === "main" ? "Dashboard" : reportItemName}</span>
                 {onClose &&
-                    <div className="absolute flex justify-end items-center top-0 left-0 h-full w-full">
-                        <div className={(isActive ? "bg-[#ffffff] " : "bg-[#c3ccd2] group-hover:bg-[#d0d9de] ")}>
-                            <FontAwesomeIcon
-                                icon={faClose}
-                                className="mr-2 cursor-pointer"
-                                onClick={handleClose}
-                            />
-                        </div>
-                    </div>
+                    <FontAwesomeIcon
+                        icon={faClose}
+                        className="cursor-pointer hover:opacity-70"
+                        onClick={handleClose}
+                    />
                 }
             </div>
+        </TabContainer>
+    )
+}
+
+export function TabContainer({ children }: {
+    children: React.ReactNode;
+}) {
+    return (
+        <div className="flex items-end h-full mr-[8px]">
+            {children}
         </div>
     )
 }

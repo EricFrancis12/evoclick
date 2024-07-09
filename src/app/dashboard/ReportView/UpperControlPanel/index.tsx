@@ -13,8 +13,8 @@ export default function UpperControlPanel({ onClick = () => { }, reportItemName 
     reportItemName?: EItemName;
 }) {
     return (
-        <div className="flex flex-col justify-center gap-6 w-full px-8 py-6 bg-[#ffffff]">
-            <div className="flex flex-wrap gap-6 w-full">
+        <UpperCPWrapper>
+            <UpperCPRow>
                 {upperCPItems
                     .filter(item => item.itemName !== reportItemName)
                     .map((item, _index) => (
@@ -24,8 +24,8 @@ export default function UpperControlPanel({ onClick = () => { }, reportItemName 
                             onClick={onClick}
                         />
                     ))}
-            </div>
-            <div className="flex flex-wrap gap-6 w-full">
+            </UpperCPRow>
+            <UpperCPRow>
                 {upperCPItemGroups.map((group, index) => (
                     <UpperCPItemGroup
                         key={index}
@@ -34,12 +34,32 @@ export default function UpperControlPanel({ onClick = () => { }, reportItemName 
                         reportItemName={reportItemName}
                     />
                 ))}
-            </div>
+            </UpperCPRow>
+        </UpperCPWrapper>
+    )
+}
+
+export function UpperCPWrapper({ children }: {
+    children: React.ReactNode;
+}) {
+    return (
+        <div className="flex flex-col justify-center gap-6 w-full px-8 py-6 bg-[#ffffff]">
+            {children}
         </div>
     )
 }
 
-const upperCPItems: TUpperCPItem[] = [
+export function UpperCPRow({ children }: {
+    children: React.ReactNode;
+}) {
+    return (
+        <div className="flex flex-wrap gap-6 w-full">
+            {children}
+        </div>
+    )
+}
+
+export const upperCPItems: TUpperCPItem[] = [
     { itemName: EItemName.CAMPAIGN, icon: faBullseye },
     { itemName: EItemName.OFFER, icon: faHandshake },
     { itemName: EItemName.LANDING_PAGE, icon: faFolder },
@@ -48,7 +68,7 @@ const upperCPItems: TUpperCPItem[] = [
     { itemName: EItemName.AFFILIATE_NETWORK, icon: faUsers },
 ];
 
-const upperCPItemGroups: TUpperCPItemGroup[] = [
+export const upperCPItemGroups: TUpperCPItemGroup[] = [
     {
         name: EItemName.COUNTRY, icon: faGlobeEurope, children: [
             { itemName: EItemName.COUNTRY, icon: faGlobeEurope },

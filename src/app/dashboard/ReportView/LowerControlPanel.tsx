@@ -57,10 +57,7 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
     }
 
     return (
-        <div
-            className="flex flex-col justify-center align-start gap-6 w-full px-8 py-6 bg-[#ebedef]"
-            style={{ borderTop: "solid lightgrey 3px" }}
-        >
+        <LowerCPWrapper>
             <LowerCPRow>
                 <CalendarButton
                     timeframe={view.timeframe}
@@ -100,11 +97,24 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
                     />
                 }
             </LowerCPRow>
+        </LowerCPWrapper>
+    )
+}
+
+export function LowerCPWrapper({ children }: {
+    children: React.ReactNode;
+}) {
+    return (
+        <div
+            className="flex flex-col justify-center gap-6 w-full px-8 py-6 bg-[#ebedef]"
+            style={{ borderTop: "solid lightgrey 3px" }}
+        >
+            {children}
         </div>
     )
 }
 
-function LowerCPRow({ children }: {
+export function LowerCPRow({ children }: {
     children: React.ReactNode
 }) {
     return (

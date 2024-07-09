@@ -23,6 +23,8 @@ export default function List({ affiliateNetworks }: {
         }
     }
 
+
+
     return (
         <>
             <div className="mb-4 p-2 border">

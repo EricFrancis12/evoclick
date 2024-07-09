@@ -35,13 +35,13 @@ function _Rows({ clicks, itemName, columns, view, depth }: {
 }) {
     const [rows, setRows] = useRows(clicks, itemName);
 
-    return (
-        <Rows
+    return rows
+        ? <Rows
             rows={rows}
             setRows={setRows}
             columns={columns}
             view={view}
             depth={depth + 1}
         />
-    )
+        : "";
 }
