@@ -271,6 +271,7 @@ function CampaignBody({ actionMenu, setActionMenu }: {
                         tags: tags ?? [],
                     }, window.location.href);
                     toast.success("Successfully created new URL Flow");
+                    console.log(createdFlow);
                     flowId = createdFlow.id;
                 } else {
                     const createdFlow = await createNewFlowAction({
