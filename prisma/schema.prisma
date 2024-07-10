@@ -57,8 +57,8 @@ model Click {
   affiliateNetworkId Int?
   campaign           Campaign          @relation(fields: [campaignId], references: [id])
   campaignId         Int
-  flow               Flow              @relation(fields: [flowId], references: [id])
-  flowId             Int
+  savedFlow          SavedFlow?        @relation(fields: [savedFlowId], references: [id])
+  savedFlowId        Int?
   landingPage        LandingPage?      @relation(fields: [landingPageId], references: [id])
   landingPageId      Int?
   offer              Offer?            @relation(fields: [offerId], references: [id])
@@ -88,36 +88,41 @@ model Campaign {
   tags                    String[]
   createdAt               DateTime      @default(now())
   updatedAt               DateTime      @updatedAt
-  flow                    Flow          @relation(fields: [flowId], references: [id])
-  flowId                  Int
   trafficSource           TrafficSource @relation(fields: [trafficSourceId], references: [id])
   trafficSourceId         Int
   Click                   Click[]
-}
 
-enum RotationType {
-  RANDOM
-  // TODO: Expand rotation types to include: "fixed", "smart", etc.
-}
+  // flowType determines what flow properties the campaign uses
+  flowType FlowType
 
-model Flow {
-  id         Int        @id @default(autoincrement())
-  type       FlowType
-  name       String?
-  url        String?
-  mainRoute  String?
-  ruleRoutes String?    @default("[]")
-  tags       String[]
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  Campaign   Campaign[]
-  Click      Click[]
+  // for BUILT_IN flowType:
+  flowMainRoute  String?
+  flowRuleRoutes String? @default("[]")
+
+  // for URL flowType:
+  flowUrl String?
+
+  // for SAVED flowType:
+  savedFlow   SavedFlow? @relation(fields: [savedFlowId], references: [id])
+  savedFlowId Int?
 }
 
 enum FlowType {
   SAVED
   BUILT_IN
   URL
+}
+
+model SavedFlow {
+  id         Int        @id @default(autoincrement())
+  name       String
+  mainRoute  String
+  ruleRoutes String     @default("[]")
+  tags       String[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  Campaign   Campaign[]
+  Click      Click[]
 }
 
 model LandingPage {
@@ -128,6 +133,11 @@ model LandingPage {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Click     Click[]
+}
+
+enum RotationType {
+  RANDOM
+  // TODO: Expand rotation types to include: "fixed", "smart", etc.
 }
 
 model Offer {
