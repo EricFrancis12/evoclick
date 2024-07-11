@@ -57,7 +57,7 @@ type ClickCreationReq struct {
 	BrowserVersion     string
 	AffiliateNetworkID int
 	CampaignID         int
-	FlowID             int
+	SavedFlowID        int
 	LandingPageID      int
 	OfferID            int
 	TrafficSourceID    int
@@ -87,7 +87,6 @@ func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationRe
 		db.Click.BrowserName.Set(creationReq.BrowserName),
 		db.Click.BrowserVersion.Set(creationReq.BrowserVersion),
 		db.Click.Campaign.Link(db.Campaign.ID.Equals(creationReq.CampaignID)),
-		db.Click.Flow.Link(db.Flow.ID.Equals(creationReq.FlowID)),
 		db.Click.TrafficSource.Link(db.TrafficSource.ID.Equals(creationReq.TrafficSourceID)),
 		// Optional parameters:
 		optParams...,
@@ -125,7 +124,6 @@ func (s *Storer) UpsertClickById(ctx context.Context, id int, click Click) (Clic
 		db.Click.BrowserName.Set(click.BrowserName),
 		db.Click.BrowserVersion.Set(click.BrowserVersion),
 		db.Click.Campaign.Link(db.Campaign.ID.Equals(click.CampaignID)),
-		db.Click.Flow.Link(db.Flow.ID.Equals(click.FlowID)),
 		db.Click.TrafficSource.Link(db.TrafficSource.ID.Equals(click.TrafficSourceID)),
 	).Update(
 		upsertParams...,
@@ -149,6 +147,7 @@ func makeOptParams(cp ClickCreationReq) []db.ClickSetParam {
 	optParams = appendIfTrue(optParams, db.Click.AffiliateNetwork.Link(db.AffiliateNetwork.ID.Equals(cp.AffiliateNetworkID)), cp.AffiliateNetworkID != 0)
 	optParams = appendIfTrue(optParams, db.Click.LandingPage.Link(db.LandingPage.ID.Equals(cp.LandingPageID)), cp.LandingPageID != 0)
 	optParams = appendIfTrue(optParams, db.Click.Offer.Link(db.Offer.ID.Equals(cp.OfferID)), cp.OfferID != 0)
+	optParams = appendIfTrue(optParams, db.Click.SavedFlow.Link(db.SavedFlow.ID.Equals(cp.SavedFlowID)), cp.SavedFlowID != 0)
 	return optParams
 }
 
@@ -174,7 +173,6 @@ func makeUpsertParams(click Click) []db.ClickSetParam {
 		db.Click.BrowserName.Set(click.BrowserName),
 		db.Click.BrowserVersion.Set(click.BrowserVersion),
 		db.Click.Campaign.Link(db.Campaign.ID.Equals(click.CampaignID)),
-		db.Click.Flow.Link(db.Flow.ID.Equals(click.FlowID)),
 		db.Click.TrafficSource.Link(db.TrafficSource.ID.Equals(click.TrafficSourceID)),
 	}
 

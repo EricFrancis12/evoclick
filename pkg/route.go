@@ -49,12 +49,12 @@ func (route Route) ClickDoesTrigger(click Click) bool {
 	})
 }
 
-func (r *Route) WeightedSelectPath() (Path, error) {
-	if len(r.Paths) == 0 {
+func (route *Route) WeightedSelectPath() (Path, error) {
+	if len(route.Paths) == 0 {
 		return Path{}, fmt.Errorf("paths slice is empty")
 	}
 
-	activePaths := r.ActivePaths()
+	activePaths := route.ActivePaths()
 	if len(activePaths) == 0 {
 		return Path{}, fmt.Errorf("route has no active paths")
 	}
@@ -81,8 +81,42 @@ func (r *Route) WeightedSelectPath() (Path, error) {
 	return Path{}, fmt.Errorf("error selecting path")
 }
 
-func (r *Route) ActivePaths() []Path {
-	return FilterSlice(r.Paths, func(p Path) bool {
+func (route *Route) ActivePaths() []Path {
+	return FilterSlice(route.Paths, func(p Path) bool {
 		return p.IsActive
 	})
+}
+
+func selectClickRoute(mainRoute Route, ruleRoutes []Route, click Click) Route {
+	route := mainRoute
+	for _, ruleRoute := range ruleRoutes {
+		if !ruleRoute.IsActive {
+			continue
+		}
+		if ruleRoute.ClickDoesTrigger(click) {
+			return ruleRoute
+		}
+	}
+	return route
+}
+
+// Loop over all routes to determine if there are
+// any routes that require an API call
+func IpInfoNeeded(routes []Route) bool {
+	for _, route := range routes {
+		for _, rule := range route.Rules {
+			if ipInfoNeededMap[rule.RuleName] {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// An API call is needed to obtain this data:
+var ipInfoNeededMap = map[RuleName]bool{
+	RuleNameRegion:  true,
+	RuleNameCountry: true,
+	RuleNameCity:    true,
+	RuleNameISP:     true,
 }

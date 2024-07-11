@@ -75,10 +75,33 @@ func (s *Storer) GetCampaignByPublicId(ctx context.Context, publicId string) (Ca
 	return c, nil
 }
 
+// Checks if the click triggered any rule routes, and if not returns the main route
+func (c *Campaign) SelectClickRoute(click Click) Route {
+	return selectClickRoute(c.FlowMainRoute, c.FlowRuleRoutes, click)
+}
+
+func (c *Campaign) IpInfoNeeded() bool {
+	return IpInfoNeeded(c.FlowRuleRoutes)
+}
+
 func formatCampaign(model *db.CampaignModel) Campaign {
-	return Campaign{
-		InnerCampaign: model.InnerCampaign,
+	campaign := Campaign{
+		InnerCampaign:  model.InnerCampaign,
+		FlowMainRoute:  newInitializedRoute(),
+		FlowRuleRoutes: []Route{},
 	}
+
+	flowMainRouteStr, ok := model.FlowMainRoute()
+	if ok {
+		campaign.FlowMainRoute = getRoute(flowMainRouteStr)
+	}
+
+	flowRuleRoutesStr, ok := model.FlowRuleRoutes()
+	if ok {
+		campaign.FlowRuleRoutes = getRoutes(flowRuleRoutesStr)
+	}
+
+	return campaign
 }
 
 func formatCampaigns(models []db.CampaignModel) []Campaign {

@@ -52,7 +52,7 @@ var DummyDataMap = map[string]any{
 }
 
 func (ct *customTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	if os.Getenv("NODE_ENV") == "development" {
+	if os.Getenv(EnvNodeEnv) == "development" {
 		for regex, val := range DummyDataMap {
 			b := []byte(req.URL.String())
 			if matched, _ := regexp.Match(regex, b); matched {
@@ -137,7 +137,7 @@ func InitMakeRedisKey(prefix string) RedisKeyFunc {
 }
 
 func CatchAllUrl() string {
-	catchAllUrl := os.Getenv("CATCH_ALL_REDIRECT_URL")
+	catchAllUrl := os.Getenv(EnvCatchAllRedirectUrl)
 	if catchAllUrl == "" {
 		return "https://bing.com"
 	}

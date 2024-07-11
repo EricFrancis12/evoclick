@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/EricFrancis12/evoclick/pkg"
+	"github.com/EricFrancis12/evoclick/prisma/db"
 )
 
 func Click(w http.ResponseWriter, r *http.Request) {
@@ -36,14 +37,24 @@ func Click(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	flow, err := storer.GetFlowById(ctx, click.FlowID)
-	if err != nil {
-		fmt.Println("error fetching flow by ID: " + err.Error())
+	var route pkg.Route
+
+	if campaign.FlowType == db.FlowTypeSaved && *campaign.SavedFlowID != 0 {
+		savedFlow, err := storer.GetSavedFlowById(ctx, click.SavedFlowID)
+		if err != nil {
+			fmt.Println("error fetching flow by ID: " + err.Error())
+			http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+			return
+		}
+		route = savedFlow.SelectClickRoute(click)
+	} else if campaign.FlowType == db.FlowTypeBuiltIn {
+		route = campaign.SelectClickRoute(click)
+	} else {
+		fmt.Println("flow type is not Saved or Built-In")
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
 	}
 
-	route := flow.SelectClickRoute(click)
 	path, err := route.WeightedSelectPath()
 	if err != nil {
 		fmt.Println("error selecting path: " + err.Error())

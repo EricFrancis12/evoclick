@@ -14,6 +14,31 @@ import (
 	"github.com/mileusna/useragent"
 )
 
+type Destination struct {
+	Type DestType
+	URL  string
+	ID   int // The ID of the landing page OR offer the visitor will being redirected to
+}
+
+type DestOpts struct {
+	ctx        context.Context
+	storer     pkg.Storer
+	campaign   pkg.Campaign
+	flow       pkg.Flow
+	r          *http.Request
+	userAgent  useragent.UserAgent
+	ipInfoData pkg.IPInfoData
+}
+
+type DestType string
+
+const (
+	DestTypeLandingPage DestType = "landingPage"
+	DestTypeOffer       DestType = "offer"
+	DestTypeURL         DestType = "url"
+	DestTypeCatchAll    DestType = "catchAll"
+)
+
 func T(w http.ResponseWriter, r *http.Request) {
 	timestamp := time.Now()
 	ctx := context.Background()
@@ -54,8 +79,8 @@ func T(w http.ResponseWriter, r *http.Request) {
 	)
 
 	// Fetch IP Info
-	ipInfoToken := os.Getenv("IP_INFO_TOKEN")
-	if ipInfoToken != "" && flow.RulesNeedIpInfo() {
+	ipInfoToken := os.Getenv(pkg.EnvIpInfoToken)
+	if ipInfoToken != "" && flow.IpInfoNeeded() {
 		data, err := pkg.FetchIpInfo(r.RemoteAddr, ipInfoToken)
 		if err != nil {
 			fmt.Println("error fetching IP Info: " + err.Error())
@@ -82,6 +107,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 		setCookie(w, pkg.CookieNameClickPublicID, publicClickId)
 	}
 
+	// Redirect the visitor
 	http.Redirect(w, r, dest.URL, http.StatusTemporaryRedirect)
 
 	// If we have an IP Info Token, AND we didn't fetch data before,
@@ -148,31 +174,6 @@ func T(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("error saving new click to db: " + err.Error())
 	}
 }
-
-type Destination struct {
-	Type DestType
-	URL  string
-	ID   int // The ID of the landing page OR offer the visitor will being redirected to
-}
-
-type DestOpts struct {
-	ctx        context.Context
-	storer     pkg.Storer
-	campaign   pkg.Campaign
-	flow       pkg.Flow
-	r          *http.Request
-	userAgent  useragent.UserAgent
-	ipInfoData pkg.IPInfoData
-}
-
-type DestType string
-
-const (
-	DestTypeLandingPage DestType = "landingPage"
-	DestTypeOffer       DestType = "offer"
-	DestTypeURL         DestType = "url"
-	DestTypeCatchAll    DestType = "catchAll"
-)
 
 func determineDest(opts DestOpts) (Destination, error) {
 	if opts.flow.Type == db.FlowTypeURL && opts.flow.URL != "" {
