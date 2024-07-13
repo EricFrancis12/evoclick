@@ -44,22 +44,10 @@ func (s *Storer) GetSavedFlowById(ctx context.Context, id int) (SavedFlow, error
 	return fl, nil
 }
 
-// Checks if the click triggered any rule routes, and if not returns the main route
 func (sf *SavedFlow) SelectViewRoute(r *http.Request, userAgent useragent.UserAgent, ipInfoData IPInfoData) Route {
-	route := sf.MainRoute
-	for _, ruleRoute := range sf.RuleRoutes {
-		if !ruleRoute.IsActive {
-			continue
-		}
-		if ruleRoute.ViewDoesTrigger(r, userAgent, ipInfoData) {
-			route = ruleRoute
-			break
-		}
-	}
-	return route
+	return selectViewRoute(sf.MainRoute, sf.RuleRoutes, r, userAgent, ipInfoData)
 }
 
-// Checks if the click triggered any rule routes, and if not returns the main route
 func (sf *SavedFlow) SelectClickRoute(click Click) Route {
 	return selectClickRoute(sf.MainRoute, sf.RuleRoutes, click)
 }

@@ -1,32 +1,32 @@
-import { Flow } from "@prisma/client";
-import { z } from "zod";
+import { SavedFlow } from "@prisma/client";
+import { parseRoute, parseRoutes } from ".";
 import cache from "../lib/cache";
 import db from "../lib/db";
-import { flowSchema, routeSchema } from "../lib/schemas";
-import { TFlow, TFlow_createRequest, TFlow_updateRequest, TRoute } from "../lib/types";
+import { savedFlowSchema } from "../lib/schemas";
+import { TSavedFlow, TSavedFlow_createRequest, TSavedFlow_updateRequest } from "../lib/types";
 import { initMakeRedisKey } from "../lib/utils";
 
 const makeKey = initMakeRedisKey("flow");
 
-export async function getAllFlows(): Promise<TFlow[]> {
-    const flows: Flow[] = await db.flow.findMany();
-    const proms: Promise<TFlow>[] = flows.map(flow => makeClientFlow(flow));
+export async function getAllFlows(): Promise<TSavedFlow[]> {
+    const savedFlows: SavedFlow[] = await db.savedFlow.findMany();
+    const proms: Promise<TSavedFlow>[] = savedFlows.map(flow => makeClientFlow(flow));
     return Promise.all(proms);
 }
 
-export async function getFlowById(id: number): Promise<TFlow | null> {
+export async function getFlowById(id: number): Promise<TSavedFlow | null> {
     // Check redis cache for this flow
     const key = makeKey(id);
     const cachedResult = await cache?.get(key);
 
     // If found in the cache, parse and return it
     if (cachedResult != null) {
-        const { data, success } = await flowSchema.safeParseAsync(cachedResult);
+        const { data, success } = await savedFlowSchema.safeParseAsync(cachedResult);
         if (success) return data;
     }
 
     // If not in cache, query db for it
-    const flowProm = db.flow.findUnique({
+    const flowProm = db.savedFlow.findUnique({
         where: { id },
     });
 
@@ -42,8 +42,8 @@ export async function getFlowById(id: number): Promise<TFlow | null> {
     return flowProm.then(flow => flow ? makeClientFlow(flow) : null);
 }
 
-export async function createNewFlow(creationRequest: TFlow_createRequest): Promise<TFlow> {
-    const flowProm = db.flow.create({
+export async function createNewFlow(creationRequest: TSavedFlow_createRequest): Promise<TSavedFlow> {
+    const flowProm = db.savedFlow.create({
         data: {
             ...creationRequest,
             // Changing mainRoute and ruleRoutes into strings because
@@ -66,8 +66,8 @@ export async function createNewFlow(creationRequest: TFlow_createRequest): Promi
     return flowProm.then(flow => makeClientFlow(flow));
 }
 
-export async function updateFlowById(id: number, data: TFlow_updateRequest): Promise<TFlow> {
-    const flowProm = db.flow.update({
+export async function updateFlowById(id: number, data: TSavedFlow_updateRequest): Promise<TSavedFlow> {
+    const flowProm = db.savedFlow.update({
         where: { id },
         data: {
             ...data,
@@ -91,21 +91,21 @@ export async function updateFlowById(id: number, data: TFlow_updateRequest): Pro
     return flowProm.then(flow => makeClientFlow(flow));
 }
 
-export async function deleteFlowById(id: number): Promise<TFlow> {
+export async function deleteFlowById(id: number): Promise<TSavedFlow> {
     // Delete the corresponding key for this flow in the cache
     if (cache) {
         const key = makeKey(id);
         cache.del(key);
     }
 
-    const flowProm = db.flow.delete({
+    const flowProm = db.savedFlow.delete({
         where: { id },
     });
 
     return flowProm.then(flow => makeClientFlow(flow));
 }
 
-async function makeClientFlow(dbModel: Flow): Promise<TFlow> {
+async function makeClientFlow(dbModel: SavedFlow): Promise<TSavedFlow> {
     const mainRouteProm = parseRoute(dbModel.mainRoute);
     const ruleRoutesProm = parseRoutes(dbModel.ruleRoutes);
     return {
@@ -113,14 +113,4 @@ async function makeClientFlow(dbModel: Flow): Promise<TFlow> {
         mainRoute: await mainRouteProm,
         ruleRoutes: await ruleRoutesProm,
     };
-}
-
-async function parseRoute(jsonStr: string | null): Promise<TRoute | null> {
-    const { success, data } = await routeSchema.safeParseAsync(jsonStr);
-    return success ? data : null;
-}
-
-async function parseRoutes(jsonStr: string | null): Promise<TRoute[]> {
-    const { success, data } = await z.array(routeSchema).safeParseAsync(jsonStr);
-    return success ? data : [];
 }

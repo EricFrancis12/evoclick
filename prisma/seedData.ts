@@ -22,8 +22,7 @@ export const landingPageSeedData = {
     tags,
 };
 
-export const flowSeedData = {
-    type: $Enums.FlowType.SAVED,
+export const savedFlowSeedData = {
     name: "My First Saved Flow",
     mainRoute: <TRoute>{
         isActive: true,

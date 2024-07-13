@@ -149,7 +149,7 @@ function itemNameToClickProp(itemName: EItemName): keyof TClick | undefined {
 const clickPropsMap: Record<EItemName, keyof TClick> = {
     [EItemName.AFFILIATE_NETWORK]: "affiliateNetworkId",
     [EItemName.CAMPAIGN]: "campaignId",
-    [EItemName.FLOW]: "flowId",
+    [EItemName.FLOW]: "savedFlowId",
     [EItemName.LANDING_PAGE]: "landingPageId",
     [EItemName.OFFER]: "offerId",
     [EItemName.TRAFFIC_SOURCE]: "trafficSourceId",

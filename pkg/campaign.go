@@ -3,9 +3,11 @@ package pkg
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"strconv"
 
 	"github.com/EricFrancis12/evoclick/prisma/db"
+	"github.com/mileusna/useragent"
 )
 
 func (s *Storer) GetAllCampaigns(ctx context.Context) ([]Campaign, error) {
@@ -73,6 +75,10 @@ func (s *Storer) GetCampaignByPublicId(ctx context.Context, publicId string) (Ca
 	defer SaveKeyToRedis(ctx, s.Cache, idKey, c)
 
 	return c, nil
+}
+
+func (c *Campaign) SelectViewRoute(r *http.Request, userAgent useragent.UserAgent, ipInfoData IPInfoData) Route {
+	return selectViewRoute(c.FlowMainRoute, c.FlowRuleRoutes, r, userAgent, ipInfoData)
 }
 
 // Checks if the click triggered any rule routes, and if not returns the main route

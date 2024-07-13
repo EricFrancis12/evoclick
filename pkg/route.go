@@ -87,6 +87,22 @@ func (route *Route) ActivePaths() []Path {
 	})
 }
 
+// Checks if the click triggered any rule routes, and if not returns the main route
+func selectViewRoute(mainRoute Route, ruleRoutes []Route, r *http.Request, userAgent useragent.UserAgent, ipInfoData IPInfoData) Route {
+	route := mainRoute
+	for _, ruleRoute := range ruleRoutes {
+		if !ruleRoute.IsActive {
+			continue
+		}
+		if ruleRoute.ViewDoesTrigger(r, userAgent, ipInfoData) {
+			route = ruleRoute
+			break
+		}
+	}
+	return route
+}
+
+// Checks if the click triggered any rule routes, and if not returns the main route
 func selectClickRoute(mainRoute Route, ruleRoutes []Route, click Click) Route {
 	route := mainRoute
 	for _, ruleRoute := range ruleRoutes {

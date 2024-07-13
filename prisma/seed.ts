@@ -2,9 +2,10 @@
 // because the seed command that runs this file "npx prisma db seed"
 // uses ts-node under the hood,
 // and it's not able to recognize that syntax in the current tsconfig.
+import { $Enums } from "@prisma/client";
 import prisma from "../src/lib/db";
 import {
-    affiliateNetworkSeedData, campaignSeedData, flowSeedData,
+    affiliateNetworkSeedData, campaignSeedData, savedFlowSeedData,
     landingPageSeedData, offerSeedData, trafficSourceData
 } from "./seedData";
 
@@ -24,11 +25,11 @@ async function main() {
         data: landingPageSeedData,
     });
 
-    const flow = await prisma.flow.create({
+    const flow = await prisma.savedFlow.create({
         data: {
-            ...flowSeedData,
+            ...savedFlowSeedData,
             mainRoute: JSON.stringify({
-                ...flowSeedData.mainRoute,
+                ...savedFlowSeedData.mainRoute,
                 paths: [
                     {
                         directLinkingEnabled: false,
@@ -39,7 +40,7 @@ async function main() {
                     },
                 ],
             }),
-            ruleRoutes: JSON.stringify(flowSeedData.ruleRoutes),
+            ruleRoutes: JSON.stringify(savedFlowSeedData.ruleRoutes),
         },
     });
 
@@ -55,8 +56,12 @@ async function main() {
     await prisma.campaign.create({
         data: {
             ...campaignSeedData,
-            flowId: flow.id,
+            flowType: $Enums.FlowType.SAVED,
+            savedFlowId: flow.id,
             trafficSourceId: trafficSource.id,
+            flowMainRoute: null,
+            flowRuleRoutes: null,
+            flowUrl: null,
         },
     });
 }
