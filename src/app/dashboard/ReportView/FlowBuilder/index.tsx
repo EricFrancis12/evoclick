@@ -7,7 +7,11 @@ import { ActionMenu, PopoverContainer, PopoverFooter, PopoverLayer, TActionMenu,
 import TagsInput from "@/components/TagsInput";
 import Button from "@/components/Button";
 import { Select } from "@/components/base";
-import { TRoute, ELogicalRelation, TPath, EItemName, TRule, ERuleName, EDeviceType, EBrowserName, TLandingPage, TOffer } from "@/lib/types";
+import { newRoute } from "@/lib/utils";
+import {
+    TRoute, ELogicalRelation, TPath, EItemName, TRule, ERuleName,
+    EDeviceType, EBrowserName, TLandingPage, TOffer
+} from "@/lib/types";
 
 type TFlowBuilder = {
     mainRoute: TRoute;
@@ -620,15 +624,6 @@ function makeItems(ids: number[], section: TSection): typeof section.options {
         if (item) result.push(item);
     }
     return result;
-}
-
-export function newRoute(): TRoute {
-    return {
-        isActive: true,
-        logicalRelation: ELogicalRelation.AND,
-        paths: [],
-        rules: [],
-    };
 }
 
 function isValidIndex(arr: unknown[], index: number): boolean {

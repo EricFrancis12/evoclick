@@ -4,10 +4,11 @@ import React, { useState, useContext, useEffect } from "react";
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-import FlowBuilder, { newRoute } from "./FlowBuilder";
+import FlowBuilder from "./FlowBuilder";
 import TagsInput from "@/components/TagsInput";
 import Button from "@/components/Button";
 import { Input, Select, SelectionButtons } from "@/components/base";
+import { newRoute } from "@/lib/utils";
 import {
     createNewAffiliateNetworkAction, createNewCampaignAction, createNewFlowAction,
     createNewLandingPageAction, createNewOfferAction, createNewTrafficSourceAction,
@@ -15,7 +16,10 @@ import {
     updateAffiliateNetworkAction, updateCampaignAction, updateFlowAction,
     updateLandingPageAction, updateOfferAction, updateTrafficSourceAction
 } from "@/lib/actions";
-import { EItemName, TAffiliateNetwork, TCampaign, TClick, TSavedFlow, TLandingPage, TNamedToken, TOffer, TRoute, TToken, TTrafficSource } from "@/lib/types";
+import {
+    EItemName, TAffiliateNetwork, TCampaign, TClick, TSavedFlow,
+    TLandingPage, TNamedToken, TOffer, TRoute, TToken, TTrafficSource
+} from "@/lib/types";
 import { $Enums } from "@prisma/client";
 
 export type TActionMenu = TAffiliateNetworkActionMenu | TCampaignActionMenu | TSavedFlowActionMenu

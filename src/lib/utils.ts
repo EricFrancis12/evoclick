@@ -1,4 +1,4 @@
-
+import { TRoute, ELogicalRelation } from "./types";
 
 export const initMakeRedisKey = (prefix: string) => (id: number | string) => `${prefix}:${id}`;
 
@@ -26,4 +26,13 @@ export function decodeTimeframe(str: string): [Date, Date] | null {
     if (nums.includes(NaN)) return null;
 
     return [new Date(nums[0]), new Date(nums[1])];
+}
+
+export function newRoute(): TRoute {
+    return {
+        isActive: true,
+        logicalRelation: ELogicalRelation.AND,
+        paths: [],
+        rules: [],
+    };
 }

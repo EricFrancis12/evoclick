@@ -137,7 +137,6 @@ function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: numb
         };
     } else if (itemName === EItemName.CAMPAIGN) {
         const ca = getPrimaryItemById(primaryData, "campaigns", id);
-        const fl = getPrimaryItemById(primaryData, "flows", id);
         actionMenu = {
             itemName,
             id: ca?.id,

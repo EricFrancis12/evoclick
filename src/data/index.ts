@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { newRoute } from "@/app/dashboard/ReportView/FlowBuilder";
 import { tokenSchema, namedTokenSchema, routeSchema } from "../lib/schemas";
+import { newRoute } from "@/lib/utils";
 import { TToken, TNamedToken, TRoute } from "../lib/types";
 
 export * from "./User";
