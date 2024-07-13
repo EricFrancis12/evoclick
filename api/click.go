@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/EricFrancis12/evoclick/pkg"
+	"github.com/EricFrancis12/evoclick/prisma/db"
 )
 
 func Click(w http.ResponseWriter, r *http.Request) {
@@ -15,12 +16,16 @@ func Click(w http.ResponseWriter, r *http.Request) {
 	storer := pkg.NewStorer()
 	storer.Renew()
 
+	fmt.Println("1")
+
 	clickPublicId := getCookieValue(r, pkg.CookieNameClickPublicID)
 	if clickPublicId == "" {
 		fmt.Println("no public Click ID found")
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
 	}
+
+	fmt.Println("2")
 
 	click, err := storer.GetClickByPublicId(ctx, clickPublicId)
 	if err != nil {
@@ -29,6 +34,8 @@ func Click(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("3")
+
 	campaign, err := storer.GetCampaignById(ctx, click.CampaignID)
 	if err != nil {
 		fmt.Println("error fetching campaign by ID: " + err.Error())
@@ -36,20 +43,36 @@ func Click(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	flow, err := storer.GetFlowById(ctx, click.FlowID)
-	if err != nil {
-		fmt.Println("error fetching flow by ID: " + err.Error())
+	fmt.Println("4")
+
+	var route pkg.Route
+
+	if campaign.FlowType == db.FlowTypeSaved && campaign.SavedFlowID != nil && *campaign.SavedFlowID != 0 {
+		savedFlow, err := storer.GetSavedFlowById(ctx, *campaign.SavedFlowID)
+		if err != nil {
+			fmt.Println("error fetching flow by ID: " + err.Error())
+			http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+			return
+		}
+		route = savedFlow.SelectClickRoute(click)
+	} else if campaign.FlowType == db.FlowTypeBuiltIn {
+		route = campaign.SelectClickRoute(click)
+	} else {
+		fmt.Println("flow type is not Saved or Built-In")
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
 	}
 
-	route := flow.SelectClickRoute(click)
+	fmt.Println("5")
+
 	path, err := route.WeightedSelectPath()
 	if err != nil {
 		fmt.Println("error selecting path: " + err.Error())
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
 	}
+
+	fmt.Println("6")
 
 	oID, err := selectIdUsingRotType[pkg.Offer](path.OfferIDs, campaign.OfferRotationType)
 	if err != nil {
@@ -58,12 +81,16 @@ func Click(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("7")
+
 	offer, err := storer.GetOfferById(ctx, oID)
 	if err != nil {
 		fmt.Println("error fetching offer by ID: " + err.Error())
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
 	}
+
+	fmt.Println("8")
 
 	http.Redirect(w, r, offer.URL, http.StatusTemporaryRedirect)
 

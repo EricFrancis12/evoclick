@@ -1,14 +1,18 @@
 import crypto from "crypto";
 import cache from "../lib/cache";
+import { parseRoute, parseRoutes } from ".";
 import db from "../lib/db";
 import { campaignSchema } from "../lib/schemas";
-import { TCampaign, TCampaign_createRequest, TCampaign_updateRequest } from "../lib/types";
 import { initMakeRedisKey } from "../lib/utils";
+import { TCampaign, TCampaign_createRequest, TCampaign_updateRequest } from "../lib/types";
+import { Campaign } from "@prisma/client";
 
 const makeKey = initMakeRedisKey("campaign");
 
 export async function getAllCampaigns(): Promise<TCampaign[]> {
-    return db.campaign.findMany();
+    const campaigns: Campaign[] = await db.campaign.findMany();
+    const proms: Promise<TCampaign>[] = campaigns.map(campaign => makeClientCampaign(campaign));
+    return Promise.all(proms);
 }
 
 export async function getCampaignById(id: number): Promise<TCampaign | null> {
@@ -36,7 +40,7 @@ export async function getCampaignById(id: number): Promise<TCampaign | null> {
         }
     });
 
-    return campaignProm;
+    return campaignProm.then(campaign => campaign ? makeClientCampaign(campaign) : null);
 }
 
 export async function createNewCampaign(creationRequest: TCampaign_createRequest): Promise<TCampaign> {
@@ -44,6 +48,10 @@ export async function createNewCampaign(creationRequest: TCampaign_createRequest
         data: {
             ...creationRequest,
             publicId: crypto.randomUUID() as string,
+            // Changing flowMainRoute and flowRuleRoutes into strings because
+            // they are saved as strings in the db
+            flowMainRoute: JSON.stringify(creationRequest.flowMainRoute),
+            flowRuleRoutes: JSON.stringify(creationRequest.flowRuleRoutes),
         }
     });
 
@@ -57,13 +65,19 @@ export async function createNewCampaign(creationRequest: TCampaign_createRequest
         }
     });
 
-    return campaignProm;
+    return campaignProm.then(campaign => makeClientCampaign(campaign));
 }
 
 export async function updateCampaignById(id: number, data: TCampaign_updateRequest): Promise<TCampaign> {
     const campaignProm = db.campaign.update({
         where: { id },
-        data,
+        data: {
+            ...data,
+            // Changing flowMainRoute and flowRuleRoutes into strings because
+            // they are saved as strings in the db
+            flowMainRoute: JSON.stringify(data.flowMainRoute),
+            flowRuleRoutes: JSON.stringify(data.flowRuleRoutes),
+        }
     });
 
     // If the update was successful, update the corresponding key for this campaign in the cache
@@ -76,7 +90,7 @@ export async function updateCampaignById(id: number, data: TCampaign_updateReque
         }
     });
 
-    return campaignProm;
+    return campaignProm.then(campaign => makeClientCampaign(campaign));
 }
 
 export async function deleteCampaignById(id: number): Promise<TCampaign> {
@@ -86,7 +100,19 @@ export async function deleteCampaignById(id: number): Promise<TCampaign> {
         cache.del(key);
     }
 
-    return db.campaign.delete({
+    const campaignProm = db.campaign.delete({
         where: { id },
     });
+
+    return campaignProm.then(campaign => makeClientCampaign(campaign));
+}
+
+async function makeClientCampaign(dbModel: Campaign): Promise<TCampaign> {
+    const mainRouteProm = parseRoute(dbModel.flowMainRoute);
+    const ruleRoutesProm = parseRoutes(dbModel.flowRuleRoutes);
+    return {
+        ...dbModel,
+        flowMainRoute: await mainRouteProm,
+        flowRuleRoutes: await ruleRoutesProm,
+    };
 }

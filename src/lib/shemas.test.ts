@@ -1,10 +1,10 @@
 import { $Enums } from "@prisma/client";
 import {
-    affiliateNetworkSchema, campaignSchema, flowSchema, landingPageSchema,
+    affiliateNetworkSchema, campaignSchema, savedFlowSchema, landingPageSchema,
     offersSchema, routeSchema, ruleSchema
 } from "./schemas";
 import {
-    ELogicalRelation, ERuleName, TAffiliateNetwork, TCampaign, TFlow, TLandingPage,
+    ELogicalRelation, ERuleName, TAffiliateNetwork, TCampaign, TSavedFlow, TLandingPage,
     TOffer, TPath, TRoute, TRule
 } from "./types";
 
@@ -22,8 +22,12 @@ describe("Testing Schemas", () => {
             tags: ["my", "campaign"],
             createdAt: new Date(),
             updatedAt: new Date(),
-            flowId: 2,
             trafficSourceId: 3,
+            flowType: $Enums.FlowType.SAVED,
+            savedFlowId: 2,
+            flowMainRoute: null,
+            flowRuleRoutes: null,
+            flowUrl: null,
         };
         expect(campaignSchema.safeParse(boilerplateCampaign).success).toEqual(true);
     });
@@ -83,46 +87,18 @@ describe("Testing Schemas", () => {
     });
 
     test("Flow Schema aligns with type", () => {
-        expect(flowSchema.safeParse({}).success).toEqual(false);
+        expect(savedFlowSchema.safeParse({}).success).toEqual(false);
 
-        const boilerplateBuiltInFlow: TFlow = {
-            id: 2,
-            type: $Enums.FlowType.BUILT_IN,
-            name: null, // Built In Flows do not have a name
-            url: null, // Built In Flows do not have a url
-            mainRoute: boilerplateRoute1,
-            ruleRoutes: [boilerplateRoute2],
-            tags: ["built", "in", "flow"],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        };
-        expect(flowSchema.safeParse(boilerplateBuiltInFlow).success).toEqual(true);
-
-        const boilerplateSavedFlow: TFlow = {
+        const boilerplateSavedFlow: TSavedFlow = {
             id: 3,
-            type: $Enums.FlowType.SAVED,
             name: "My Saved Flow",
-            url: null, // Saved Flows do not have a url
             mainRoute: boilerplateRoute1,
             ruleRoutes: [boilerplateRoute2],
             tags: ["saved", "flow"],
             createdAt: new Date(),
             updatedAt: new Date(),
         };
-        expect(flowSchema.safeParse(boilerplateSavedFlow).success).toEqual(true);
-
-        const boilerplateUrlFlow: TFlow = {
-            id: 4,
-            type: $Enums.FlowType.URL,
-            name: null, // URL Flows do not have a name
-            url: "https://example.com",
-            mainRoute: null, // URL Flows do not have a main route
-            ruleRoutes: null, // URL Flows do not have ruleRoutes
-            tags: ["url", "flow"],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        };
-        expect(flowSchema.safeParse(boilerplateUrlFlow).success).toEqual(true);
+        expect(savedFlowSchema.safeParse(boilerplateSavedFlow).success).toEqual(true);
     });
 
     const boilerplateAffiliateNetwork: TAffiliateNetwork = {

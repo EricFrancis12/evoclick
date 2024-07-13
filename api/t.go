@@ -14,11 +14,45 @@ import (
 	"github.com/mileusna/useragent"
 )
 
+type Destination struct {
+	Type DestType
+	URL  string
+	ID   int // The ID of the landing page OR offer the visitor will being redirected to
+}
+
+type DestOpts struct {
+	ctx        context.Context
+	storer     pkg.Storer
+	campaign   pkg.Campaign
+	savedFlow  pkg.SavedFlow
+	r          *http.Request
+	userAgent  useragent.UserAgent
+	ipInfoData pkg.IPInfoData
+}
+
+type DestType string
+
+const (
+	DestTypeLandingPage DestType = "landingPage"
+	DestTypeOffer       DestType = "offer"
+	DestTypeURL         DestType = "url"
+	DestTypeCatchAll    DestType = "catchAll"
+)
+
 func T(w http.ResponseWriter, r *http.Request) {
 	timestamp := time.Now()
 	ctx := context.Background()
 	storer := pkg.NewStorer()
 	storer.Renew()
+
+	var (
+		ipInfoData     pkg.IPInfoData
+		receivedIpInfo = false
+		userAgentStr   = r.UserAgent()
+		ua             = useragent.Parse(userAgentStr)
+		publicClickId  = pkg.NewPublicClickID()
+		savedFlow      = pkg.SavedFlow{}
+	)
 
 	g := getGValue(r)
 	if g == "" {
@@ -37,25 +71,29 @@ func T(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	flow, err := storer.GetFlowById(ctx, campaign.FlowID)
-	if err != nil {
-		// If flow not found, redirect the visitor to the catch-all url
-		fmt.Println("error fetching Flow: " + err.Error())
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
-		return
+	var ipInfoRequired = false
+
+	if campaign.FlowType == db.FlowTypeSaved {
+		savedFlow, err = storer.GetSavedFlowById(ctx, *campaign.SavedFlowID)
+		if err != nil {
+			// If flow not found, redirect the visitor to the catch-all url
+			fmt.Println("error fetching Flow: " + err.Error())
+			http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+			return
+		}
+
+		// TODO ...
+
+		ipInfoRequired = savedFlow.IpInfoNeeded()
+	} else if campaign.FlowType == db.FlowTypeBuiltIn {
+		// TODO ...
+
+		ipInfoRequired = campaign.IpInfoNeeded()
 	}
 
-	var (
-		ipInfoData     pkg.IPInfoData
-		receivedIpInfo = false
-		userAgentStr   = r.UserAgent()
-		ua             = useragent.Parse(userAgentStr)
-		publicClickId  = pkg.NewPublicClickID()
-	)
-
-	// Fetch IP Info
-	ipInfoToken := os.Getenv("IP_INFO_TOKEN")
-	if ipInfoToken != "" && flow.RulesNeedIpInfo() {
+	// Fetch IP Info if needed
+	ipInfoToken := os.Getenv(pkg.EnvIpInfoToken)
+	if ipInfoToken != "" && ipInfoRequired {
 		data, err := pkg.FetchIpInfo(r.RemoteAddr, ipInfoToken)
 		if err != nil {
 			fmt.Println("error fetching IP Info: " + err.Error())
@@ -69,7 +107,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 		ctx:        ctx,
 		storer:     *storer,
 		campaign:   campaign,
-		flow:       flow,
+		savedFlow:  savedFlow,
 		r:          r,
 		userAgent:  ua,
 		ipInfoData: ipInfoData,
@@ -82,6 +120,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 		setCookie(w, pkg.CookieNameClickPublicID, publicClickId)
 	}
 
+	// Redirect the visitor
 	http.Redirect(w, r, dest.URL, http.StatusTemporaryRedirect)
 
 	// If we have an IP Info Token, AND we didn't fetch data before,
@@ -138,7 +177,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 		BrowserVersion:     ua.Version,
 		AffiliateNetworkID: affiliateNetwork.ID,
 		CampaignID:         campaign.ID,
-		FlowID:             flow.ID,
+		SavedFlowID:        savedFlow.ID,
 		LandingPageID:      getLandingPageID(dest),
 		OfferID:            getOfferID(dest),
 		TrafficSourceID:    campaign.TrafficSourceID,
@@ -149,39 +188,20 @@ func T(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type Destination struct {
-	Type DestType
-	URL  string
-	ID   int // The ID of the landing page OR offer the visitor will being redirected to
-}
-
-type DestOpts struct {
-	ctx        context.Context
-	storer     pkg.Storer
-	campaign   pkg.Campaign
-	flow       pkg.Flow
-	r          *http.Request
-	userAgent  useragent.UserAgent
-	ipInfoData pkg.IPInfoData
-}
-
-type DestType string
-
-const (
-	DestTypeLandingPage DestType = "landingPage"
-	DestTypeOffer       DestType = "offer"
-	DestTypeURL         DestType = "url"
-	DestTypeCatchAll    DestType = "catchAll"
-)
-
 func determineDest(opts DestOpts) (Destination, error) {
-	if opts.flow.Type == db.FlowTypeURL && opts.flow.URL != "" {
+	if opts.campaign.FlowType == db.FlowTypeURL && opts.campaign.FlowURL != nil && *opts.campaign.FlowURL != "" {
 		return Destination{
 			Type: DestTypeURL,
-			URL:  opts.flow.URL,
+			URL:  *opts.campaign.FlowURL,
 		}, nil
-	} else if opts.flow.Type == db.FlowTypeBuiltIn || opts.flow.Type == db.FlowTypeSaved {
-		route := opts.flow.SelectViewRoute(opts.r, opts.userAgent, opts.ipInfoData)
+	} else if opts.campaign.FlowType == db.FlowTypeBuiltIn || opts.campaign.FlowType == db.FlowTypeSaved {
+		route := pkg.Route{}
+		if opts.campaign.FlowType == db.FlowTypeBuiltIn {
+			route = opts.campaign.SelectViewRoute(opts.r, opts.userAgent, opts.ipInfoData)
+		} else {
+			route = opts.savedFlow.SelectViewRoute(opts.r, opts.userAgent, opts.ipInfoData)
+		}
+
 		path, err := route.WeightedSelectPath()
 		if err != nil {
 			return catchAllDest(), err

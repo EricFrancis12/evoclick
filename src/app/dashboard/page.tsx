@@ -100,7 +100,7 @@ function reportItemFilter(reportItemName: EItemName | null, reportItemId: number
         case EItemName.CAMPAIGN:
             return { campaignId: reportItemId };
         case EItemName.FLOW:
-            return { flowId: reportItemId };
+            return { savedFlowId: reportItemId };
         case EItemName.LANDING_PAGE:
             return { landingPageId: reportItemId };
         case EItemName.OFFER:

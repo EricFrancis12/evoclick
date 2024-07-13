@@ -6,6 +6,13 @@ import (
 	"github.com/EricFrancis12/evoclick/prisma/db"
 )
 
+const (
+	EnvNodeEnv             string = "NODE_ENV"
+	EnvCatchAllRedirectUrl string = "CATCH_ALL_REDIRECT_URL"
+	EnvIpInfoToken         string = "IP_INFO_TOKEN"
+	EnvRedisUrl            string = "REDIS_URL"
+)
+
 type Click struct {
 	db.InnerClick
 	ClickTime          time.Time `json:"clickTime"`
@@ -17,6 +24,7 @@ type Click struct {
 	City               string    `json:"city"`
 	Tokens             []Token   `json:"tokens"`
 	AffiliateNetworkID int       `json:"affiliateNetworkID"`
+	SavedFlowID        int       `json:"savedFlowID"`
 	LandingPageID      int       `json:"landingPageID"`
 	OfferID            int       `json:"offerID"`
 }
@@ -27,12 +35,12 @@ type AffiliateNetwork struct {
 
 type Campaign struct {
 	db.InnerCampaign
+	FlowMainRoute  Route   `json:"mainRoute"`
+	FlowRuleRoutes []Route `json:"ruleRoutes"`
 }
 
-type Flow struct {
-	db.InnerFlow
-	Name       string  `json:"name"`
-	URL        string  `json:"url"`
+type SavedFlow struct {
+	db.InnerSavedFlow
 	MainRoute  Route   `json:"mainRoute"`
 	RuleRoutes []Route `json:"ruleRoutes"`
 }

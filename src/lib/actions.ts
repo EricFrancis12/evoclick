@@ -12,7 +12,7 @@ import {
     TUser, ECookieName, TClick,
     TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest,
     TCampaign, TCampaign_createRequest, TCampaign_updateRequest,
-    TFlow, TFlow_createRequest, TFlow_updateRequest,
+    TSavedFlow, TSavedFlow_createRequest, TSavedFlow_updateRequest,
     TLandingPage, TLandingPage_createRequest, TLandingPage_updateRequest,
     TOffer, TOffer_createRequest, TOffer_updateRequest,
     TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest
@@ -141,7 +141,7 @@ export const createNewCampaignAction = campaignActions.createAction;
 export const updateCampaignAction = campaignActions.updateAction;
 export const deleteCampaignAction = campaignActions.deleteAction;
 
-const flowOperations: CRUDOperations<TFlow_createRequest, TFlow_updateRequest, TFlow> = {
+const flowOperations: CRUDOperations<TSavedFlow_createRequest, TSavedFlow_updateRequest, TSavedFlow> = {
     readAll: data.getAllFlows,
     readOne: data.getFlowById,
     create: data.createNewFlow,

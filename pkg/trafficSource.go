@@ -78,7 +78,7 @@ func (ts TrafficSource) FillPostbackURL(click Click) string {
 		"{updatedAt}":          timeString(click.UpdatedAt),
 		"{affiliateNetworkId}": strconv.Itoa(click.AffiliateNetworkID),
 		"{campaignId}":         strconv.Itoa(click.CampaignID),
-		"{flowId}":             strconv.Itoa(click.FlowID),
+		"{flowId}":             strconv.Itoa(click.SavedFlowID),
 		"{landingPageId}":      strconv.Itoa(click.LandingPageID),
 		"{offerId}":            strconv.Itoa(click.OfferID),
 		"{trafficSourceId}":    strconv.Itoa(click.TrafficSourceID),

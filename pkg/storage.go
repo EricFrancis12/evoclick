@@ -33,7 +33,7 @@ func (s *Storer) Renew() {
 	}
 
 	if s.Cache == nil {
-		connStr := os.Getenv("REDIS_URL")
+		connStr := os.Getenv(EnvRedisUrl)
 		if connStr == "" {
 			return
 		}

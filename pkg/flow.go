@@ -10,33 +10,33 @@ import (
 	"github.com/mileusna/useragent"
 )
 
-func (s *Storer) GetAllFlows(ctx context.Context) ([]Flow, error) {
-	models, err := s.Client.Flow.FindMany().Exec(ctx)
+func (s *Storer) GetAllSavedFlows(ctx context.Context) ([]SavedFlow, error) {
+	models, err := s.Client.SavedFlow.FindMany().Exec(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return formatFlows(models), nil
+	return formatSavedFlows(models), nil
 }
 
-func (s *Storer) GetFlowById(ctx context.Context, id int) (Flow, error) {
+func (s *Storer) GetSavedFlowById(ctx context.Context, id int) (SavedFlow, error) {
 	key := InitMakeRedisKey("flow")(strconv.Itoa(id))
 	// Check redis cache for this flow
-	flow, err := CheckRedisForKey[Flow](ctx, s.Cache, key)
+	savedFlow, err := CheckRedisForKey[SavedFlow](ctx, s.Cache, key)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		return *flow, nil
+		return *savedFlow, nil
 	}
 
 	// If not in cache, query db for it
-	model, err := s.Client.Flow.FindUnique(
-		db.Flow.ID.Equals(id),
+	model, err := s.Client.SavedFlow.FindUnique(
+		db.SavedFlow.ID.Equals(id),
 	).Exec(ctx)
 	if err != nil {
-		return Flow{}, err
+		return SavedFlow{}, err
 	}
 
-	fl := formatFlow(model)
+	fl := formatSavedFlow(model)
 
 	// If we fetch from the db successfully, create a new key for this flow in the cache
 	defer SaveKeyToRedis(ctx, s.Cache, key, fl)
@@ -44,97 +44,48 @@ func (s *Storer) GetFlowById(ctx context.Context, id int) (Flow, error) {
 	return fl, nil
 }
 
-// Checks if the click triggered any rule routes, and if not returns the main route
-func (f *Flow) SelectViewRoute(r *http.Request, userAgent useragent.UserAgent, ipInfoData IPInfoData) Route {
-	route := f.MainRoute
-	for _, ruleRoute := range f.RuleRoutes {
-		if !ruleRoute.IsActive {
-			continue
-		}
-		if ruleRoute.ViewDoesTrigger(r, userAgent, ipInfoData) {
-			route = ruleRoute
-			break
-		}
-	}
-	return route
+func (sf *SavedFlow) SelectViewRoute(r *http.Request, userAgent useragent.UserAgent, ipInfoData IPInfoData) Route {
+	return selectViewRoute(sf.MainRoute, sf.RuleRoutes, r, userAgent, ipInfoData)
 }
 
-// Checks if the click triggered any rule routes, and if not returns the main route
-func (f *Flow) SelectClickRoute(click Click) Route {
-	route := f.MainRoute
-	for _, ruleRoute := range f.RuleRoutes {
-		if !ruleRoute.IsActive {
-			continue
-		}
-		if ruleRoute.ClickDoesTrigger(click) {
-			route = ruleRoute
-			break
-		}
-	}
-	return route
+func (sf *SavedFlow) SelectClickRoute(click Click) Route {
+	return selectClickRoute(sf.MainRoute, sf.RuleRoutes, click)
 }
 
-// An API call is needed to obtain this data:
-var ipInfoNeeded = map[RuleName]bool{
-	RuleNameRegion:  true,
-	RuleNameCountry: true,
-	RuleNameCity:    true,
-	RuleNameISP:     true,
+func (sf *SavedFlow) IpInfoNeeded() bool {
+	return IpInfoNeeded(sf.RuleRoutes)
 }
 
-func (f *Flow) RulesNeedIpInfo() bool {
-	// Loop over all rules to determine if there are
-	// any rules that require an API call
-	for _, route := range f.RuleRoutes {
-		for _, rule := range route.Rules {
-			if ipInfoNeeded[rule.RuleName] {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-func formatFlow(model *db.FlowModel) Flow {
+func formatSavedFlow(model *db.SavedFlowModel) SavedFlow {
 	var (
 		mainRoute  = getRoute(model.MainRoute)
 		ruleRoutes = getRoutes(model.RuleRoutes)
 	)
-	return Flow{
-		InnerFlow:  model.InnerFlow,
-		MainRoute:  mainRoute,
-		RuleRoutes: ruleRoutes,
+	return SavedFlow{
+		InnerSavedFlow: model.InnerSavedFlow,
+		MainRoute:      mainRoute,
+		RuleRoutes:     ruleRoutes,
 	}
 }
 
-func formatFlows(models []db.FlowModel) []Flow {
-	var flows []Flow
+func formatSavedFlows(models []db.SavedFlowModel) []SavedFlow {
+	var savedFlows []SavedFlow
 	for _, model := range models {
-		fl := formatFlow(&model)
-		flows = append(flows, fl)
+		fl := formatSavedFlow(&model)
+		savedFlows = append(savedFlows, fl)
 	}
-	return flows
+	return savedFlows
 }
 
-type RouteFunc func() (value string, ok bool)
-
-func getRoute(routeFunc RouteFunc) Route {
-	jsonStr, ok := routeFunc()
-	if !ok {
-		return makeInitializedRoute()
-	}
+func getRoute(jsonStr string) Route {
 	route, err := ParseJSON[Route](jsonStr)
 	if err != nil {
-		return makeInitializedRoute()
+		return newInitializedRoute()
 	}
 	return route
 }
 
-func getRoutes(routeFunc RouteFunc) []Route {
-	jsonStr, ok := routeFunc()
-	if !ok {
-		return []Route{}
-	}
+func getRoutes(jsonStr string) []Route {
 	routes, err := ParseJSON[[]Route](jsonStr)
 	if err != nil {
 		return []Route{}
@@ -142,7 +93,7 @@ func getRoutes(routeFunc RouteFunc) []Route {
 	return routes
 }
 
-func makeInitializedRoute() Route {
+func newInitializedRoute() Route {
 	return Route{
 		IsActive:        false,
 		LogicalRelation: LogicalRelationAnd,

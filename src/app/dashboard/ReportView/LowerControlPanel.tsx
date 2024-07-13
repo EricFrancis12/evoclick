@@ -31,10 +31,8 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
     }, [view.itemName]);
 
     function handleCreateNewItem() {
-        if (view.itemName === EItemName.FLOW) {
-            setActionMenu({ itemName: EItemName.FLOW, type: "SAVED" });
-        } else if (
-            view.itemName === EItemName.AFFILIATE_NETWORK
+        if (view.itemName === EItemName.AFFILIATE_NETWORK
+            || view.itemName === EItemName.FLOW
             || view.itemName === EItemName.LANDING_PAGE
             || view.itemName === EItemName.OFFER
             || view.itemName === EItemName.TRAFFIC_SOURCE
@@ -139,7 +137,6 @@ function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: numb
         };
     } else if (itemName === EItemName.CAMPAIGN) {
         const ca = getPrimaryItemById(primaryData, "campaigns", id);
-        const fl = getPrimaryItemById(primaryData, "flows", id);
         actionMenu = {
             itemName,
             id: ca?.id,
@@ -148,23 +145,18 @@ function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: numb
             offerRotationType: ca?.offerRotationType,
             geoName: ca?.geoName,
             tags: ca?.tags,
-            flowId: ca?.flowId,
-            flowData: {
-                type: fl?.type ?? undefined,
-                name: fl?.name ?? undefined,
-                url: fl?.url ?? undefined,
-                mainRoute: fl?.mainRoute ?? undefined,
-                ruleRoutes: fl?.ruleRoutes ?? undefined,
-                tags: fl?.tags ?? undefined,
-            },
             trafficSourceId: ca?.trafficSourceId,
+            flowType: ca?.flowType,
+            savedFlowId: ca?.savedFlowId ?? undefined,
+            flowUrl: ca?.flowUrl ?? undefined,
+            flowMainRoute: ca?.flowMainRoute ?? undefined,
+            flowRuleRoutes: ca?.flowRuleRoutes ?? undefined,
         };
     } else if (itemName === EItemName.FLOW) {
         const fl = getPrimaryItemById(primaryData, "flows", id);
         actionMenu = {
             itemName,
             id: fl?.id,
-            type: "SAVED",
             name: fl?.name ?? undefined,
             mainRoute: fl?.mainRoute ?? undefined,
             ruleRoutes: fl?.ruleRoutes ?? undefined,

@@ -3,7 +3,9 @@ import { z } from "zod";
 import { toZod } from "tozod";
 import {
     TAffiliateNetwork, TLandingPage, TOffer, TToken, TNamedToken, TTrafficSource, TUser,
-    TPath, ELogicalRelation, ERuleName
+    TPath, ELogicalRelation, ERuleName,
+    TSavedFlow,
+    TCampaign
 } from "./types";
 
 export const userSchema: toZod<TUser> = z.object({
@@ -21,20 +23,6 @@ export const affiliateNetworkSchema: toZod<TAffiliateNetwork> = z.object({
     tags: z.array(z.string()),
     createdAt: z.date(),
     updatedAt: z.date(),
-});
-
-export const campaignSchema = z.object({
-    id: z.number(),
-    publicId: z.string(),
-    name: z.string(),
-    landingPageRotationType: z.nativeEnum($Enums.RotationType),
-    offerRotationType: z.nativeEnum($Enums.RotationType),
-    geoName: z.nativeEnum($Enums.GeoName),
-    tags: z.array(z.string()),
-    createdAt: z.date(),
-    updatedAt: z.date(),
-    flowId: z.number(),
-    trafficSourceId: z.number(),
 });
 
 export const ruleSchema = z.object({
@@ -58,16 +46,32 @@ export const routeSchema = z.object({
     paths: z.array(pathSchema),
 });
 
-export const flowSchema = z.object({
+export const savedFlowSchema = z.object({
     id: z.number(),
-    type: z.nativeEnum($Enums.FlowType),
-    name: z.string().nullable(),
-    url: z.string().nullable(),
-    mainRoute: routeSchema.nullable(),
-    ruleRoutes: z.array(routeSchema).nullable(),
+    name: z.string(),
+    mainRoute: routeSchema,
+    ruleRoutes: z.array(routeSchema),
     tags: z.array(z.string()),
     createdAt: z.date(),
     updatedAt: z.date(),
+});
+
+export const campaignSchema = z.object({
+    id: z.number(),
+    publicId: z.string(),
+    name: z.string(),
+    landingPageRotationType: z.nativeEnum($Enums.RotationType),
+    offerRotationType: z.nativeEnum($Enums.RotationType),
+    geoName: z.nativeEnum($Enums.GeoName),
+    tags: z.array(z.string()),
+    createdAt: z.date(),
+    updatedAt: z.date(),
+    trafficSourceId: z.number(),
+    flowType: z.nativeEnum($Enums.FlowType),
+    savedFlowId: z.number().nullable(),
+    flowUrl: z.string().nullable(),
+    flowMainRoute: routeSchema.nullable(),
+    flowRuleRoutes: z.array(routeSchema).nullable(),
 });
 
 export const landingPageSchema: toZod<TLandingPage> = z.object({

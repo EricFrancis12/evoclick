@@ -1,4 +1,4 @@
-import { AffiliateNetwork, Campaign, Click, Flow, LandingPage, Offer, TrafficSource, User } from "@prisma/client";
+import { AffiliateNetwork, Campaign, Click, SavedFlow, LandingPage, Offer, TrafficSource, User } from "@prisma/client";
 
 type omissions = "id" | "createdAt" | "updatedAt";
 
@@ -13,17 +13,20 @@ export type TAffiliateNetwork_createRequest = Omit<TAffiliateNetwork, omissions>
 export type TAffiliateNetwork_updateRequest = Omit<Partial<TAffiliateNetwork>, omissions>;
 
 // Extending Campaign model
-export type TCampaign = Campaign;
+export type TCampaign = Omit<Campaign, "flowMainRoute" | "flowRuleRoutes"> & {
+    flowMainRoute: TRoute | null;
+    flowRuleRoutes: TRoute[] | null;
+};
 export type TCampaign_createRequest = Omit<TCampaign, omissions | "publicId">;
 export type TCampaign_updateRequest = Omit<Partial<TCampaign>, omissions>;
 
 // Extending Flow model
-export type TFlow = Omit<Flow, "mainRoute" | "ruleRoutes"> & {
-    mainRoute: TRoute | null;
-    ruleRoutes: TRoute[] | null;
+export type TSavedFlow = Omit<SavedFlow, "mainRoute" | "ruleRoutes"> & {
+    mainRoute: TRoute;
+    ruleRoutes: TRoute[];
 };
-export type TFlow_createRequest = Omit<TFlow, omissions>;
-export type TFlow_updateRequest = Omit<Partial<TFlow>, omissions>;
+export type TSavedFlow_createRequest = Omit<TSavedFlow, omissions>;
+export type TSavedFlow_updateRequest = Omit<Partial<TSavedFlow>, omissions>;
 
 // Extending Landing Page model
 export type TLandingPage = LandingPage;
@@ -54,7 +57,7 @@ export type TNamedToken = TToken & {
 
 // Extending Click model
 export type TClick = Omit<Click, "tokens"> & {
-    tokens: TToken[]
+    tokens: TToken[];
 };
 
 export type TRoute = {

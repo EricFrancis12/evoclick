@@ -4,10 +4,11 @@ import React, { useState, useContext, useEffect } from "react";
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-import FlowBuilder, { newRoute } from "./FlowBuilder";
+import FlowBuilder from "./FlowBuilder";
 import TagsInput from "@/components/TagsInput";
 import Button from "@/components/Button";
 import { Input, Select, SelectionButtons } from "@/components/base";
+import { newRoute } from "@/lib/utils";
 import {
     createNewAffiliateNetworkAction, createNewCampaignAction, createNewFlowAction,
     createNewLandingPageAction, createNewOfferAction, createNewTrafficSourceAction,
@@ -15,7 +16,10 @@ import {
     updateAffiliateNetworkAction, updateCampaignAction, updateFlowAction,
     updateLandingPageAction, updateOfferAction, updateTrafficSourceAction
 } from "@/lib/actions";
-import { EItemName, TAffiliateNetwork, TCampaign, TClick, TFlow, TLandingPage, TNamedToken, TOffer, TRoute, TToken, TTrafficSource } from "@/lib/types";
+import {
+    EItemName, TAffiliateNetwork, TCampaign, TClick, TSavedFlow,
+    TLandingPage, TNamedToken, TOffer, TRoute, TToken, TTrafficSource
+} from "@/lib/types";
 import { $Enums } from "@prisma/client";
 
 export type TActionMenu = TAffiliateNetworkActionMenu | TCampaignActionMenu | TSavedFlowActionMenu
@@ -24,7 +28,7 @@ export type TActionMenu = TAffiliateNetworkActionMenu | TCampaignActionMenu | TS
 export type TPrimaryData = {
     affiliateNetworks: TAffiliateNetwork[];
     campaigns: TCampaign[];
-    flows: TFlow[];
+    flows: TSavedFlow[];
     landingPages: TLandingPage[];
     offers: TOffer[];
     trafficSources: TTrafficSource[];
@@ -215,7 +219,7 @@ function CampaignBody({ actionMenu, setActionMenu }: {
     actionMenu: TCampaignActionMenu;
     setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 }) {
-    const [flows, setFlows] = useState<TFlow[]>([]);
+    const [savedFlows, setSavedFlows] = useState<TSavedFlow[]>([]);
     const [trafficSources, setTrafficSources] = useState<TTrafficSource[]>([]);
 
     const [flowBuilderOpen, setFlowBuilderOpen] = useState<boolean>(false);
@@ -226,79 +230,33 @@ function CampaignBody({ actionMenu, setActionMenu }: {
             .catch(() => toast.error("Error fetching Traffic Sources"));
 
         getAllFlowsAction()
-            .then(_flows => {
-                setFlows(_flows);
-
-                const flow = _flows.find(_flow => _flow.id === actionMenu.flowId);
-                if (!flow) return;
-
-                const { type, name, url, mainRoute, ruleRoutes, tags } = flow;
-                setActionMenu({
-                    ...actionMenu,
-                    flowData: {
-                        type,
-                        name: name ?? undefined,
-                        url: url ?? undefined,
-                        mainRoute: mainRoute ?? undefined,
-                        ruleRoutes: ruleRoutes ?? undefined,
-                        tags,
-                    },
-                });
-            })
+            .then(_savedFlows => setSavedFlows(_savedFlows))
             .catch(() => toast.error("Error fetching Flows"));
     }, []);
 
     async function handleSave() {
-        if (!actionMenu.flowData?.type) {
+        if (!actionMenu.flowType) {
             toast.error("A flow type is required");
             return;
         };
         try {
-            const { id, name, landingPageRotationType, offerRotationType, geoName, tags, trafficSourceId } = actionMenu;
-            let flowId: number | undefined = actionMenu.flowId;
-            if (actionMenu.flowData?.type !== "SAVED") {
-                const { type, mainRoute, ruleRoutes, url, tags } = actionMenu.flowData;
-                if (typeof flowId === "number") {
-                    await updateFlowAction(flowId, { mainRoute, ruleRoutes, url, tags }, window.location.href);
-                    toast.success("Flow was updated successfully");
-                } else if (type === "URL") {
-                    const createdFlow = await createNewFlowAction({
-                        name: null,
-                        type: $Enums.FlowType.URL,
-                        mainRoute: null,
-                        ruleRoutes: null,
-                        url: url ?? "",
-                        tags: tags ?? [],
-                    }, window.location.href);
-                    toast.success("Successfully created new URL Flow");
-                    console.log(createdFlow);
-                    flowId = createdFlow.id;
-                } else {
-                    const createdFlow = await createNewFlowAction({
-                        name: null,
-                        type: $Enums.FlowType.BUILT_IN,
-                        mainRoute: mainRoute ?? newRoute(),
-                        ruleRoutes: ruleRoutes ?? [],
-                        url: null,
-                        tags: tags ?? [],
-                    }, window.location.href);
-                    toast.success("Successfully created new Built-in Flow");
-                    flowId = createdFlow.id;
-                }
-            }
-
-            if (flowId == undefined) {
-                toast.error("Missing flow ID");
-                return;
-            } else if (typeof id === "number") {
+            const {
+                id, name, landingPageRotationType, offerRotationType, geoName, tags, trafficSourceId,
+                flowType, savedFlowId, flowUrl, flowMainRoute, flowRuleRoutes
+            } = actionMenu;
+            if (typeof id === "number") {
                 await updateCampaignAction(id, {
                     name,
                     landingPageRotationType,
                     offerRotationType,
                     geoName,
                     tags,
-                    flowId,
                     trafficSourceId,
+                    flowType,
+                    savedFlowId,
+                    flowUrl,
+                    flowMainRoute,
+                    flowRuleRoutes,
                 }, window.location.href);
                 toast.success("Campaign was updated successfully");
             } else if (trafficSourceId !== undefined) {
@@ -308,8 +266,12 @@ function CampaignBody({ actionMenu, setActionMenu }: {
                     offerRotationType: offerRotationType ?? $Enums.RotationType.RANDOM,
                     geoName: geoName ?? $Enums.GeoName.NONE,
                     tags: tags ?? [],
-                    flowId: flowId,
                     trafficSourceId,
+                    flowType,
+                    savedFlowId: savedFlowId ?? null,
+                    flowUrl: flowUrl ?? null,
+                    flowMainRoute: flowMainRoute ?? null,
+                    flowRuleRoutes: flowRuleRoutes ?? null,
                 }, window.location.href);
                 toast.success("Successfully created new Campaign");
             }
@@ -352,48 +314,42 @@ function CampaignBody({ actionMenu, setActionMenu }: {
             <SelectionButtons
                 name="Flow"
                 options={Object.values($Enums.FlowType)}
-                value={actionMenu.flowData?.type || ""}
+                value={actionMenu.flowType || ""}
                 onClick={flowType => setActionMenu({
                     ...actionMenu,
-                    flowData: {
-                        ...actionMenu.flowData,
-                        type: flowType as $Enums.FlowType,
-                    },
+                    flowType: flowType as $Enums.FlowType,
                 })}
             >
-                {actionMenu.flowData?.type === "SAVED" &&
+                {actionMenu.flowType === "SAVED" &&
                     <Select
                         name="Saved Flows"
-                        value={actionMenu.flowId}
+                        value={actionMenu.savedFlowId}
                         onChange={e => setActionMenu({
                             ...actionMenu,
-                            flowId: Number(e.target.value),
+                            savedFlowId: Number(e.target.value),
                         })}
                     >
                         <option value="">None</option>
-                        {flows.map(({ id, name }) => (
+                        {savedFlows.map(({ id, name }) => (
                             <option key={id} value={id}>
                                 {name}
                             </option>
                         ))}
                     </Select>
                 }
-                {actionMenu.flowData?.type === "BUILT_IN" &&
+                {actionMenu.flowType === "BUILT_IN" &&
                     <Button
                         text="Edit Built-In Flow"
                         onClick={() => setFlowBuilderOpen(true)}
                     />
                 }
-                {actionMenu.flowData?.type === "URL" &&
+                {actionMenu.flowType === "URL" &&
                     <Input
                         name="URL"
-                        value={actionMenu.flowData.url || ""}
+                        value={actionMenu.flowUrl || ""}
                         onChange={e => setActionMenu({
                             ...actionMenu,
-                            flowData: {
-                                ...actionMenu.flowData,
-                                url: e.target.value,
-                            },
+                            flowUrl: e.target.value,
                         })}
                     />
                 }
@@ -410,16 +366,13 @@ function CampaignBody({ actionMenu, setActionMenu }: {
                     <PopoverContainer>
                         <FlowBuilder
                             value={{
-                                mainRoute: actionMenu.flowData?.mainRoute || newRoute(),
-                                ruleRoutes: actionMenu.flowData?.ruleRoutes || [],
+                                mainRoute: actionMenu.flowMainRoute || newRoute(),
+                                ruleRoutes: actionMenu.flowRuleRoutes || [],
                             }}
                             onChange={({ mainRoute, ruleRoutes }) => setActionMenu({
                                 ...actionMenu,
-                                flowData: {
-                                    ...actionMenu.flowData,
-                                    mainRoute,
-                                    ruleRoutes,
-                                },
+                                flowMainRoute: mainRoute,
+                                flowRuleRoutes: ruleRoutes,
                             })}
                         />
                         <PopoverFooter>
@@ -473,10 +426,8 @@ function SavedFlowBody({ actionMenu, setActionMenu }: {
             } else {
                 await createNewFlowAction({
                     name: name ?? "",
-                    type: $Enums.FlowType.SAVED,
                     mainRoute: mainRoute ?? newRoute(),
                     ruleRoutes: ruleRoutes ?? [],
-                    url: null,
                     tags: tags ?? [],
                 }, window.location.href);
                 toast.success("Successfully created new Saved Flow");
@@ -892,24 +843,17 @@ type TCampaignActionMenu = {
     offerRotationType?: $Enums.RotationType;
     geoName?: $Enums.GeoName;
     tags?: string[];
-    flowId?: number;
-    flowData?: TFlowData;
     trafficSourceId?: number;
-};
-
-type TFlowData = {
-    type?: $Enums.FlowType;
-    name?: string;
-    url?: string;
-    mainRoute?: TRoute;
-    ruleRoutes?: TRoute[];
-    tags?: string[];
+    flowType?: $Enums.FlowType;
+    savedFlowId?: number;
+    flowUrl?: string;
+    flowMainRoute?: TRoute;
+    flowRuleRoutes?: TRoute[];
 };
 
 type TSavedFlowActionMenu = {
     itemName: EItemName.FLOW;
     id?: number;
-    type: "SAVED";
     name?: string;
     mainRoute?: TRoute;
     ruleRoutes?: TRoute[];
