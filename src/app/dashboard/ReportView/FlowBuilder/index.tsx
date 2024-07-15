@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp, faExternalLink, faPencilAlt, faPlus, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-import { ActionMenu, PopoverContainer, PopoverFooter, PopoverLayer, TActionMenu, useReportView } from "../ReportViewContext";
+import {
+    ActionMenu, newPrimaryItemActionMenu,
+    PopoverContainer, PopoverFooter, PopoverLayer, TActionMenu, useReportView
+} from "../ReportViewContext";
 import TagsInput from "@/components/TagsInput";
 import Button from "@/components/Button";
 import { Select } from "@/components/base";
@@ -573,7 +576,10 @@ function Section({ section, path, onChange }: {
                                             <FontAwesomeIcon
                                                 icon={faPencilAlt}
                                                 className="cursor-pointer"
-                                                onClick={() => setOuterActionMenu({ itemName, ...item })}
+                                                onClick={() => setOuterActionMenu({
+                                                    ...newPrimaryItemActionMenu(itemName),
+                                                    ...item
+                                                })}
                                             />
                                             <FontAwesomeIcon
                                                 icon={faTrashAlt}
@@ -585,7 +591,7 @@ function Section({ section, path, onChange }: {
                         </div>
                         <div className="flex justify-between items-center bg-white h-[40px] my-1 px-2">
                             <div
-                                onClick={() => setOuterActionMenu({ itemName })}
+                                onClick={() => setOuterActionMenu(newPrimaryItemActionMenu(itemName))}
                                 className="flex justify-center items-center h-full w-[50%] cursor-pointer"
                                 style={{ borderRight: "solid 1px grey" }}
                             >

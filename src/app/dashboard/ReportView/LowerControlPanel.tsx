@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { faPencil, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { TActionMenu, TPrimaryData, useReportView } from "./ReportViewContext";
+import { faLink, faPencil, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { newPrimaryItemActionMenu, TActionMenu, TPrimaryData, useReportView } from "./ReportViewContext";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import CalendarButton from "@/components/CalendarButton";
 import RefreshButton from "@/components/RefreshButton";
@@ -31,16 +31,7 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
     }, [view.itemName]);
 
     function handleCreateNewItem() {
-        if (view.itemName === EItemName.AFFILIATE_NETWORK
-            || view.itemName === EItemName.FLOW
-            || view.itemName === EItemName.LANDING_PAGE
-            || view.itemName === EItemName.OFFER
-            || view.itemName === EItemName.TRAFFIC_SOURCE
-        ) {
-            setActionMenu({ itemName: view.itemName });
-        } else {
-            setActionMenu({ itemName: EItemName.CAMPAIGN });
-        }
+        setActionMenu(newPrimaryItemActionMenu(view.itemName));
     }
 
     function handleEditItem() {
@@ -52,6 +43,14 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
     function handleReportChainChange(reportChain: TReportChain) {
         setRows(rows.map(row => ({ ...row, selected: false }))); // Deselect all rows on report chain change
         updateViewReportChainById(view.id, reportChain)
+    }
+
+    function handleGetCampaignLinks(rowId: string | number) {
+        if (view.itemName !== EItemName.CAMPAIGN || typeof rowId !== "number") return;
+        setActionMenu({
+            type: "campaign links",
+            campaignId: rowId,
+        });
     }
 
     return (
@@ -81,6 +80,13 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
                                 text={`Create New ${isPrimary(view.itemName) ? view.itemName : EItemName.CAMPAIGN}`}
                                 icon={faPlus}
                                 onClick={handleCreateNewItem}
+                            />
+                        }
+                        {(selectedRows.length === 1 && view.itemName === EItemName.CAMPAIGN) &&
+                            <Button
+                                text="Get Campaign Links"
+                                icon={faLink}
+                                onClick={() => handleGetCampaignLinks(selectedRows[0].id)}
                             />
                         }
                     </>
@@ -129,6 +135,7 @@ function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: numb
     if (itemName === EItemName.AFFILIATE_NETWORK) {
         const an = getPrimaryItemById(primaryData, "affiliateNetworks", id);
         actionMenu = {
+            type: itemName,
             itemName,
             id: an?.id,
             name: an?.name,
@@ -138,6 +145,7 @@ function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: numb
     } else if (itemName === EItemName.CAMPAIGN) {
         const ca = getPrimaryItemById(primaryData, "campaigns", id);
         actionMenu = {
+            type: itemName,
             itemName,
             id: ca?.id,
             name: ca?.name,
@@ -155,6 +163,7 @@ function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: numb
     } else if (itemName === EItemName.FLOW) {
         const fl = getPrimaryItemById(primaryData, "flows", id);
         actionMenu = {
+            type: itemName,
             itemName,
             id: fl?.id,
             name: fl?.name ?? undefined,
@@ -165,6 +174,7 @@ function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: numb
     } else if (itemName === EItemName.LANDING_PAGE) {
         const lp = getPrimaryItemById(primaryData, "landingPages", id);
         actionMenu = {
+            type: itemName,
             itemName,
             id: lp?.id,
             name: lp?.name,
@@ -174,6 +184,7 @@ function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: numb
     } else if (itemName === EItemName.OFFER) {
         const o = getPrimaryItemById(primaryData, "offers", id);
         actionMenu = {
+            type: itemName,
             itemName,
             id: o?.id,
             name: o?.name,
@@ -185,6 +196,7 @@ function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: numb
     } else if (itemName === EItemName.TRAFFIC_SOURCE) {
         const ts = getPrimaryItemById(primaryData, "trafficSources", id);
         actionMenu = {
+            type: itemName,
             itemName,
             id: ts?.id,
             name: ts?.name,

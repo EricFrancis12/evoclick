@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useContext, useEffect } from "react";
+import Link from "next/link";
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faTimes, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faCopy, faExternalLink, faTimes, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import FlowBuilder from "./FlowBuilder";
 import TagsInput from "@/components/TagsInput";
 import Button from "@/components/Button";
@@ -13,6 +14,7 @@ import {
     createNewAffiliateNetworkAction, createNewCampaignAction, createNewFlowAction,
     createNewLandingPageAction, createNewOfferAction, createNewTrafficSourceAction,
     getAllAffiliateNetworksAction, getAllFlowsAction, getAllTrafficSourcesAction,
+    getOneCampaignAction,
     updateAffiliateNetworkAction, updateCampaignAction, updateFlowAction,
     updateLandingPageAction, updateOfferAction, updateTrafficSourceAction
 } from "@/lib/actions";
@@ -23,7 +25,7 @@ import {
 import { $Enums } from "@prisma/client";
 
 export type TActionMenu = TAffiliateNetworkActionMenu | TCampaignActionMenu | TSavedFlowActionMenu
-    | TLandingPageActionMenu | TOfferActionMenu | TTrafficSourceActionMenu;
+    | TLandingPageActionMenu | TOfferActionMenu | TTrafficSourceActionMenu | TCampaignLinksActionMenu;
 
 export type TPrimaryData = {
     affiliateNetworks: TAffiliateNetwork[];
@@ -109,7 +111,7 @@ export function ActionMenu({ actionMenu, setActionMenu }: {
     return (
         <div className="flex flex-col items-center bg-white">
             <ActionMenuHeader
-                title={actionMenu.itemName}
+                title={actionMenu.type}
                 onClose={() => setActionMenu(null)}
             />
             <ActionMenuBody actionMenu={actionMenu} setActionMenu={setActionMenu} />
@@ -139,7 +141,7 @@ export function ActionMenuBody({ actionMenu, setActionMenu }: {
     actionMenu: TActionMenu;
     setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 }) {
-    switch (actionMenu.itemName) {
+    switch (actionMenu.type) {
         case EItemName.AFFILIATE_NETWORK:
             return <AffiliateNetworkBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
         case EItemName.CAMPAIGN:
@@ -152,6 +154,8 @@ export function ActionMenuBody({ actionMenu, setActionMenu }: {
             return <OfferBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
         case EItemName.TRAFFIC_SOURCE:
             return <TrafficSourceBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
+        case "campaign links":
+            return <CampaignLinksBody actionMenu={actionMenu} setActionMenu={setActionMenu} />
         default:
             return "";
     }
@@ -710,6 +714,93 @@ function TrafficSourceBody({ actionMenu, setActionMenu }: {
     )
 }
 
+function CampaignLinksBody({ actionMenu, setActionMenu }: {
+    actionMenu: TCampaignLinksActionMenu;
+    setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
+}) {
+    const [campaign, setCampaign] = useState<TCampaign | null>(null);
+
+    useEffect(() => {
+        getOneCampaignAction(actionMenu.campaignId)
+            .then(_campaign => setCampaign(_campaign))
+            .catch(() => toast.error("Error fetching Campaign"));
+    }, []);
+
+    return (
+        <ActionMenuBodyWrapper>
+            {campaign &&
+                <div className="flex flex-col gap-4 w-full p-2">
+                    <CampaignLinksRows campaign={campaign} />
+                </div>
+            }
+        </ActionMenuBodyWrapper>
+    )
+}
+
+function CampaignLinksRows({ campaign }: {
+    campaign: TCampaign;
+}) {
+    const { protocol, hostname, port } = window.location;
+    const rows = [
+        {
+            name: "Campaign URL",
+            link: makeCampaignUrl(protocol, hostname, port, campaign?.publicId),
+        },
+        {
+            name: "Click URL",
+            link: makeClickUrl(protocol, hostname, port),
+        },
+    ];
+
+    return rows.map(({ name, link }, index) => (
+        <div key={index} className="flex items-center w-full">
+            <FontAwesomeIcon
+                icon={faCopy}
+                className="mr-2 cursor-pointer hover:text-green-400"
+                onClick={() => copyToClipboard(link)}
+            />
+            <div className="flex justify-between items-center gap-4 w-full">
+                <span>{name}: </span>
+                <Link href={link} className="text-end hover:underline">
+                    {link}
+                    <FontAwesomeIcon icon={faExternalLink} className="ml-2" />
+                </Link>
+            </div>
+        </div>
+    ))
+}
+
+function makeCampaignUrl(protocol: string, hostname: string, port: string, campaignPublicId: string): string {
+    return `${protocol}//${hostname}${port ? ":" + port : ""}/t/${campaignPublicId}`;
+}
+
+function makeClickUrl(protocol: string, hostname: string, port: string) {
+    return `${protocol}//${hostname}${port ? ":" + port : ""}/click`;
+}
+
+function copyToClipboard(text: string) {
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text);
+        } else {
+            // Fallback for older browsers
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+            textarea.style.left = "-9999px";
+            document.body.appendChild(textarea);
+            textarea.select();
+            textarea.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+        }
+        toast.success("Copied text to clipboard");
+    } catch (err) {
+        toast.error("error copying text to clipboard");
+    }
+}
+
 function ActionMenuFooter({ onSave, disabled }: {
     onSave: () => void;
     disabled?: boolean;
@@ -827,7 +918,26 @@ function TokenInput({ token, onChange, onDelete, title = "" }: {
     )
 }
 
+export function newPrimaryItemActionMenu(itemName: EItemName): TActionMenu {
+    if (itemName === EItemName.AFFILIATE_NETWORK
+        || itemName === EItemName.FLOW
+        || itemName === EItemName.LANDING_PAGE
+        || itemName === EItemName.OFFER
+        || itemName === EItemName.TRAFFIC_SOURCE
+    ) {
+        return {
+            type: itemName,
+            itemName,
+        } as TActionMenu;
+    }
+    return {
+        type: EItemName.CAMPAIGN,
+        itemName: EItemName.CAMPAIGN,
+    };
+}
+
 type TAffiliateNetworkActionMenu = {
+    type: EItemName.AFFILIATE_NETWORK;
     itemName: EItemName.AFFILIATE_NETWORK;
     id?: number;
     name?: string;
@@ -836,6 +946,7 @@ type TAffiliateNetworkActionMenu = {
 };
 
 type TCampaignActionMenu = {
+    type: EItemName.CAMPAIGN;
     itemName: EItemName.CAMPAIGN;
     id?: number;
     name?: string;
@@ -852,6 +963,7 @@ type TCampaignActionMenu = {
 };
 
 type TSavedFlowActionMenu = {
+    type: EItemName.FLOW;
     itemName: EItemName.FLOW;
     id?: number;
     name?: string;
@@ -861,6 +973,7 @@ type TSavedFlowActionMenu = {
 };
 
 type TLandingPageActionMenu = {
+    type: EItemName.LANDING_PAGE;
     itemName: EItemName.LANDING_PAGE;
     id?: number;
     name?: string;
@@ -869,6 +982,7 @@ type TLandingPageActionMenu = {
 };
 
 type TOfferActionMenu = {
+    type: EItemName.OFFER;
     itemName: EItemName.OFFER;
     id?: number;
     name?: string;
@@ -879,6 +993,7 @@ type TOfferActionMenu = {
 };
 
 type TTrafficSourceActionMenu = {
+    type: EItemName.TRAFFIC_SOURCE;
     itemName: EItemName.TRAFFIC_SOURCE;
     id?: number;
     name?: string;
@@ -887,4 +1002,9 @@ type TTrafficSourceActionMenu = {
     customTokens?: TNamedToken[];
     postbackUrl?: string | null;
     tags?: string[];
+};
+
+type TCampaignLinksActionMenu = {
+    type: "campaign links";
+    campaignId: number;
 };
