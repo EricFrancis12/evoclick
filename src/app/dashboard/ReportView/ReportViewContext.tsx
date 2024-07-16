@@ -773,7 +773,7 @@ function CampaignLinksRows({ campaign }: {
 }
 
 function makeCampaignUrl(protocol: string, hostname: string, port: string, campaignPublicId: string): string {
-    return `${protocol}//${hostname}${port ? ":" + port : ""}/t/${campaignPublicId}`;
+    return `${protocol}//${hostname}${port ? ":" + port : ""}/t?g=${campaignPublicId}`;
 }
 
 function makeClickUrl(protocol: string, hostname: string, port: string) {
