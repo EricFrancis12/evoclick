@@ -1,20 +1,20 @@
 package pkg
 
 import (
+	"context"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/mileusna/useragent"
 )
 
 const defaultCatchAllRedirectUrl = "https://bing.com"
 
-func CatchAllUrl() string {
-	catchAllUrl := os.Getenv(EnvCatchAllRedirectUrl)
-	if catchAllUrl == "" {
-		return defaultCatchAllRedirectUrl
-	}
-	return catchAllUrl
+func InitRoute() (time.Time, context.Context, *Storer) {
+	storer := NewStorer()
+	storer.Renew()
+	return time.Now(), context.Background(), storer
 }
 
 func RedirectVisitor(w http.ResponseWriter, r *http.Request, url string) {
@@ -23,6 +23,14 @@ func RedirectVisitor(w http.ResponseWriter, r *http.Request, url string) {
 
 func RedirectToCatchAllUrl(w http.ResponseWriter, r *http.Request) {
 	RedirectVisitor(w, r, CatchAllUrl())
+}
+
+func CatchAllUrl() string {
+	catchAllUrl := os.Getenv(EnvCatchAllRedirectUrl)
+	if catchAllUrl == "" {
+		return defaultCatchAllRedirectUrl
+	}
+	return catchAllUrl
 }
 
 func catchAllDest() Destination {

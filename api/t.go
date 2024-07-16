@@ -15,12 +15,7 @@ import (
 )
 
 func T(w http.ResponseWriter, r *http.Request) {
-	var (
-		ctx       = context.Background()
-		timestamp = time.Now()
-		storer    = pkg.NewStorer()
-	)
-	storer.Renew()
+	timestamp, ctx, storer := pkg.InitRoute()
 
 	g := getGValue(r)
 	if g == "" {
@@ -75,9 +70,9 @@ func T(w http.ResponseWriter, r *http.Request) {
 	anch := make(chan pkg.AffiliateNetwork)
 	go fetchAffiliateNetwork(ctx, storer, dest, anch)
 
+	publicClickId := pkg.NewPublicClickID()
 	// If we are sending the visitor to a landing page,
 	// set cookies to be retrieved later at /click
-	publicClickId := pkg.NewPublicClickID()
 	if dest.Type == pkg.DestTypeLandingPage {
 		setCookie(w, pkg.CookieNameCampaignPublicID, campaign.PublicID)
 		setCookie(w, pkg.CookieNameClickPublicID, publicClickId)

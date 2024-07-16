@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -11,12 +10,7 @@ import (
 )
 
 func Click(w http.ResponseWriter, r *http.Request) {
-	var (
-		ctx       = context.Background()
-		timestamp = time.Now()
-		storer    = pkg.NewStorer()
-	)
-	storer.Renew()
+	timestamp, ctx, storer := pkg.InitRoute()
 
 	clickPublicId := getCookieValue(r, pkg.CookieNameClickPublicID)
 	if clickPublicId == "" {

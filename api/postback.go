@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -15,12 +14,7 @@ import (
 type PostbackResp struct{}
 
 func Postback(w http.ResponseWriter, r *http.Request) {
-	var (
-		ctx       = context.Background()
-		timestamp = time.Now()
-		storer    = pkg.NewStorer()
-	)
-	storer.Renew()
+	timestamp, ctx, storer := pkg.InitRoute()
 
 	if clickPublicId := r.URL.Query().Get("pid"); clickPublicId != "" {
 		// Get click from db
