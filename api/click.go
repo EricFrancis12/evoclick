@@ -16,16 +16,12 @@ func Click(w http.ResponseWriter, r *http.Request) {
 	storer := pkg.NewStorer()
 	storer.Renew()
 
-	fmt.Println("1")
-
 	clickPublicId := getCookieValue(r, pkg.CookieNameClickPublicID)
 	if clickPublicId == "" {
 		fmt.Println("no public Click ID found")
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
 	}
-
-	fmt.Println("2")
 
 	click, err := storer.GetClickByPublicId(ctx, clickPublicId)
 	if err != nil {
@@ -34,16 +30,12 @@ func Click(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("3")
-
 	campaign, err := storer.GetCampaignById(ctx, click.CampaignID)
 	if err != nil {
 		fmt.Println("error fetching campaign by ID: " + err.Error())
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
 	}
-
-	fmt.Println("4")
 
 	var route pkg.Route
 
@@ -63,16 +55,12 @@ func Click(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("5")
-
 	path, err := route.WeightedSelectPath()
 	if err != nil {
 		fmt.Println("error selecting path: " + err.Error())
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
 	}
-
-	fmt.Println("6")
 
 	oID, err := selectIdUsingRotType[pkg.Offer](path.OfferIDs, campaign.OfferRotationType)
 	if err != nil {
@@ -81,16 +69,12 @@ func Click(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("7")
-
 	offer, err := storer.GetOfferById(ctx, oID)
 	if err != nil {
 		fmt.Println("error fetching offer by ID: " + err.Error())
 		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
 		return
 	}
-
-	fmt.Println("8")
 
 	http.Redirect(w, r, offer.URL, http.StatusTemporaryRedirect)
 
