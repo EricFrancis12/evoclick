@@ -210,7 +210,7 @@ function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: numb
     return actionMenu;
 }
 
-function getPrimaryItemById<T extends keyof TPrimaryData>(
+export function getPrimaryItemById<T extends keyof TPrimaryData>(
     primaryData: TPrimaryData,
     itemName: T,
     id: number
