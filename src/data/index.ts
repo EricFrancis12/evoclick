@@ -24,7 +24,7 @@ export async function parseRoutes(jsonStr: string): Promise<TRoute[]> {
 
 export async function parseToken(jsonStr: string): Promise<TToken> {
     const { success, data } = await tokenSchema.spa(safeParseJson(jsonStr));
-    return success ? data : makeBoilerplateToken();
+    return success ? data : newToken();
 }
 
 export async function parseTokens(jsonStr: string): Promise<TToken[]> {
@@ -37,7 +37,7 @@ export async function parseNamedTokens(jsonStr: string): Promise<TNamedToken[]> 
     return success ? data : [];
 }
 
-export function makeBoilerplateToken(): TToken {
+export function newToken(): TToken {
     return {
         queryParam: "",
         value: "",

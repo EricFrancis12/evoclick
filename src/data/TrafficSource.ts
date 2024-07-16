@@ -1,7 +1,7 @@
 import { TrafficSource } from "@prisma/client";
 import cache from "../lib/cache";
 import db from "../lib/db";
-import { parseToken, parseNamedTokens, makeBoilerplateToken } from ".";
+import { parseToken, parseNamedTokens } from ".";
 import { trafficSourceSchema } from "../lib/schemas";
 import { TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest } from "../lib/types";
 import { initMakeRedisKey, safeParseJson } from "../lib/utils";
