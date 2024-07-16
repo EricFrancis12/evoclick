@@ -14,7 +14,7 @@ import (
 type PostbackResp struct{}
 
 func Postback(w http.ResponseWriter, r *http.Request) {
-	timestamp, ctx, storer := pkg.InitRoute()
+	timestamp, ctx, storer := pkg.InitVisit()
 
 	if clickPublicId := r.URL.Query().Get("pid"); clickPublicId != "" {
 		// Get click from db

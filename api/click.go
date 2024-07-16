@@ -10,7 +10,7 @@ import (
 )
 
 func Click(w http.ResponseWriter, r *http.Request) {
-	timestamp, ctx, storer := pkg.InitRoute()
+	timestamp, ctx, storer := pkg.InitVisit()
 
 	clickPublicId := getCookieValue(r, pkg.CookieNameClickPublicID)
 	if clickPublicId == "" {

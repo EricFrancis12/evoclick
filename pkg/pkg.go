@@ -11,7 +11,7 @@ import (
 
 const defaultCatchAllRedirectUrl = "https://bing.com"
 
-func InitRoute() (time.Time, context.Context, *Storer) {
+func InitVisit() (time.Time, context.Context, *Storer) {
 	storer := NewStorer()
 	storer.Renew()
 	return time.Now(), context.Background(), storer

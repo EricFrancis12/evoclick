@@ -15,7 +15,7 @@ import (
 )
 
 func T(w http.ResponseWriter, r *http.Request) {
-	timestamp, ctx, storer := pkg.InitRoute()
+	timestamp, ctx, storer := pkg.InitVisit()
 
 	g := getGValue(r)
 	if g == "" {
