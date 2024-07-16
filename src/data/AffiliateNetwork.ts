@@ -2,7 +2,7 @@ import cache from "../lib/cache";
 import db from "../lib/db";
 import { affiliateNetworkSchema } from "../lib/schemas";
 import { TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest } from "../lib/types";
-import { initMakeRedisKey } from "../lib/utils";
+import { initMakeRedisKey, safeParseJson } from "../lib/utils";
 
 const makeKey = initMakeRedisKey("affiliateNetwork");
 
@@ -17,7 +17,7 @@ export async function getAffiliateNetworkById(id: number): Promise<TAffiliateNet
 
     // If found in the cache, parse and return it
     if (cachedResult != null) {
-        const { data, success } = await affiliateNetworkSchema.safeParseAsync(cachedResult);
+        const { data, success } = await affiliateNetworkSchema.spa(safeParseJson(cachedResult));
         if (success) return data;
     }
 

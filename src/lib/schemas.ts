@@ -42,8 +42,8 @@ export const pathSchema: toZod<TPath> = z.object({
 export const routeSchema = z.object({
     isActive: z.boolean(),
     logicalRelation: z.nativeEnum(ELogicalRelation),
-    rules: z.array(ruleSchema),
     paths: z.array(pathSchema),
+    rules: z.array(ruleSchema),
 });
 
 export const savedFlowSchema = z.object({

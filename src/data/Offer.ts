@@ -2,7 +2,7 @@ import cache from "../lib/cache";
 import db from "../lib/db";
 import { offersSchema } from "../lib/schemas";
 import { TOffer, TOffer_createRequest, TOffer_updateRequest } from "../lib/types";
-import { initMakeRedisKey } from "../lib/utils";
+import { initMakeRedisKey, safeParseJson } from "../lib/utils";
 
 const makeKey = initMakeRedisKey("offer");
 
@@ -17,7 +17,7 @@ export async function getOfferById(id: number): Promise<TOffer | null> {
 
     // If found in the cache, parse and return it
     if (cachedResult != null) {
-        const { data, success } = await offersSchema.safeParseAsync(cachedResult);
+        const { data, success } = await offersSchema.spa(safeParseJson(cachedResult));
         if (success) return data;
     }
 

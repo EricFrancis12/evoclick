@@ -70,7 +70,6 @@ export function useRows(clicks: TClick[], itemName: EItemName) {
 
     useEffect(() => {
         const newRows = makeRows(clicks, itemName, makeEnrichWith(itemName, primaryData));
-        console.log(structuredClone(newRows));
         setRows(newRows);
     }, [clicks.length, itemName]);
 
@@ -100,7 +99,6 @@ function makeRows(clicks: TClick[], itemName: EItemName, enrichWith?: TEnrichWit
                 });
             }
         }
-        console.log(rows);
         return rows;
     }, []);
 

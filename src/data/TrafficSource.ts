@@ -4,7 +4,7 @@ import db from "../lib/db";
 import { parseToken, parseNamedTokens, makeBoilerplateToken } from ".";
 import { trafficSourceSchema } from "../lib/schemas";
 import { TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest } from "../lib/types";
-import { initMakeRedisKey } from "../lib/utils";
+import { initMakeRedisKey, safeParseJson } from "../lib/utils";
 
 const makeKey = initMakeRedisKey("trafficSource");
 
@@ -21,7 +21,7 @@ export async function geTTrafficSourceById(id: number): Promise<TTrafficSource |
 
     // If found in the cache, parse and return it
     if (cachedResult != null) {
-        const { data, success } = await trafficSourceSchema.safeParseAsync(cachedResult);
+        const { data, success } = await trafficSourceSchema.spa(safeParseJson(cachedResult));
         if (success) return data;
     }
 

@@ -4,7 +4,7 @@ import cache from "../lib/cache";
 import db from "../lib/db";
 import { savedFlowSchema } from "../lib/schemas";
 import { TSavedFlow, TSavedFlow_createRequest, TSavedFlow_updateRequest } from "../lib/types";
-import { initMakeRedisKey } from "../lib/utils";
+import { initMakeRedisKey, newRoute, safeParseJson } from "../lib/utils";
 
 const makeKey = initMakeRedisKey("flow");
 
@@ -21,7 +21,7 @@ export async function getFlowById(id: number): Promise<TSavedFlow | null> {
 
     // If found in the cache, parse and return it
     if (cachedResult != null) {
-        const { data, success } = await savedFlowSchema.safeParseAsync(cachedResult);
+        const { data, success } = await savedFlowSchema.spa(safeParseJson(cachedResult));
         if (success) return data;
     }
 
@@ -106,8 +106,9 @@ export async function deleteFlowById(id: number): Promise<TSavedFlow> {
 }
 
 async function makeClientFlow(dbModel: SavedFlow): Promise<TSavedFlow> {
-    const mainRouteProm = parseRoute(dbModel.mainRoute);
-    const ruleRoutesProm = parseRoutes(dbModel.ruleRoutes);
+    const { mainRoute, ruleRoutes } = dbModel;
+    const mainRouteProm = mainRoute ? parseRoute(mainRoute) : newRoute();
+    const ruleRoutesProm = ruleRoutes ? parseRoutes(ruleRoutes) : [];
     return {
         ...dbModel,
         mainRoute: await mainRouteProm,

@@ -3,7 +3,7 @@ import cache from "../lib/cache";
 import db from "../lib/db";
 import { landingPageSchema } from "../lib/schemas";
 import { TLandingPage, TLandingPage_createRequest, TLandingPage_updateRequest } from "../lib/types";
-import { initMakeRedisKey } from "../lib/utils";
+import { initMakeRedisKey, safeParseJson } from "../lib/utils";
 
 const makeKey = initMakeRedisKey("landingPage");
 
@@ -18,7 +18,7 @@ export async function getLandingPageById(id: number): Promise<TLandingPage | nul
 
     // If found in the cache, parse and return it
     if (cachedResult != null) {
-        const { data, success } = await landingPageSchema.safeParseAsync(cachedResult);
+        const { data, success } = await landingPageSchema.spa(safeParseJson(cachedResult));
         if (success) return data;
     }
 

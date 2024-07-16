@@ -3,7 +3,7 @@ import cache from "../lib/cache";
 import { parseRoute, parseRoutes } from ".";
 import db from "../lib/db";
 import { campaignSchema } from "../lib/schemas";
-import { initMakeRedisKey } from "../lib/utils";
+import { initMakeRedisKey, newRoute, safeParseJson } from "../lib/utils";
 import { TCampaign, TCampaign_createRequest, TCampaign_updateRequest } from "../lib/types";
 import { Campaign } from "@prisma/client";
 
@@ -22,7 +22,7 @@ export async function getCampaignById(id: number): Promise<TCampaign | null> {
 
     // If found in the cache, parse and return it
     if (cachedResult != null) {
-        const { data, success } = await campaignSchema.safeParseAsync(cachedResult);
+        const { data, success } = await campaignSchema.spa(safeParseJson(cachedResult));
         if (success) return data;
     }
 
@@ -108,8 +108,9 @@ export async function deleteCampaignById(id: number): Promise<TCampaign> {
 }
 
 async function makeClientCampaign(dbModel: Campaign): Promise<TCampaign> {
-    const mainRouteProm = parseRoute(dbModel.flowMainRoute);
-    const ruleRoutesProm = parseRoutes(dbModel.flowRuleRoutes);
+    const { flowMainRoute, flowRuleRoutes } = dbModel;
+    const mainRouteProm = flowMainRoute ? parseRoute(flowMainRoute) : newRoute();
+    const ruleRoutesProm = flowRuleRoutes ? parseRoutes(flowRuleRoutes) : [];
     return {
         ...dbModel,
         flowMainRoute: await mainRouteProm,
