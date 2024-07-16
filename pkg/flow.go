@@ -57,14 +57,10 @@ func (sf *SavedFlow) IpInfoNeeded() bool {
 }
 
 func formatSavedFlow(model *db.SavedFlowModel) SavedFlow {
-	var (
-		mainRoute  = getRoute(model.MainRoute)
-		ruleRoutes = getRoutes(model.RuleRoutes)
-	)
 	return SavedFlow{
 		InnerSavedFlow: model.InnerSavedFlow,
-		MainRoute:      mainRoute,
-		RuleRoutes:     ruleRoutes,
+		MainRoute:      parseRoute(model.MainRoute),
+		RuleRoutes:     parseRoutes(model.RuleRoutes),
 	}
 }
 
@@ -77,27 +73,18 @@ func formatSavedFlows(models []db.SavedFlowModel) []SavedFlow {
 	return savedFlows
 }
 
-func getRoute(jsonStr string) Route {
+func parseRoute(jsonStr string) Route {
 	route, err := ParseJSON[Route](jsonStr)
 	if err != nil {
-		return newInitializedRoute()
+		return NewRoute()
 	}
 	return route
 }
 
-func getRoutes(jsonStr string) []Route {
+func parseRoutes(jsonStr string) []Route {
 	routes, err := ParseJSON[[]Route](jsonStr)
 	if err != nil {
 		return []Route{}
 	}
 	return routes
-}
-
-func newInitializedRoute() Route {
-	return Route{
-		IsActive:        false,
-		LogicalRelation: LogicalRelationAnd,
-		Rules:           []Rule{},
-		Paths:           []Path{},
-	}
 }

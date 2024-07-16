@@ -2,50 +2,23 @@ package pkg
 
 import (
 	"fmt"
-	"math/rand"
 	"net/http"
-	"time"
 
 	"github.com/mileusna/useragent"
 )
 
-type DoesTriggerRuleFunc func(rule Rule) bool
-
-// Determine if any rule in this route triggers based on a given condition
-func (route Route) doesTrigger(condition DoesTriggerRuleFunc) bool {
-	if !route.IsActive {
-		return false
+func NewRoute() Route {
+	return Route{
+		IsActive:        false,
+		LogicalRelation: LogicalRelationAnd,
+		Rules:           []Rule{},
+		Paths:           []Path{},
 	}
-
-	bools := []bool{}
-	for _, rule := range route.Rules {
-		bools = append(bools, condition(rule))
-	}
-
-	if route.LogicalRelation == LogicalRelationAnd {
-		// Handle "AND" logical relation
-		// Check if at least one result is false
-		return !sliceIncludes(bools, false)
-	} else if route.LogicalRelation == LogicalRelationOr {
-		// Handle "OR" logical relation
-		// Check if at least one result is true
-		return sliceIncludes(bools, true)
-	}
-
-	return false
 }
 
-// Determine if the view triggers any rules in this route
-func (route Route) ViewDoesTrigger(r *http.Request, ua useragent.UserAgent, ipInfoData IPInfoData) bool {
-	return route.doesTrigger(func(rule Rule) bool {
-		return rule.ViewDoesTrigger(r, ua, ipInfoData)
-	})
-}
-
-// Determine if the click triggers any rules in this route
-func (route Route) ClickDoesTrigger(click Click) bool {
-	return route.doesTrigger(func(rule Rule) bool {
-		return rule.ClickDoesTrigger(click)
+func (route *Route) ActivePaths() []Path {
+	return FilterSlice(route.Paths, func(p Path) bool {
+		return p.IsActive
 	})
 }
 
@@ -59,31 +32,42 @@ func (route *Route) WeightedSelectPath() (Path, error) {
 		return Path{}, fmt.Errorf("route has no active paths")
 	}
 
-	// Calculate the total weight
-	totalWeight := 0
-	for _, path := range activePaths {
-		totalWeight += path.Weight
-	}
-
-	// Generate a random number between 0 and totalWeight-1
-	rand.Seed(time.Now().UnixNano())
-	randnum := rand.Intn(totalWeight)
-
-	// Find the path corresponding to the random number
-	runningWeight := 0
-	for _, path := range activePaths {
-		runningWeight += path.Weight
-		if randnum < runningWeight {
-			return path, nil
-		}
-	}
-
-	return Path{}, fmt.Errorf("error selecting path")
+	return determinePath(activePaths)
 }
 
-func (route *Route) ActivePaths() []Path {
-	return FilterSlice(route.Paths, func(p Path) bool {
-		return p.IsActive
+// Determines if any rule in this route triggers based on a given condition
+func (route Route) doesTrigger(condition func(rule Rule) bool) bool {
+	if !route.IsActive {
+		return false
+	}
+
+	bools := []bool{}
+	for _, rule := range route.Rules {
+		bools = append(bools, condition(rule))
+	}
+
+	if route.LogicalRelation == LogicalRelationAnd {
+		// Check if at least one bool is false
+		return !sliceIncludes(bools, false)
+	} else if route.LogicalRelation == LogicalRelationOr {
+		// Check if at least one bool is true
+		return sliceIncludes(bools, true)
+	}
+
+	return false
+}
+
+// Determines if the view triggers any rules in this route
+func (route Route) ViewDoesTrigger(r *http.Request, ua useragent.UserAgent, ipInfoData IPInfoData) bool {
+	return route.doesTrigger(func(rule Rule) bool {
+		return rule.ViewDoesTrigger(r, ua, ipInfoData)
+	})
+}
+
+// Determines if the click triggers any rules in this route
+func (route Route) ClickDoesTrigger(click Click) bool {
+	return route.doesTrigger(func(rule Rule) bool {
+		return rule.ClickDoesTrigger(click)
 	})
 }
 
@@ -129,7 +113,7 @@ func IpInfoNeeded(routes []Route) bool {
 	return false
 }
 
-// An API call is needed to obtain this data:
+// Stores whether or not the RuleName requires an API call to obtain its data
 var ipInfoNeededMap = map[RuleName]bool{
 	RuleNameRegion:  true,
 	RuleNameCountry: true,

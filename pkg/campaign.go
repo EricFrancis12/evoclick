@@ -90,21 +90,96 @@ func (c *Campaign) IpInfoNeeded() bool {
 	return IpInfoNeeded(c.FlowRuleRoutes)
 }
 
+func (c *Campaign) SelectLandingPageID(ids []int) (int, error) {
+	return selectIDUsingRotType(ids, c.LandingPageRotationType)
+}
+
+func (c *Campaign) SelectOfferID(ids []int) (int, error) {
+	return selectIDUsingRotType(ids, c.OfferRotationType)
+}
+
+func (c *Campaign) DetermineViewDestination(r *http.Request, ctx context.Context, storer Storer, savedFlow SavedFlow, userAgent useragent.UserAgent, ipInfoData IPInfoData) (Destination, error) {
+	if c.FlowType == db.FlowTypeURL && c.FlowURL != nil && *c.FlowURL != "" {
+		return Destination{
+			Type: DestTypeURL,
+			URL:  *c.FlowURL,
+		}, nil
+	} else if c.FlowType == db.FlowTypeBuiltIn || c.FlowType == db.FlowTypeSaved {
+		route := Route{}
+		if c.FlowType == db.FlowTypeBuiltIn {
+			route = c.SelectViewRoute(r, userAgent, ipInfoData)
+		} else {
+			route = savedFlow.SelectViewRoute(r, userAgent, ipInfoData)
+		}
+
+		path, err := route.WeightedSelectPath()
+		if err != nil {
+			return catchAllDest(), err
+		}
+
+		if !path.DirectLinkingEnabled {
+			lpID, err := c.SelectOfferID(path.LandingPageIDs)
+			if err != nil {
+				return catchAllDest(), err
+			}
+
+			lp, err := storer.GetLandingPageById(ctx, lpID)
+			if err != nil {
+				return catchAllDest(), err
+			}
+
+			return Destination{
+				Type: DestTypeLandingPage,
+				URL:  lp.URL,
+				ID:   lp.ID,
+			}, nil
+		} else {
+			oID, err := c.SelectOfferID(path.OfferIDs)
+			if err != nil {
+				return catchAllDest(), err
+			}
+
+			o, err := storer.GetOfferById(ctx, oID)
+			if err != nil {
+				return catchAllDest(), err
+			}
+
+			return Destination{
+				Type: DestTypeOffer,
+				URL:  o.URL,
+				ID:   o.ID,
+			}, nil
+		}
+	}
+	return catchAllDest(), fmt.Errorf("missing or unknown flow type")
+}
+
+func selectIDUsingRotType(ids []int, rotType db.RotationType) (int, error) {
+	if len(ids) == 0 {
+		return 0, fmt.Errorf("ids slice is empty")
+	}
+	if rotType == db.RotationTypeRandom {
+		return RandomItem(ids)
+	} else {
+		return 0, fmt.Errorf("unknown rotation type: " + string(rotType))
+	}
+}
+
 func formatCampaign(model *db.CampaignModel) Campaign {
 	campaign := Campaign{
 		InnerCampaign:  model.InnerCampaign,
-		FlowMainRoute:  newInitializedRoute(),
+		FlowMainRoute:  NewRoute(),
 		FlowRuleRoutes: []Route{},
 	}
 
 	flowMainRouteStr, ok := model.FlowMainRoute()
 	if ok {
-		campaign.FlowMainRoute = getRoute(flowMainRouteStr)
+		campaign.FlowMainRoute = parseRoute(flowMainRouteStr)
 	}
 
 	flowRuleRoutesStr, ok := model.FlowRuleRoutes()
 	if ok {
-		campaign.FlowRuleRoutes = getRoutes(flowRuleRoutesStr)
+		campaign.FlowRuleRoutes = parseRoutes(flowRuleRoutesStr)
 	}
 
 	return campaign

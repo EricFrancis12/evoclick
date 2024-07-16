@@ -14,52 +14,20 @@ import (
 	"github.com/mileusna/useragent"
 )
 
-type Destination struct {
-	Type DestType
-	URL  string
-	ID   int // The ID of the landing page OR offer the visitor will being redirected to
-}
-
-type DestOpts struct {
-	ctx        context.Context
-	storer     pkg.Storer
-	campaign   pkg.Campaign
-	savedFlow  pkg.SavedFlow
-	r          *http.Request
-	userAgent  useragent.UserAgent
-	ipInfoData pkg.IPInfoData
-}
-
-type DestType string
-
-const (
-	DestTypeLandingPage DestType = "landingPage"
-	DestTypeOffer       DestType = "offer"
-	DestTypeURL         DestType = "url"
-	DestTypeCatchAll    DestType = "catchAll"
-)
-
 func T(w http.ResponseWriter, r *http.Request) {
-	timestamp := time.Now()
-	ctx := context.Background()
-	storer := pkg.NewStorer()
-	storer.Renew()
-
 	var (
-		ipInfoData     pkg.IPInfoData
-		receivedIpInfo = false
-		userAgentStr   = r.UserAgent()
-		ua             = useragent.Parse(userAgentStr)
-		publicClickId  = pkg.NewPublicClickID()
-		savedFlow      = pkg.SavedFlow{}
+		ctx       = context.Background()
+		timestamp = time.Now()
+		storer    = pkg.NewStorer()
 	)
+	storer.Renew()
 
 	g := getGValue(r)
 	if g == "" {
 		// If g is not specified we have no way of fetching the campaign,
 		// so redirect to the catch-all url
-		fmt.Println("g not specified")
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		fmt.Println("g value not specified")
+		pkg.RedirectToCatchAllUrl(w, r)
 		return
 	}
 
@@ -67,91 +35,65 @@ func T(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// If campaign not found, redirect the visitor to the catch-all url
 		fmt.Println("error fetching Campaign by public ID: " + err.Error())
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		pkg.RedirectToCatchAllUrl(w, r)
 		return
 	}
 
-	var ipInfoRequired = false
+	var (
+		ipInfoData             = pkg.IPInfoData{}
+		visitorNeedsIpInfoData = false
+		userAgent              = useragent.Parse(r.UserAgent())
+		savedFlow              = pkg.SavedFlow{}
+	)
+
+	ipidch := make(chan pkg.IPInfoData)
+	go fetchIpInfoData(r, os.Getenv(pkg.EnvIpInfoToken), ipidch)
+
+	tsch := make(chan pkg.TrafficSource)
+	go fetchtrafficSource(ctx, storer, campaign.TrafficSourceID, tsch)
 
 	if campaign.FlowType == db.FlowTypeSaved {
 		savedFlow, err = storer.GetSavedFlowById(ctx, *campaign.SavedFlowID)
 		if err != nil {
 			// If flow not found, redirect the visitor to the catch-all url
 			fmt.Println("error fetching Flow: " + err.Error())
-			http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+			pkg.RedirectToCatchAllUrl(w, r)
 			return
 		}
-
-		// TODO ...
-
-		ipInfoRequired = savedFlow.IpInfoNeeded()
+		visitorNeedsIpInfoData = savedFlow.IpInfoNeeded()
 	} else if campaign.FlowType == db.FlowTypeBuiltIn {
-		// TODO ...
-
-		ipInfoRequired = campaign.IpInfoNeeded()
+		visitorNeedsIpInfoData = campaign.IpInfoNeeded()
 	}
 
-	// Fetch IP Info if needed
-	ipInfoToken := os.Getenv(pkg.EnvIpInfoToken)
-	if ipInfoToken != "" && ipInfoRequired {
-		data, err := pkg.FetchIpInfo(r.RemoteAddr, ipInfoToken)
-		if err != nil {
-			fmt.Println("error fetching IP Info: " + err.Error())
-		} else {
-			ipInfoData = data
-			receivedIpInfo = true
-		}
+	// If determining the destination requires ipinfoData, wait for the channel response
+	if visitorNeedsIpInfoData {
+		ipInfoData = <-ipidch
 	}
 
-	dest, _ := determineDest(DestOpts{
-		ctx:        ctx,
-		storer:     *storer,
-		campaign:   campaign,
-		savedFlow:  savedFlow,
-		r:          r,
-		userAgent:  ua,
-		ipInfoData: ipInfoData,
-	})
+	dest, _ := campaign.DetermineViewDestination(r, ctx, *storer, savedFlow, userAgent, ipInfoData)
+
+	anch := make(chan pkg.AffiliateNetwork)
+	go fetchAffiliateNetwork(ctx, storer, dest, anch)
 
 	// If we are sending the visitor to a landing page,
 	// set cookies to be retrieved later at /click
-	if dest.Type == DestTypeLandingPage {
+	publicClickId := pkg.NewPublicClickID()
+	if dest.Type == pkg.DestTypeLandingPage {
 		setCookie(w, pkg.CookieNameCampaignPublicID, campaign.PublicID)
 		setCookie(w, pkg.CookieNameClickPublicID, publicClickId)
 	}
 
-	// Redirect the visitor
-	http.Redirect(w, r, dest.URL, http.StatusTemporaryRedirect)
+	pkg.RedirectVisitor(w, r, dest.URL)
 
-	// If we have an IP Info Token, AND we didn't fetch data before,
-	// fetch the IP Info now
-	if ipInfoToken != "" && !receivedIpInfo {
-		data, err := pkg.FetchIpInfo(r.RemoteAddr, ipInfoToken)
-		if err != nil {
-			fmt.Println("error fetching IP Info: " + err.Error())
-		} else {
-			ipInfoData = data
-			receivedIpInfo = true
-		}
+	// If we did not pull from the ipInfoData channel before the redirect, pull from it now
+	if !visitorNeedsIpInfoData {
+		ipInfoData = <-ipidch
 	}
+	trafficSource := <-tsch
+	affiliateNetwork := <-anch
 
-	trafficSource, err := storer.GetTrafficSourceById(ctx, campaign.TrafficSourceID)
-	if err != nil {
-		fmt.Println("error fetching Traffic Source: " + err.Error())
-	}
-
-	var affiliateNetwork pkg.AffiliateNetwork
-	if dest.Type == DestTypeOffer {
-		an, err := storer.GetAffiliateNetworkById(ctx, dest.ID)
-		if err != nil {
-			fmt.Println("error fetching Affiliate Network: " + err.Error())
-		} else {
-			affiliateNetwork = an
-		}
-	}
-
-	// Log click in db
-	creationReq := pkg.ClickCreationReq{
+	// Save click to db
+	_, err = storer.CreateNewClick(ctx, pkg.ClickCreationReq{
 		PublicId:           publicClickId,
 		ExternalId:         getExternalId(*r.URL, trafficSource),
 		Cost:               getCost(*r.URL, trafficSource),
@@ -163,96 +105,71 @@ func T(w http.ResponseWriter, r *http.Request) {
 		Tokens:             makeTokens(*r.URL, trafficSource),
 		IP:                 r.RemoteAddr,
 		Isp:                ipInfoData.Org,
-		UserAgent:          userAgentStr,
+		UserAgent:          r.UserAgent(),
 		Language:           pkg.GetLanguage(r),
 		Country:            ipInfoData.Country,
 		Region:             ipInfoData.Region,
 		City:               ipInfoData.City,
-		DeviceType:         getDeviceType(ua),
-		Device:             ua.Device,
+		DeviceType:         getDeviceType(userAgent),
+		Device:             userAgent.Device,
 		ScreenResolution:   pkg.GetScreenRes(r),
-		Os:                 ua.OS,
-		OsVersion:          ua.OSVersion,
-		BrowserName:        ua.Name,
-		BrowserVersion:     ua.Version,
+		Os:                 userAgent.OS,
+		OsVersion:          userAgent.OSVersion,
+		BrowserName:        userAgent.Name,
+		BrowserVersion:     userAgent.Version,
 		AffiliateNetworkID: affiliateNetwork.ID,
 		CampaignID:         campaign.ID,
 		SavedFlowID:        savedFlow.ID,
 		LandingPageID:      getLandingPageID(dest),
 		OfferID:            getOfferID(dest),
 		TrafficSourceID:    campaign.TrafficSourceID,
-	}
-
-	if _, err := storer.CreateNewClick(ctx, creationReq); err != nil {
+	})
+	if err != nil {
 		fmt.Println("error saving new click to db: " + err.Error())
 	}
 }
 
-func determineDest(opts DestOpts) (Destination, error) {
-	if opts.campaign.FlowType == db.FlowTypeURL && opts.campaign.FlowURL != nil && *opts.campaign.FlowURL != "" {
-		return Destination{
-			Type: DestTypeURL,
-			URL:  *opts.campaign.FlowURL,
-		}, nil
-	} else if opts.campaign.FlowType == db.FlowTypeBuiltIn || opts.campaign.FlowType == db.FlowTypeSaved {
-		route := pkg.Route{}
-		if opts.campaign.FlowType == db.FlowTypeBuiltIn {
-			route = opts.campaign.SelectViewRoute(opts.r, opts.userAgent, opts.ipInfoData)
-		} else {
-			route = opts.savedFlow.SelectViewRoute(opts.r, opts.userAgent, opts.ipInfoData)
-		}
-
-		path, err := route.WeightedSelectPath()
-		if err != nil {
-			return catchAllDest(), err
-		}
-
-		if !path.DirectLinkingEnabled {
-			lpID, err := selectIdUsingRotType[pkg.LandingPage](path.LandingPageIDs, opts.campaign.LandingPageRotationType)
-			if err != nil {
-				return catchAllDest(), err
-			}
-
-			lp, err := opts.storer.GetLandingPageById(opts.ctx, lpID)
-			if err != nil {
-				return catchAllDest(), err
-			}
-
-			return Destination{
-				Type: DestTypeLandingPage,
-				URL:  lp.URL,
-				ID:   lp.ID,
-			}, nil
-		} else {
-			oID, err := selectIdUsingRotType[pkg.Offer](path.OfferIDs, opts.campaign.OfferRotationType)
-			if err != nil {
-				return catchAllDest(), err
-			}
-
-			o, err := opts.storer.GetOfferById(opts.ctx, oID)
-			if err != nil {
-				return catchAllDest(), err
-			}
-
-			return Destination{
-				Type: DestTypeOffer,
-				URL:  o.URL,
-				ID:   o.ID,
-			}, nil
-		}
+func fetchIpInfoData(r *http.Request, ipInfoToken string, ch chan pkg.IPInfoData) {
+	if ipInfoToken == "" {
+		fmt.Println("IP Info token is an empty string")
+		ch <- pkg.IPInfoData{}
+		return
 	}
-	return catchAllDest(), fmt.Errorf("missing or unknown flow type")
+
+	data, err := pkg.CustomClient.FetchIpInfoData(r.RemoteAddr, ipInfoToken)
+	if err != nil {
+		fmt.Println("Error fetching IP Info: " + err.Error())
+		ch <- pkg.IPInfoData{}
+		return
+	}
+
+	ch <- data
 }
 
-func selectIdUsingRotType[T pkg.LandingPage | pkg.Offer](ids []int, rotType db.RotationType) (int, error) {
-	if len(ids) == 0 {
-		return 0, fmt.Errorf("ids slice is empty")
+func fetchAffiliateNetwork(ctx context.Context, storer *pkg.Storer, dest pkg.Destination, ch chan pkg.AffiliateNetwork) {
+	if dest.Type != pkg.DestTypeOffer {
+		ch <- pkg.AffiliateNetwork{}
+		return
 	}
-	if rotType == db.RotationTypeRandom {
-		return pkg.RandomItem(ids)
-	} else {
-		return 0, fmt.Errorf("unknown rotation type: " + string(rotType))
+
+	affiliateNetwork, err := storer.GetAffiliateNetworkById(ctx, dest.ID)
+	if err != nil {
+		fmt.Println("error fetching Affiliate Network: " + err.Error())
+		ch <- pkg.AffiliateNetwork{}
+		return
 	}
+
+	ch <- affiliateNetwork
+}
+
+func fetchtrafficSource(ctx context.Context, storer *pkg.Storer, id int, ch chan pkg.TrafficSource) {
+	trafficSource, err := storer.GetTrafficSourceById(ctx, id)
+	if err != nil {
+		fmt.Println("error fetching Traffic Source: " + err.Error())
+		ch <- pkg.TrafficSource{}
+		return
+	}
+	ch <- trafficSource
 }
 
 func getGValue(r *http.Request) string {
@@ -274,13 +191,6 @@ func setCookie(w http.ResponseWriter, name pkg.CookieName, value string) {
 		SameSite: http.SameSiteLaxMode,
 	}
 	http.SetCookie(w, cookie)
-}
-
-func catchAllDest() Destination {
-	return Destination{
-		Type: DestTypeCatchAll,
-		URL:  pkg.CatchAllUrl(),
-	}
 }
 
 // Itterate over all key/value pairs in the query string,
@@ -324,15 +234,15 @@ func getCost(url url.URL, ts pkg.TrafficSource) int {
 	return cost
 }
 
-func getClicktime(dest Destination, timestamp time.Time) time.Time {
-	if dest.Type == DestTypeOffer {
+func getClicktime(dest pkg.Destination, timestamp time.Time) time.Time {
+	if dest.Type == pkg.DestTypeOffer {
 		return timestamp
 	}
 	return time.Time{}
 }
 
-func getClickOutputURL(dest Destination) string {
-	if dest.Type == DestTypeOffer {
+func getClickOutputURL(dest pkg.Destination) string {
+	if dest.Type == pkg.DestTypeOffer {
 		return dest.URL
 	}
 	return ""
@@ -342,15 +252,15 @@ func getDeviceType(ua useragent.UserAgent) string {
 	return string(pkg.GetDeviceType(ua))
 }
 
-func getLandingPageID(dest Destination) int {
-	if dest.Type == DestTypeLandingPage {
+func getLandingPageID(dest pkg.Destination) int {
+	if dest.Type == pkg.DestTypeLandingPage {
 		return dest.ID
 	}
 	return 0
 }
 
-func getOfferID(dest Destination) int {
-	if dest.Type == DestTypeOffer {
+func getOfferID(dest pkg.Destination) int {
+	if dest.Type == pkg.DestTypeOffer {
 		return dest.ID
 	}
 	return 0

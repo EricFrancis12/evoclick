@@ -15,13 +15,14 @@ import (
 type PostbackResp struct{}
 
 func Postback(w http.ResponseWriter, r *http.Request) {
-	timestamp := time.Now()
-	ctx := context.Background()
-	storer := pkg.NewStorer()
+	var (
+		ctx       = context.Background()
+		timestamp = time.Now()
+		storer    = pkg.NewStorer()
+	)
 	storer.Renew()
 
-	clickPublicId := r.URL.Query().Get("pid")
-	if clickPublicId != "" {
+	if clickPublicId := r.URL.Query().Get("pid"); clickPublicId != "" {
 		// Get click from db
 		click, err := storer.GetClickByPublicId(ctx, clickPublicId)
 		if err != nil {

@@ -38,7 +38,8 @@ func (s *Storer) GetTrafficSourceById(ctx context.Context, id int) (TrafficSourc
 
 	ts := formatTrafficSource(model)
 
-	// If we fetch from the db successfully, create a new key for this traffic source in the cache
+	// If we fetch from the db successfully,
+	// create a new key for this traffic source in the cache
 	defer SaveKeyToRedis(ctx, s.Cache, key, ts)
 
 	return ts, nil
@@ -49,40 +50,7 @@ func (ts TrafficSource) FillPostbackURL(click Click) string {
 		return ""
 	}
 
-	clickPropsMap := map[string]string{
-		"{ID}":                 strconv.Itoa(click.ID),
-		"{publicID}":           click.PublicID,
-		"{externalID}":         click.ExternalID,
-		"{cost}":               strconv.Itoa(click.Cost),
-		"{revenue}":            strconv.Itoa(click.Revenue),
-		"{viewTime}":           timeString(click.ViewTime),
-		"{clickTime}":          timeString(click.ClickTime),
-		"{convTime}":           timeString(click.ConvTime),
-		"{viewOutputUrl}":      click.ViewOutputURL,
-		"{clickOutputUrl}":     click.ClickOutputURL,
-		"{ip}":                 click.IP,
-		"{isp}":                click.Isp,
-		"{userAgent}":          click.UserAgent,
-		"{language}":           click.Language,
-		"{country}":            click.Country,
-		"{region}":             click.Region,
-		"{city}":               click.City,
-		"{deviceType}":         click.DeviceType,
-		"{device}":             click.Device,
-		"{screenResolution}":   click.ScreenResolution,
-		"{os}":                 click.Os,
-		"{osVersion}":          click.OsVersion,
-		"{browserName}":        click.BrowserName,
-		"{browserVersion}":     click.BrowserVersion,
-		"{createdAt}":          timeString(click.CreatedAt),
-		"{updatedAt}":          timeString(click.UpdatedAt),
-		"{affiliateNetworkId}": strconv.Itoa(click.AffiliateNetworkID),
-		"{campaignId}":         strconv.Itoa(click.CampaignID),
-		"{flowId}":             strconv.Itoa(click.SavedFlowID),
-		"{landingPageId}":      strconv.Itoa(click.LandingPageID),
-		"{offerId}":            strconv.Itoa(click.OfferID),
-		"{trafficSourceId}":    strconv.Itoa(click.TrafficSourceID),
-	}
+	clickPropsMap := newClickPropsMap(click)
 
 	result := ts.PostbackURL
 	for matcher, clickProp := range clickPropsMap {
@@ -94,16 +62,11 @@ func (ts TrafficSource) FillPostbackURL(click Click) string {
 }
 
 func formatTrafficSource(model *db.TrafficSourceModel) TrafficSource {
-	var (
-		externalIDToken = parseToken(model.ExternalIDToken)
-		costToken       = parseToken(model.CostToken)
-		customTokens    = parseNamedTokens(model.CustomTokens)
-	)
 	return TrafficSource{
 		InnerTrafficSource: model.InnerTrafficSource,
-		ExternalIDToken:    externalIDToken,
-		CostToken:          costToken,
-		CustomTokens:       customTokens,
+		ExternalIDToken:    parseToken(model.ExternalIDToken),
+		CostToken:          parseToken(model.CostToken),
+		CustomTokens:       parseNamedTokens(model.CustomTokens),
 	}
 }
 

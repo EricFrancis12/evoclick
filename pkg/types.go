@@ -29,6 +29,39 @@ type Click struct {
 	OfferID            int       `json:"offerID"`
 }
 
+type ClickCreationReq struct {
+	PublicId           string
+	ExternalId         string
+	Cost               int
+	Revenue            int
+	ViewTime           time.Time
+	ClickTime          time.Time
+	ConvTime           time.Time
+	ViewOutputURL      string
+	ClickOutputURL     string
+	Tokens             []Token
+	IP                 string
+	Isp                string
+	UserAgent          string
+	Language           string
+	Country            string
+	Region             string
+	City               string
+	DeviceType         string
+	Device             string
+	ScreenResolution   string
+	Os                 string
+	OsVersion          string
+	BrowserName        string
+	BrowserVersion     string
+	AffiliateNetworkID int
+	CampaignID         int
+	SavedFlowID        int
+	LandingPageID      int
+	OfferID            int
+	TrafficSourceID    int
+}
+
 type AffiliateNetwork struct {
 	db.InnerAffiliateNetwork
 }
@@ -144,4 +177,19 @@ type CookieName string
 const (
 	CookieNameCampaignPublicID CookieName = "campaignPublicID"
 	CookieNameClickPublicID    CookieName = "clickPublicID"
+)
+
+type Destination struct {
+	Type DestType
+	URL  string
+	ID   int // The ID of the landing page OR offer the visitor will being redirected to
+}
+
+type DestType string
+
+const (
+	DestTypeLandingPage DestType = "landingPage"
+	DestTypeOffer       DestType = "offer"
+	DestTypeURL         DestType = "url"
+	DestTypeCatchAll    DestType = "catchAll"
 )

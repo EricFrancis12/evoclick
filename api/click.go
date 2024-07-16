@@ -11,39 +11,40 @@ import (
 )
 
 func Click(w http.ResponseWriter, r *http.Request) {
-	timestamp := time.Now()
-	ctx := context.Background()
-	storer := pkg.NewStorer()
+	var (
+		ctx       = context.Background()
+		timestamp = time.Now()
+		storer    = pkg.NewStorer()
+	)
 	storer.Renew()
 
 	clickPublicId := getCookieValue(r, pkg.CookieNameClickPublicID)
 	if clickPublicId == "" {
 		fmt.Println("no public Click ID found")
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		pkg.RedirectToCatchAllUrl(w, r)
 		return
 	}
 
 	click, err := storer.GetClickByPublicId(ctx, clickPublicId)
 	if err != nil {
 		fmt.Println("error fetching click by Public ID: " + err.Error())
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		pkg.RedirectToCatchAllUrl(w, r)
 		return
 	}
 
 	campaign, err := storer.GetCampaignById(ctx, click.CampaignID)
 	if err != nil {
 		fmt.Println("error fetching campaign by ID: " + err.Error())
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		pkg.RedirectToCatchAllUrl(w, r)
 		return
 	}
 
 	var route pkg.Route
-
 	if campaign.FlowType == db.FlowTypeSaved && campaign.SavedFlowID != nil && *campaign.SavedFlowID != 0 {
 		savedFlow, err := storer.GetSavedFlowById(ctx, *campaign.SavedFlowID)
 		if err != nil {
 			fmt.Println("error fetching flow by ID: " + err.Error())
-			http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+			pkg.RedirectToCatchAllUrl(w, r)
 			return
 		}
 		route = savedFlow.SelectClickRoute(click)
@@ -51,32 +52,32 @@ func Click(w http.ResponseWriter, r *http.Request) {
 		route = campaign.SelectClickRoute(click)
 	} else {
 		fmt.Println("flow type is not Saved or Built-In")
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		pkg.RedirectToCatchAllUrl(w, r)
 		return
 	}
 
 	path, err := route.WeightedSelectPath()
 	if err != nil {
 		fmt.Println("error selecting path: " + err.Error())
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		pkg.RedirectToCatchAllUrl(w, r)
 		return
 	}
 
-	oID, err := selectIdUsingRotType[pkg.Offer](path.OfferIDs, campaign.OfferRotationType)
+	oID, err := campaign.SelectOfferID(path.OfferIDs)
 	if err != nil {
 		fmt.Println("error selecting Offer ID: " + err.Error())
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		pkg.RedirectToCatchAllUrl(w, r)
 		return
 	}
 
 	offer, err := storer.GetOfferById(ctx, oID)
 	if err != nil {
 		fmt.Println("error fetching offer by ID: " + err.Error())
-		http.Redirect(w, r, pkg.CatchAllUrl(), http.StatusTemporaryRedirect)
+		pkg.RedirectToCatchAllUrl(w, r)
 		return
 	}
 
-	http.Redirect(w, r, offer.URL, http.StatusTemporaryRedirect)
+	pkg.RedirectVisitor(w, r, offer.URL)
 
 	// Update clickTime and clickOutputUrl
 	updatedClick := updateClick(click, timestamp, offer.URL)

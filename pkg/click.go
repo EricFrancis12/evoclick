@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
+	"strconv"
 
 	"github.com/EricFrancis12/evoclick/prisma/db"
 	"github.com/google/uuid"
@@ -28,39 +28,6 @@ func (s *Storer) GetClickByPublicId(ctx context.Context, publicId string) (Click
 		return Click{}, err
 	}
 	return formatClick(model), nil
-}
-
-type ClickCreationReq struct {
-	PublicId           string
-	ExternalId         string
-	Cost               int
-	Revenue            int
-	ViewTime           time.Time
-	ClickTime          time.Time
-	ConvTime           time.Time
-	ViewOutputURL      string
-	ClickOutputURL     string
-	Tokens             []Token
-	IP                 string
-	Isp                string
-	UserAgent          string
-	Language           string
-	Country            string
-	Region             string
-	City               string
-	DeviceType         string
-	Device             string
-	ScreenResolution   string
-	Os                 string
-	OsVersion          string
-	BrowserName        string
-	BrowserVersion     string
-	AffiliateNetworkID int
-	CampaignID         int
-	SavedFlowID        int
-	LandingPageID      int
-	OfferID            int
-	TrafficSourceID    int
 }
 
 func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationReq) (Click, error) {
@@ -134,6 +101,14 @@ func (s *Storer) UpsertClickById(ctx context.Context, id int, click Click) (Clic
 	return formatClick(model), nil
 }
 
+func formatClick(model *db.ClickModel) Click {
+	clickTokens := parseClickTokens(model.Tokens)
+	return Click{
+		InnerClick: model.InnerClick,
+		Tokens:     clickTokens,
+	}
+}
+
 func makeOptParams(cp ClickCreationReq) []db.ClickSetParam {
 	optParams := []db.ClickSetParam{}
 	// Optional parameters that CANNOT accept default values, so they should be ommitted if they are 0
@@ -149,6 +124,13 @@ func makeOptParams(cp ClickCreationReq) []db.ClickSetParam {
 	optParams = appendIfTrue(optParams, db.Click.Offer.Link(db.Offer.ID.Equals(cp.OfferID)), cp.OfferID != 0)
 	optParams = appendIfTrue(optParams, db.Click.SavedFlow.Link(db.SavedFlow.ID.Equals(cp.SavedFlowID)), cp.SavedFlowID != 0)
 	return optParams
+}
+
+func appendIfTrue(params []db.ClickSetParam, p db.ClickSetParam, condition bool) []db.ClickSetParam {
+	if condition {
+		params = append(params, p)
+	}
+	return params
 }
 
 func makeUpsertParams(click Click) []db.ClickSetParam {
@@ -193,18 +175,6 @@ func makeUpsertParams(click Click) []db.ClickSetParam {
 	return params
 }
 
-func formatClick(model *db.ClickModel) Click {
-	clickTokens := parseClickTokens(model.Tokens)
-	return Click{
-		InnerClick: model.InnerClick,
-		Tokens:     clickTokens,
-	}
-}
-
-func NewPublicClickID() string {
-	return uuid.New().String()
-}
-
 func parseClickTokens(jsonStr string) []Token {
 	clickTokens, err := ParseJSON[[]Token](jsonStr)
 	if err != nil {
@@ -222,9 +192,45 @@ func marshallTokens(tokens []Token) string {
 	return string(jsonData)
 }
 
-func appendIfTrue(params []db.ClickSetParam, p db.ClickSetParam, condition bool) []db.ClickSetParam {
-	if condition {
-		params = append(params, p)
+func NewPublicClickID() string {
+	return uuid.New().String()
+}
+
+type ClickPropsMap = map[string]string
+
+func newClickPropsMap(click Click) ClickPropsMap {
+	return ClickPropsMap{
+		"{ID}":                 strconv.Itoa(click.ID),
+		"{publicID}":           click.PublicID,
+		"{externalID}":         click.ExternalID,
+		"{cost}":               strconv.Itoa(click.Cost),
+		"{revenue}":            strconv.Itoa(click.Revenue),
+		"{viewTime}":           timeString(click.ViewTime),
+		"{clickTime}":          timeString(click.ClickTime),
+		"{convTime}":           timeString(click.ConvTime),
+		"{viewOutputUrl}":      click.ViewOutputURL,
+		"{clickOutputUrl}":     click.ClickOutputURL,
+		"{ip}":                 click.IP,
+		"{isp}":                click.Isp,
+		"{userAgent}":          click.UserAgent,
+		"{language}":           click.Language,
+		"{country}":            click.Country,
+		"{region}":             click.Region,
+		"{city}":               click.City,
+		"{deviceType}":         click.DeviceType,
+		"{device}":             click.Device,
+		"{screenResolution}":   click.ScreenResolution,
+		"{os}":                 click.Os,
+		"{osVersion}":          click.OsVersion,
+		"{browserName}":        click.BrowserName,
+		"{browserVersion}":     click.BrowserVersion,
+		"{createdAt}":          timeString(click.CreatedAt),
+		"{updatedAt}":          timeString(click.UpdatedAt),
+		"{affiliateNetworkId}": strconv.Itoa(click.AffiliateNetworkID),
+		"{campaignId}":         strconv.Itoa(click.CampaignID),
+		"{flowId}":             strconv.Itoa(click.SavedFlowID),
+		"{landingPageId}":      strconv.Itoa(click.LandingPageID),
+		"{offerId}":            strconv.Itoa(click.OfferID),
+		"{trafficSourceId}":    strconv.Itoa(click.TrafficSourceID),
 	}
-	return params
 }
