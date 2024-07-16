@@ -279,6 +279,7 @@ function CampaignBody({ actionMenu, setActionMenu }: {
                 }, window.location.href);
                 toast.success("Successfully created new Campaign");
             }
+            setActionMenu(null);
         } catch (err) {
             console.error(err);
             toast.error("Error completing operation");
