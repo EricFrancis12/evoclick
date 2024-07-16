@@ -20,18 +20,13 @@ export default function Report({ view, reportItemName }: {
     const { clicks } = useReportView();
     const [rows, setRows] = useRows(clicks, itemName);
 
-    useEffect(() => {
-        if (!rows) return;
-        setRows(rows.map(row => ({ ...row, selected: false })));
-    }, [itemName]);
-
     const { reportViews, addReportView, updateViewItemNameById } = useViewsStore(store => store);
     const queryRouter = useQueryRouter();
 
     // Finds the first row that is selected and creates a report for it
     function handleNewReport() {
         if (!rows) return;
-        const selectedRows = rows.filter(row => row.selected === true);
+        const selectedRows = rows.filter(row => row.selected);
         if (selectedRows.length < 1) return;
         const newViewItemName = itemName !== EItemName.CAMPAIGN ? EItemName.CAMPAIGN : EItemName.OFFER;
         const newView = newReportView(newViewItemName, faBullseye, itemName, selectedRows[0].id.toString());
@@ -71,11 +66,12 @@ export default function Report({ view, reportItemName }: {
 export function useRows(clicks: TClick[], itemName: EItemName) {
     const { primaryData } = useReportView();
 
-    const enrichWith = itemNameInPrimaryData(itemName, primaryData)?.map(({ id, name }) => ({ id, name: name || "" }));
     const [rows, setRows] = useState<TRow[] | null>(null);
 
     useEffect(() => {
-        setRows(makeRows(clicks, itemName, enrichWith));
+        const newRows = makeRows(clicks, itemName, makeEnrichWith(itemName, primaryData));
+        console.log(structuredClone(newRows));
+        setRows(newRows);
     }, [clicks.length, itemName]);
 
     const value: [TRow[] | null, React.Dispatch<React.SetStateAction<TRow[] | null>>] = [rows, setRows];
@@ -104,6 +100,7 @@ function makeRows(clicks: TClick[], itemName: EItemName, enrichWith?: TEnrichWit
                 });
             }
         }
+        console.log(rows);
         return rows;
     }, []);
 
@@ -121,6 +118,10 @@ function makeRows(clicks: TClick[], itemName: EItemName, enrichWith?: TEnrichWit
     }
 
     return rows;
+}
+
+function makeEnrichWith(itemName: EItemName, primaryData: TPrimaryData): TEnrichWith[] | undefined {
+    return itemNameInPrimaryData(itemName, primaryData)?.map(({ id, name }) => ({ id, name: name || "" }));
 }
 
 function itemNameInPrimaryData(itemName: EItemName, primaryData: TPrimaryData) {
