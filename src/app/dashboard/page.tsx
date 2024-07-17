@@ -13,22 +13,12 @@ export default async function DashboardPage({ params, searchParams }: {
     params: { itemName?: string, id?: string };
     searchParams: { timeframe?: string };
 }) {
-    console.log(1);
-
     await useProtectedRoute();
 
-    console.log(2);
-
     const timeframe = decodeSearchParams(searchParams).timeframe ?? defaultTimeframe;
-
-    console.log(3);
-
     const { reportItemName, reportItemId } = decodeParams(params);
 
-    console.log(4);
-
     try {
-
         const clicksProm = getAllClicks({
             where: {
                 AND: [
@@ -38,37 +28,26 @@ export default async function DashboardPage({ params, searchParams }: {
             },
         });
 
-        console.log(5);
-
         const affilaiteNetworksProm = getAllAffiliateNetworks();
-        // const campaignsProm = getAllCampaigns();
+        const campaignsProm = getAllCampaigns();
         const flowsProm = getAllFlows();
         const landingPagesProm = getAllLandingPages();
         const offersProm = getAllOffers();
         const trafficSourcesProm = getAllTrafficSources();
 
-        console.log(6);
-
         const clicks = await clicksProm;
-        console.log(7);
         const affiliateNetworks = await affilaiteNetworksProm;
-        console.log(8);
-        // const campaigns = await campaignsProm;
-        // console.log(9);
+        const campaigns = await campaignsProm;
         const flows = await flowsProm;
-        console.log(10);
         const landingPages = await landingPagesProm;
-        console.log(11);
         const offers = await offersProm;
-        console.log(12);
         const trafficSources = await trafficSourcesProm;
-        console.log(13);
 
         return (
             <ReportView
                 primaryData={{
                     affiliateNetworks,
-                    campaigns: [],
+                    campaigns,
                     flows,
                     landingPages,
                     offers,

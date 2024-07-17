@@ -109,8 +109,8 @@ export async function deleteFlowById(id: number): Promise<TSavedFlow> {
 
 async function makeClientFlow(dbModel: SavedFlow): Promise<TSavedFlow> {
     const { mainRoute, ruleRoutes } = dbModel;
-    const mainRouteProm = mainRoute ? parseRoute(mainRoute) : newRoute();
-    const ruleRoutesProm = ruleRoutes ? parseRoutes(ruleRoutes) : [];
+    const mainRouteProm = parseRoute(mainRoute);
+    const ruleRoutesProm = parseRoutes(ruleRoutes);
     return {
         ...dbModel,
         mainRoute: await mainRouteProm,

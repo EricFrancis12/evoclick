@@ -17,6 +17,10 @@ export function formatErr(err: unknown): string {
     return "Unknown error";
 }
 
+export function promFrom<T>(t: T): () => Promise<T> {
+    return async () => t;
+}
+
 // Determines whether an element contains overflowing nodes or not
 export function isOverflown(ref: React.RefObject<HTMLElement>) {
     if (!ref?.current) return false;

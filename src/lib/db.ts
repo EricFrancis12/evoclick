@@ -15,10 +15,6 @@ const prismaClientSingleton = () => {
                 emit: 'event',
                 level: 'warn',
             },
-            {
-                emit: 'event',
-                level: 'query',
-            },
         ],
     });
 
@@ -28,7 +24,6 @@ const prismaClientSingleton = () => {
         prisma.$on('error', e => console.error(e.message));
         prisma.$on('info', e => console.log(e.message));
         prisma.$on('warn', e => console.log(e.message));
-        prisma.$on('query', e => console.log(e));
     }
 
     return prisma;
