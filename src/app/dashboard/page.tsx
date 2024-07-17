@@ -13,10 +13,19 @@ export default async function DashboardPage({ params, searchParams }: {
     params: { itemName?: string, id?: string };
     searchParams: { timeframe?: string };
 }) {
+    console.log(1);
+
     await useProtectedRoute();
 
+    console.log(2);
+
     const timeframe = decodeSearchParams(searchParams).timeframe ?? defaultTimeframe;
+
+    console.log(3);
+
     const { reportItemName, reportItemId } = decodeParams(params);
+
+    console.log(4);
 
     const clicksProm = getAllClicks({
         where: {
@@ -27,12 +36,16 @@ export default async function DashboardPage({ params, searchParams }: {
         },
     });
 
+    console.log(5);
+
     const affilaiteNetworksProm = getAllAffiliateNetworks();
     const campaignsProm = getAllCampaigns();
     const flowsProm = getAllFlows();
     const landingPagesProm = getAllLandingPages();
     const offersProm = getAllOffers();
     const trafficSourcesProm = getAllTrafficSources();
+
+    console.log(6);
 
     try {
         const clicks = await clicksProm;
