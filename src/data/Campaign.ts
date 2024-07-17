@@ -12,10 +12,12 @@ import { TCampaign, TCampaign_createRequest, TCampaign_updateRequest } from "../
 const makeKey = makeRedisKeyFunc("campaign");
 
 export async function getAllCampaigns(): Promise<TCampaign[]> {
-    // const campaigns: Campaign[] = await db.campaign.findMany();
-    // const proms: Promise<TCampaign>[] = campaigns.map(campaign => makeClientCampaign(campaign));
-    // return Promise.all(proms);
-    return [];
+    console.log(1);
+    const campaigns: Campaign[] = await db.campaign.findMany();
+    console.log(2);
+    const proms: Promise<TCampaign>[] = campaigns.map(campaign => makeClientCampaign(campaign));
+    console.log(3);
+    return Promise.all(proms);
 }
 
 export async function getCampaignById(id: number): Promise<TCampaign | null> {
@@ -111,7 +113,9 @@ export async function deleteCampaignById(id: number): Promise<TCampaign> {
 }
 
 async function makeClientCampaign(dbModel: Campaign): Promise<TCampaign> {
+    console.log(4);
     const { flowMainRoute, flowRuleRoutes } = dbModel;
+    console.log(5);
     return {
         ...dbModel,
         flowMainRoute: flowMainRoute ? await parseRoute(flowMainRoute) : newRoute(),
