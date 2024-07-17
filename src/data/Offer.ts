@@ -1,8 +1,8 @@
-import cache from "../lib/cache";
+import cache, { makeRedisKeyFunc } from "../lib/cache";
 import db from "../lib/db";
 import { offersSchema } from "../lib/schemas";
 import { REDIS_EXPIRY } from "../lib/constants";
-import { makeRedisKeyFunc, safeParseJson } from "../lib/utils";
+import { safeParseJson } from "../lib/utils";
 import { TOffer, TOffer_createRequest, TOffer_updateRequest } from "../lib/types";
 
 const makeKey = makeRedisKeyFunc("offer");

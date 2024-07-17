@@ -1,7 +1,7 @@
-import cache from "../lib/cache";
+import cache, { makeRedisKeyFunc } from "../lib/cache";
 import db from "../lib/db";
 import { affiliateNetworkSchema } from "../lib/schemas";
-import { makeRedisKeyFunc, safeParseJson } from "../lib/utils";
+import { safeParseJson } from "../lib/utils";
 import { REDIS_EXPIRY } from "@/lib/constants";
 import { TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest } from "../lib/types";
 

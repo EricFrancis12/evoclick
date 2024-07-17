@@ -1,10 +1,10 @@
 import { SavedFlow } from "@prisma/client";
 import { parseRoute, parseRoutes } from ".";
-import cache from "../lib/cache";
+import cache, { makeRedisKeyFunc } from "../lib/cache";
 import db from "../lib/db";
 import { savedFlowSchema } from "../lib/schemas";
 import { REDIS_EXPIRY } from "@/lib/constants";
-import { makeRedisKeyFunc, newRoute, safeParseJson } from "../lib/utils";
+import { newRoute, safeParseJson } from "../lib/utils";
 import { TSavedFlow, TSavedFlow_createRequest, TSavedFlow_updateRequest } from "../lib/types";
 
 const makeKey = makeRedisKeyFunc("flow");

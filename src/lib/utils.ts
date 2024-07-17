@@ -1,7 +1,5 @@
 import { TRoute, ELogicalRelation } from "./types";
 
-export const makeRedisKeyFunc = (prefix: string) => (id: number | string) => `${prefix}:${id}`;
-
 export function safeParseJson(jsonStr: string, resultIfError: unknown = {}): unknown {
     let result: unknown;
     try {

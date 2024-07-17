@@ -1,9 +1,9 @@
 import crypto from "crypto";
-import cache from "../lib/cache";
+import cache, { makeRedisKeyFunc } from "../lib/cache";
 import { parseRoute, parseRoutes } from ".";
 import db from "../lib/db";
 import { campaignSchema } from "../lib/schemas";
-import { makeRedisKeyFunc, newRoute, safeParseJson } from "../lib/utils";
+import { newRoute, safeParseJson } from "../lib/utils";
 import { REDIS_EXPIRY } from "../lib/constants";
 import { TCampaign, TCampaign_createRequest, TCampaign_updateRequest } from "../lib/types";
 import { Campaign } from "@prisma/client";
