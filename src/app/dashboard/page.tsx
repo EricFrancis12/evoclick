@@ -27,14 +27,14 @@ export default async function DashboardPage({ params, searchParams }: {
 
     console.log(4);
 
-    const clicksProm = getAllClicks({
-        where: {
-            AND: [
-                timeframeFilter(timeframe),
-                reportItemFilter(reportItemName, reportItemId),
-            ],
-        },
-    });
+    // const clicksProm = getAllClicks({
+    //     where: {
+    //         AND: [
+    //             timeframeFilter(timeframe),
+    //             reportItemFilter(reportItemName, reportItemId),
+    //         ],
+    //     },
+    // });
 
     console.log(5);
 
@@ -48,7 +48,7 @@ export default async function DashboardPage({ params, searchParams }: {
     console.log(6);
 
     try {
-        const clicks = await clicksProm;
+        // const clicks = await clicksProm;
         console.log(7);
         const affiliateNetworks = await affilaiteNetworksProm;
         console.log(8);
@@ -73,7 +73,8 @@ export default async function DashboardPage({ params, searchParams }: {
                     offers,
                     trafficSources,
                 }}
-                clicks={clicks}
+                clicks={[]}
+                // clicks={clicks}
                 timeframe={timeframe}
                 reportItemName={reportItemName ?? undefined}
             />
