@@ -22,10 +22,14 @@ const prismaClientSingleton = () => {
         ],
     });
 
-    prisma.$on('error', e => console.error(e.message));
-    prisma.$on('info', e => console.log(e.message));
-    prisma.$on('warn', e => console.log(e.message));
-    prisma.$on('query', e => console.log(e));
+    if (process.env.NODE_ENV !== "test" // Prevents logs during tests
+        && process.env.NEXT_PHASE !== "phase-production-build" // Prevents logs during next build
+    ) {
+        prisma.$on('error', e => console.error(e.message));
+        prisma.$on('info', e => console.log(e.message));
+        prisma.$on('warn', e => console.log(e.message));
+        prisma.$on('query', e => console.log(e));
+    }
 
     return prisma;
 };
