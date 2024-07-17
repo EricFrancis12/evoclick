@@ -44,7 +44,7 @@ export default async function DashboardPage({ params, searchParams }: {
         // const campaignsProm = getAllCampaigns();
         // const flowsProm = getAllFlows();
         const landingPagesProm = getAllLandingPages();
-        // const offersProm = getAllOffers();
+        const offersProm = getAllOffers();
         // const trafficSourcesProm = getAllTrafficSources();
 
         console.log(6);
@@ -59,8 +59,8 @@ export default async function DashboardPage({ params, searchParams }: {
         // console.log(10);
         const landingPages = await landingPagesProm;
         console.log(11);
-        // const offers = await offersProm;
-        // console.log(12);
+        const offers = await offersProm;
+        console.log(12);
         // const trafficSources = await trafficSourcesProm;
         // console.log(13);
 
@@ -71,7 +71,7 @@ export default async function DashboardPage({ params, searchParams }: {
                     campaigns: [],
                     flows: [],
                     landingPages,
-                    offers: [],
+                    offers,
                     trafficSources: [],
                 }}
                 // primaryData={{
