@@ -49,12 +49,19 @@ export default async function DashboardPage({ params, searchParams }: {
 
     try {
         const clicks = await clicksProm;
+        console.log(7);
         const affiliateNetworks = await affilaiteNetworksProm;
+        console.log(8);
         const campaigns = await campaignsProm;
+        console.log(9);
         const flows = await flowsProm;
+        console.log(10);
         const landingPages = await landingPagesProm;
+        console.log(11);
         const offers = await offersProm;
+        console.log(12);
         const trafficSources = await trafficSourcesProm;
+        console.log(13);
 
         return (
             <ReportView
