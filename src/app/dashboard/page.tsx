@@ -41,11 +41,11 @@ export default async function DashboardPage({ params, searchParams }: {
         console.log(5);
 
         const affilaiteNetworksProm = getAllAffiliateNetworks();
-        const campaignsProm = getAllCampaigns();
-        const flowsProm = getAllFlows();
-        const landingPagesProm = getAllLandingPages();
-        const offersProm = getAllOffers();
-        const trafficSourcesProm = getAllTrafficSources();
+        // const campaignsProm = getAllCampaigns();
+        // const flowsProm = getAllFlows();
+        // const landingPagesProm = getAllLandingPages();
+        // const offersProm = getAllOffers();
+        // const trafficSourcesProm = getAllTrafficSources();
 
         console.log(6);
 
@@ -53,27 +53,35 @@ export default async function DashboardPage({ params, searchParams }: {
         console.log(7);
         const affiliateNetworks = await affilaiteNetworksProm;
         console.log(8);
-        const campaigns = await campaignsProm;
-        console.log(9);
-        const flows = await flowsProm;
-        console.log(10);
-        const landingPages = await landingPagesProm;
-        console.log(11);
-        const offers = await offersProm;
-        console.log(12);
-        const trafficSources = await trafficSourcesProm;
-        console.log(13);
+        // const campaigns = await campaignsProm;
+        // console.log(9);
+        // const flows = await flowsProm;
+        // console.log(10);
+        // const landingPages = await landingPagesProm;
+        // console.log(11);
+        // const offers = await offersProm;
+        // console.log(12);
+        // const trafficSources = await trafficSourcesProm;
+        // console.log(13);
 
         return (
             <ReportView
                 primaryData={{
                     affiliateNetworks,
-                    campaigns,
-                    flows,
-                    landingPages,
-                    offers,
-                    trafficSources,
+                    campaigns: [],
+                    flows: [],
+                    landingPages: [],
+                    offers: [],
+                    trafficSources: [],
                 }}
+                // primaryData={{
+                //     affiliateNetworks,
+                //     campaigns,
+                //     flows,
+                //     landingPages,
+                //     offers,
+                //     trafficSources,
+                // }}
                 clicks={[]}
                 // clicks={clicks}
                 timeframe={timeframe}
