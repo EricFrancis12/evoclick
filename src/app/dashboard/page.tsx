@@ -41,7 +41,7 @@ export default async function DashboardPage({ params, searchParams }: {
         console.log(5);
 
         const affilaiteNetworksProm = getAllAffiliateNetworks();
-        // const campaignsProm = getAllCampaigns();
+        const campaignsProm = getAllCampaigns();
         const flowsProm = getAllFlows();
         const landingPagesProm = getAllLandingPages();
         const offersProm = getAllOffers();
@@ -53,8 +53,8 @@ export default async function DashboardPage({ params, searchParams }: {
         console.log(7);
         const affiliateNetworks = await affilaiteNetworksProm;
         console.log(8);
-        // const campaigns = await campaignsProm;
-        // console.log(9);
+        const campaigns = await campaignsProm;
+        console.log(9);
         const flows = await flowsProm;
         console.log(10);
         const landingPages = await landingPagesProm;
@@ -68,20 +68,12 @@ export default async function DashboardPage({ params, searchParams }: {
             <ReportView
                 primaryData={{
                     affiliateNetworks,
-                    campaigns: [],
+                    campaigns,
                     flows,
                     landingPages,
                     offers,
                     trafficSources,
                 }}
-                // primaryData={{
-                //     affiliateNetworks,
-                //     campaigns,
-                //     flows,
-                //     landingPages,
-                //     offers,
-                //     trafficSources,
-                // }}
                 clicks={[]}
                 // clicks={clicks}
                 timeframe={timeframe}
