@@ -124,6 +124,7 @@ export async function deleteCampaignById(id: number): Promise<TCampaign> {
 
 async function makeClientCampaign(dbModel: Campaign): Promise<TCampaign> {
     console.log(4);
+    console.log(dbModel);
     const flowMainRoute = dbModel.flowMainRoute ? await parseRoute(dbModel.flowMainRoute) : newRoute();
     console.log(5);
     const flowRuleRoutes = dbModel.flowRuleRoutes ? await parseRoutes(dbModel.flowRuleRoutes) : [];
