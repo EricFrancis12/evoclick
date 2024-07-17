@@ -19,13 +19,13 @@ func (s *Storer) GetAllCampaigns(ctx context.Context) ([]Campaign, error) {
 }
 
 func (s *Storer) GetCampaignById(ctx context.Context, id int) (Campaign, error) {
-	key := InitMakeRedisKey("campaign")(strconv.Itoa(id))
+	key := s.MakeRedisKeyFunc("campaign")(strconv.Itoa(id))
 	// Check redis cache for this campaign
-	campaign, err := CheckRedisForKey[Campaign](ctx, s.Cache, key)
+	campaign, err := CheckRedisForKey[Campaign](s.Cache, ctx, key)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		return *campaign, nil
+		return campaign, nil
 	}
 
 	// If not in cache, query db for it
@@ -39,21 +39,21 @@ func (s *Storer) GetCampaignById(ctx context.Context, id int) (Campaign, error) 
 	c := formatCampaign(model)
 
 	// If we fetch from the db successfully, create a new key for this campaign in the cache
-	defer SaveKeyToRedis(ctx, s.Cache, key, c)
+	defer s.SaveKeyToRedis(ctx, key, c)
 
 	return c, nil
 }
 
 func (s *Storer) GetCampaignByPublicId(ctx context.Context, publicId string) (Campaign, error) {
 	// Create a Redis key to store the campaign at its public id
-	publicIdKey := InitMakeRedisKey("campaign@publicId")(publicId)
+	publicIdKey := s.MakeRedisKeyFunc("campaign@publicId")(publicId)
 
 	// Check redis cache for this campaign
-	campaign, err := CheckRedisForKey[Campaign](ctx, s.Cache, publicIdKey)
+	campaign, err := CheckRedisForKey[Campaign](s.Cache, ctx, publicIdKey)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		return *campaign, nil
+		return campaign, nil
 	}
 
 	// If not in cache, query db for it
@@ -67,12 +67,12 @@ func (s *Storer) GetCampaignByPublicId(ctx context.Context, publicId string) (Ca
 	c := formatCampaign(model)
 
 	// If we fetch from the db successfully, set a new key for this campaign@publicId in the cache
-	defer SaveKeyToRedis(ctx, s.Cache, publicIdKey, c)
+	defer s.SaveKeyToRedis(ctx, publicIdKey, c)
 
 	// Create a Redis key to store the campaign normally at its id
-	idKey := InitMakeRedisKey("campaign")(strconv.Itoa(c.ID))
+	idKey := s.MakeRedisKeyFunc("campaign")(strconv.Itoa(c.ID))
 	// Set a new key for this campaign in the cache
-	defer SaveKeyToRedis(ctx, s.Cache, idKey, c)
+	defer s.SaveKeyToRedis(ctx, idKey, c)
 
 	return c, nil
 }

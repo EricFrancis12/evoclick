@@ -1,10 +1,11 @@
 import cache from "../lib/cache";
 import db from "../lib/db";
 import { offersSchema } from "../lib/schemas";
+import { REDIS_EXPIRY } from "../lib/constants";
+import { makeRedisKeyFunc, safeParseJson } from "../lib/utils";
 import { TOffer, TOffer_createRequest, TOffer_updateRequest } from "../lib/types";
-import { initMakeRedisKey, safeParseJson } from "../lib/utils";
 
-const makeKey = initMakeRedisKey("offer");
+const makeKey = makeRedisKeyFunc("offer");
 
 export async function getAllOffers(): Promise<TOffer[]> {
     return db.offer.findMany();
@@ -30,7 +31,7 @@ export async function getOfferById(id: number): Promise<TOffer | null> {
     offerProm.then(offer => {
         if (offer && cache) {
             cache.set(key, JSON.stringify(offer), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });
@@ -48,7 +49,7 @@ export async function createNewOffer(creationRequest: TOffer_createRequest): Pro
         if (offer && cache) {
             const key = makeKey(offer.id);
             cache.set(key, JSON.stringify(offer), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });
@@ -67,7 +68,7 @@ export async function updateOfferById(id: number, data: TOffer_updateRequest): P
         if (offer && cache) {
             const key = makeKey(offer.id);
             cache.set(key, JSON.stringify(offer), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });

@@ -3,10 +3,11 @@ import cache from "../lib/cache";
 import db from "../lib/db";
 import { parseToken, parseNamedTokens } from ".";
 import { trafficSourceSchema } from "../lib/schemas";
+import { REDIS_EXPIRY } from "../lib/constants";
+import { makeRedisKeyFunc, safeParseJson } from "../lib/utils";
 import { TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest } from "../lib/types";
-import { initMakeRedisKey, safeParseJson } from "../lib/utils";
 
-const makeKey = initMakeRedisKey("trafficSource");
+const makeKey = makeRedisKeyFunc("trafficSource");
 
 export async function getAllTrafficSources(): Promise<TTrafficSource[]> {
     const trafficSources: TrafficSource[] = await db.trafficSource.findMany();
@@ -34,7 +35,7 @@ export async function geTTrafficSourceById(id: number): Promise<TTrafficSource |
     trafficSourceProm.then(trafficSource => {
         if (trafficSource && cache) {
             cache.set(key, JSON.stringify(trafficSource), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });
@@ -59,7 +60,7 @@ export async function createNewTrafficSource(creationRequest: TTrafficSource_cre
         if (trafficSource && cache) {
             const key = makeKey(trafficSource.id);
             cache.set(key, JSON.stringify(trafficSource), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });
@@ -85,7 +86,7 @@ export async function updateTrafficSourceById(id: number, data: TTrafficSource_u
         if (trafficSource && cache) {
             const key = makeKey(trafficSource.id);
             cache.set(key, JSON.stringify(trafficSource), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });

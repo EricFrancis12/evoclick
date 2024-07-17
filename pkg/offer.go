@@ -17,13 +17,13 @@ func (s *Storer) GetAllOffers(ctx context.Context) ([]Offer, error) {
 }
 
 func (s *Storer) GetOfferById(ctx context.Context, id int) (Offer, error) {
-	key := InitMakeRedisKey("offer")(strconv.Itoa(id))
+	key := s.MakeRedisKeyFunc("offer")(strconv.Itoa(id))
 	// Check redis cache for this offer
-	offer, err := CheckRedisForKey[Offer](ctx, s.Cache, key)
+	offer, err := CheckRedisForKey[Offer](s.Cache, ctx, key)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		return *offer, nil
+		return offer, nil
 	}
 
 	// If not in cache, query db for it
@@ -37,7 +37,7 @@ func (s *Storer) GetOfferById(ctx context.Context, id int) (Offer, error) {
 	o := formatOffer(model)
 
 	// If we fetch from the db successfully, create a new key for this offer in the cache
-	defer SaveKeyToRedis(ctx, s.Cache, key, o)
+	defer s.SaveKeyToRedis(ctx, key, o)
 
 	return o, nil
 }

@@ -19,13 +19,13 @@ func (s *Storer) GetAllSavedFlows(ctx context.Context) ([]SavedFlow, error) {
 }
 
 func (s *Storer) GetSavedFlowById(ctx context.Context, id int) (SavedFlow, error) {
-	key := InitMakeRedisKey("flow")(strconv.Itoa(id))
+	key := s.MakeRedisKeyFunc("flow")(strconv.Itoa(id))
 	// Check redis cache for this flow
-	savedFlow, err := CheckRedisForKey[SavedFlow](ctx, s.Cache, key)
+	savedFlow, err := CheckRedisForKey[SavedFlow](s.Cache, ctx, key)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		return *savedFlow, nil
+		return savedFlow, nil
 	}
 
 	// If not in cache, query db for it
@@ -39,7 +39,7 @@ func (s *Storer) GetSavedFlowById(ctx context.Context, id int) (SavedFlow, error
 	fl := formatSavedFlow(model)
 
 	// If we fetch from the db successfully, create a new key for this flow in the cache
-	defer SaveKeyToRedis(ctx, s.Cache, key, fl)
+	defer s.SaveKeyToRedis(ctx, key, fl)
 
 	return fl, nil
 }

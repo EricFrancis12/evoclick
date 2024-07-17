@@ -1,10 +1,11 @@
 import cache from "../lib/cache";
 import db from "../lib/db";
 import { affiliateNetworkSchema } from "../lib/schemas";
+import { makeRedisKeyFunc, safeParseJson } from "../lib/utils";
+import { REDIS_EXPIRY } from "@/lib/constants";
 import { TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest } from "../lib/types";
-import { initMakeRedisKey, safeParseJson } from "../lib/utils";
 
-const makeKey = initMakeRedisKey("affiliateNetwork");
+const makeKey = makeRedisKeyFunc("affiliateNetwork");
 
 export async function getAllAffiliateNetworks(): Promise<TAffiliateNetwork[]> {
     return db.affiliateNetwork.findMany();
@@ -30,7 +31,7 @@ export async function getAffiliateNetworkById(id: number): Promise<TAffiliateNet
     affiliateNetworkProm.then(affiliateNetwork => {
         if (affiliateNetwork && cache) {
             cache.set(key, JSON.stringify(affiliateNetwork), {
-                EX: 60 // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });
@@ -48,7 +49,7 @@ export async function createNewAffiliateNetwork(creationRequest: TAffiliateNetwo
         if (affiliateNetwork && cache) {
             const key = makeKey(affiliateNetwork.id);
             cache.set(key, JSON.stringify(affiliateNetwork), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });
@@ -67,7 +68,7 @@ export async function updateAffiliateNetworkById(id: number, data: TAffiliateNet
         if (affiliateNetwork && cache) {
             const key = makeKey(affiliateNetwork.id);
             cache.set(key, JSON.stringify(affiliateNetwork), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });

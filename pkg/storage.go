@@ -34,12 +34,19 @@ func (s *Storer) Renew() {
 	}
 
 	if connStr := os.Getenv(EnvRedisUrl); connStr != "" {
-		cache, err := ConnectToReddis(connStr)
-		if err != nil {
+		if err := s.ConnectToRedis(connStr); err != nil {
 			fmt.Println(err.Error())
 		} else {
-			s.Cache = cache
 			fmt.Println("Connected to Reddis")
 		}
 	}
+}
+
+func (s *Storer) ConnectToRedis(connStr string) error {
+	opts, err := redis.ParseURL(connStr)
+	if err != nil {
+		return fmt.Errorf("error parsing Redis connection string: " + err.Error())
+	}
+	s.Cache = redis.NewClient(opts)
+	return nil
 }

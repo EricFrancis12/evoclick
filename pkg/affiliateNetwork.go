@@ -17,13 +17,13 @@ func (s *Storer) GetAllAffiliateNetworks(ctx context.Context) ([]AffiliateNetwor
 }
 
 func (s *Storer) GetAffiliateNetworkById(ctx context.Context, id int) (AffiliateNetwork, error) {
-	key := InitMakeRedisKey("affiliateNetwork")(strconv.Itoa(id))
+	key := s.MakeRedisKeyFunc("affiliateNetwork")(strconv.Itoa(id))
 	// Check redis cache for this affiliate network
-	affiliateNetwork, err := CheckRedisForKey[AffiliateNetwork](ctx, s.Cache, key)
+	affiliateNetwork, err := CheckRedisForKey[AffiliateNetwork](s.Cache, ctx, key)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		return *affiliateNetwork, nil
+		return affiliateNetwork, nil
 	}
 
 	// If not in cache, query db for it
@@ -37,7 +37,7 @@ func (s *Storer) GetAffiliateNetworkById(ctx context.Context, id int) (Affiliate
 	an := formatAffiliateNetwork(model)
 
 	// If we fetch from the db successfully, create a new key for this affiliate network in the cache
-	defer SaveKeyToRedis(ctx, s.Cache, key, an)
+	defer s.SaveKeyToRedis(ctx, key, an)
 
 	return an, nil
 }

@@ -2,10 +2,11 @@
 import cache from "../lib/cache";
 import db from "../lib/db";
 import { landingPageSchema } from "../lib/schemas";
+import { REDIS_EXPIRY } from "@/lib/constants";
+import { makeRedisKeyFunc, safeParseJson } from "../lib/utils";
 import { TLandingPage, TLandingPage_createRequest, TLandingPage_updateRequest } from "../lib/types";
-import { initMakeRedisKey, safeParseJson } from "../lib/utils";
 
-const makeKey = initMakeRedisKey("landingPage");
+const makeKey = makeRedisKeyFunc("landingPage");
 
 export async function getAllLandingPages(): Promise<TLandingPage[]> {
     return db.landingPage.findMany();
@@ -31,7 +32,7 @@ export async function getLandingPageById(id: number): Promise<TLandingPage | nul
     landingPageProm.then(landingPage => {
         if (landingPage && cache) {
             cache.set(key, JSON.stringify(landingPage), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });
@@ -49,7 +50,7 @@ export async function createNewLandingPage(creationRequest: TLandingPage_createR
         if (landingPage && cache) {
             const key = makeKey(landingPage.id);
             cache.set(key, JSON.stringify(landingPage), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });
@@ -68,7 +69,7 @@ export async function updateLandingPageById(id: number, data: TLandingPage_updat
         if (landingPage && cache) {
             const key = makeKey(landingPage.id);
             cache.set(key, JSON.stringify(landingPage), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });

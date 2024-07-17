@@ -19,13 +19,13 @@ func (s *Storer) GetAllTrafficSources(ctx context.Context) ([]TrafficSource, err
 }
 
 func (s *Storer) GetTrafficSourceById(ctx context.Context, id int) (TrafficSource, error) {
-	key := InitMakeRedisKey("trafficSource")(strconv.Itoa(id))
+	key := s.MakeRedisKeyFunc("trafficSource")(strconv.Itoa(id))
 	// Check redis cache for this traffic source
-	trafficSource, err := CheckRedisForKey[TrafficSource](ctx, s.Cache, key)
+	trafficSource, err := CheckRedisForKey[TrafficSource](s.Cache, ctx, key)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		return *trafficSource, nil
+		return trafficSource, nil
 	}
 
 	// If not in cache, query db for it
@@ -40,7 +40,7 @@ func (s *Storer) GetTrafficSourceById(ctx context.Context, id int) (TrafficSourc
 
 	// If we fetch from the db successfully,
 	// create a new key for this traffic source in the cache
-	defer SaveKeyToRedis(ctx, s.Cache, key, ts)
+	defer s.SaveKeyToRedis(ctx, key, ts)
 
 	return ts, nil
 }

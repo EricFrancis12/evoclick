@@ -3,11 +3,12 @@ import cache from "../lib/cache";
 import { parseRoute, parseRoutes } from ".";
 import db from "../lib/db";
 import { campaignSchema } from "../lib/schemas";
-import { initMakeRedisKey, newRoute, safeParseJson } from "../lib/utils";
+import { makeRedisKeyFunc, newRoute, safeParseJson } from "../lib/utils";
+import { REDIS_EXPIRY } from "../lib/constants";
 import { TCampaign, TCampaign_createRequest, TCampaign_updateRequest } from "../lib/types";
 import { Campaign } from "@prisma/client";
 
-const makeKey = initMakeRedisKey("campaign");
+const makeKey = makeRedisKeyFunc("campaign");
 
 export async function getAllCampaigns(): Promise<TCampaign[]> {
     const campaigns: Campaign[] = await db.campaign.findMany();
@@ -35,7 +36,7 @@ export async function getCampaignById(id: number): Promise<TCampaign | null> {
     campaignProm.then(campaign => {
         if (campaign && cache) {
             cache.set(key, JSON.stringify(campaign), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });
@@ -60,7 +61,7 @@ export async function createNewCampaign(creationRequest: TCampaign_createRequest
         if (campaign && cache) {
             const key = makeKey(campaign.id);
             cache.set(key, JSON.stringify(campaign), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });
@@ -85,7 +86,7 @@ export async function updateCampaignById(id: number, data: TCampaign_updateReque
         if (campaign && cache) {
             const key = makeKey(campaign.id);
             cache.set(key, JSON.stringify(campaign), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });

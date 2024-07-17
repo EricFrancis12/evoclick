@@ -3,10 +3,11 @@ import { parseRoute, parseRoutes } from ".";
 import cache from "../lib/cache";
 import db from "../lib/db";
 import { savedFlowSchema } from "../lib/schemas";
+import { REDIS_EXPIRY } from "@/lib/constants";
+import { makeRedisKeyFunc, newRoute, safeParseJson } from "../lib/utils";
 import { TSavedFlow, TSavedFlow_createRequest, TSavedFlow_updateRequest } from "../lib/types";
-import { initMakeRedisKey, newRoute, safeParseJson } from "../lib/utils";
 
-const makeKey = initMakeRedisKey("flow");
+const makeKey = makeRedisKeyFunc("flow");
 
 export async function getAllFlows(): Promise<TSavedFlow[]> {
     const savedFlows: SavedFlow[] = await db.savedFlow.findMany();
@@ -34,7 +35,7 @@ export async function getFlowById(id: number): Promise<TSavedFlow | null> {
     flowProm.then(flow => {
         if (flow && cache) {
             cache.set(key, JSON.stringify(flow), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });
@@ -58,7 +59,7 @@ export async function createNewFlow(creationRequest: TSavedFlow_createRequest): 
         if (flow && cache) {
             const key = makeKey(flow.id);
             cache.set(key, JSON.stringify(flow), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });
@@ -83,7 +84,7 @@ export async function updateFlowById(id: number, data: TSavedFlow_updateRequest)
         if (flow && cache) {
             const key = makeKey(flow.id);
             cache.set(key, JSON.stringify(flow), {
-                EX: 60, // Exipry time in seconds
+                EX: REDIS_EXPIRY,
             });
         }
     });
