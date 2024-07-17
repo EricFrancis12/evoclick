@@ -15,11 +15,7 @@ import (
 )
 
 func T(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("~ 1")
-
 	timestamp, ctx, storer := pkg.InitVisit()
-
-	fmt.Println("~ 2")
 
 	g := getGValue(r)
 	if g == "" {
@@ -29,8 +25,6 @@ func T(w http.ResponseWriter, r *http.Request) {
 		pkg.RedirectToCatchAllUrl(w, r)
 		return
 	}
-
-	fmt.Println("~ 3")
 
 	campaign, err := storer.GetCampaignByPublicId(ctx, g)
 	if err != nil {
@@ -47,17 +41,11 @@ func T(w http.ResponseWriter, r *http.Request) {
 		savedFlow              = pkg.SavedFlow{}
 	)
 
-	fmt.Println("~ 4")
-
 	ipidch := make(chan pkg.IPInfoData)
 	go fetchIpInfoData(r, os.Getenv(pkg.EnvIpInfoToken), ipidch)
 
-	fmt.Println("~ 5")
-
 	tsch := make(chan pkg.TrafficSource)
 	go fetchtrafficSource(ctx, storer, campaign.TrafficSourceID, tsch)
-
-	fmt.Println("~ 6")
 
 	if campaign.FlowType == db.FlowTypeSaved {
 		savedFlow, err = storer.GetSavedFlowById(ctx, *campaign.SavedFlowID)
@@ -72,23 +60,15 @@ func T(w http.ResponseWriter, r *http.Request) {
 		visitorNeedsIpInfoData = campaign.IpInfoNeeded()
 	}
 
-	fmt.Println("~ 7")
-
 	// If determining the destination requires ipinfoData, wait for the channel response
 	if visitorNeedsIpInfoData {
 		ipInfoData = <-ipidch
 	}
 
-	fmt.Println("~ 8")
-
 	dest, _ := campaign.DetermineViewDestination(r, ctx, *storer, savedFlow, userAgent, ipInfoData)
-
-	fmt.Println("~ 9")
 
 	anch := make(chan pkg.AffiliateNetwork)
 	go fetchAffiliateNetwork(ctx, storer, dest, anch)
-
-	fmt.Println("~ 10")
 
 	publicClickId := pkg.NewPublicClickID()
 	// If we are sending the visitor to a landing page,
@@ -98,26 +78,14 @@ func T(w http.ResponseWriter, r *http.Request) {
 		setCookie(w, pkg.CookieNameClickPublicID, publicClickId)
 	}
 
-	fmt.Println("~ 11")
-
 	pkg.RedirectVisitor(w, r, dest.URL)
-
-	fmt.Println("~ 12")
 
 	// If we did not pull from the ipInfoData channel before the redirect, pull from it now
 	if !visitorNeedsIpInfoData {
 		ipInfoData = <-ipidch
 	}
-
-	fmt.Println("~ 13")
-
 	trafficSource := <-tsch
-
-	fmt.Println("~ 14")
-
 	affiliateNetwork := <-anch
-
-	fmt.Println("~ 15")
 
 	// Save click to db
 	_, err = storer.CreateNewClick(ctx, pkg.ClickCreationReq{
@@ -151,14 +119,9 @@ func T(w http.ResponseWriter, r *http.Request) {
 		OfferID:            getOfferID(dest),
 		TrafficSourceID:    campaign.TrafficSourceID,
 	})
-
-	fmt.Println("~ 16")
-
 	if err != nil {
 		fmt.Println("error saving new click to db: " + err.Error())
 	}
-
-	fmt.Println("~ 17")
 }
 
 func fetchIpInfoData(r *http.Request, ipInfoToken string, ch chan pkg.IPInfoData) {
