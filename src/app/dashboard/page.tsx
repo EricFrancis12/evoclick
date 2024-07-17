@@ -43,7 +43,7 @@ export default async function DashboardPage({ params, searchParams }: {
         const affilaiteNetworksProm = getAllAffiliateNetworks();
         // const campaignsProm = getAllCampaigns();
         // const flowsProm = getAllFlows();
-        // const landingPagesProm = getAllLandingPages();
+        const landingPagesProm = getAllLandingPages();
         // const offersProm = getAllOffers();
         // const trafficSourcesProm = getAllTrafficSources();
 
@@ -57,8 +57,8 @@ export default async function DashboardPage({ params, searchParams }: {
         // console.log(9);
         // const flows = await flowsProm;
         // console.log(10);
-        // const landingPages = await landingPagesProm;
-        // console.log(11);
+        const landingPages = await landingPagesProm;
+        console.log(11);
         // const offers = await offersProm;
         // console.log(12);
         // const trafficSources = await trafficSourcesProm;
@@ -70,7 +70,7 @@ export default async function DashboardPage({ params, searchParams }: {
                     affiliateNetworks,
                     campaigns: [],
                     flows: [],
-                    landingPages: [],
+                    landingPages,
                     offers: [],
                     trafficSources: [],
                 }}
