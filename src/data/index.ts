@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { tokenSchema, namedTokenSchema, routeSchema } from "../lib/schemas";
-import { newRoute, safeParseJson } from "@/lib/utils";
-import { TToken, TNamedToken, TRoute } from "../lib/types";
+import { safeParseJson } from "@/lib/utils";
+import { newRoute } from "@/app/dashboard/ReportView/FlowBuilder/Route";
 import { newToken } from "@/app/dashboard/ReportView/TokenInput";
+import { TToken, TNamedToken, TRoute } from "../lib/types";
 
 export * from "./User";
 export * from "./AffiliateNetwork";
