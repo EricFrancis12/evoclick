@@ -2,11 +2,14 @@ import { createClient, RedisClientType } from "redis";
 
 export const makeRedisKeyFunc = (prefix: string) => (id: number | string) => `${prefix}:${id}`;
 
-// Using the redis cache is an optional feature
+// Using the Redis cache is an optional feature
 let cache: RedisClientType | undefined;
 
-// If a REDIS_URL is provided, a redis client will be created
-if (process.env.REDIS_URL && process.env.NODE_ENV !== "test" && process.env.NEXT_PHASE !== "phase-production-build") {
+// If a REDIS_URL is provided, a Redis client will be created
+if (process.env.REDIS_URL
+    && process.env.NODE_ENV !== "test" // Prevents connecting to Redis during tests
+    && process.env.NEXT_PHASE !== "phase-production-build" // Prevents connecting to Redis during next build
+) {
     cache = createClient({
         url: process.env.REDIS_URL,
         socket: {

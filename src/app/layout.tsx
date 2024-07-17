@@ -13,12 +13,10 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
     title: "EvoClick",
-    description: "The best things in my life have come from other people",
+    description: "Self-Hosted Click Tracker for Media Buyers",
 };
 
-export default function RootLayout({
-    children,
-}: Readonly<{
+export default function RootLayout({ children }: Readonly<{
     children: React.ReactNode;
 }>) {
     return (

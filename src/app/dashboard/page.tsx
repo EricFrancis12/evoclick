@@ -36,7 +36,6 @@ export default async function DashboardPage({ params, searchParams }: {
 
     try {
         const clicks = await clicksProm;
-
         const affiliateNetworks = await affilaiteNetworksProm;
         const campaigns = await campaignsProm;
         const flows = await flowsProm;

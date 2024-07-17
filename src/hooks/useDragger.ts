@@ -1,4 +1,4 @@
-
+"use client";
 
 export default function useDragger(onMouseMove: (e: MouseEvent, u?: unknown) => void) {
     let boundHandleMouseMove: (e: MouseEvent) => void;

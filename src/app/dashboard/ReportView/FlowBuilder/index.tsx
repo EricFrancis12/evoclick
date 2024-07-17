@@ -78,19 +78,19 @@ function RulesMenu({ route, onChange }: {
 }) {
     return (
         <div
-            className='flex flex-col justify-start items-between h-full w-full max-h-[90vh] max-w-[700px] bg-white'
-            style={{ borderRadius: '5px' }}
+            className="flex flex-col justify-start items-between h-full w-full max-h-[90vh] max-w-[700px] bg-white"
+            style={{ borderRadius: "5px" }}
         >
             <div
-                className='flex flex-col justify-start items-start gap-2 px-4 overflow-y-scroll'
-                style={{ height: 'inherit' }}
+                className="flex flex-col justify-start items-start gap-2 px-4 overflow-y-scroll"
+                style={{ height: "inherit" }}
             >
-                <div className='flex justify-start items-center w-full'>
+                <div className="flex justify-start items-center w-full">
                     <span>Logical Relation</span>
                 </div>
-                <div className='flex justify-start items-center gap-2 w-full'>
+                <div className="flex justify-start items-center gap-2 w-full">
                     {Object.values(ELogicalRelation).map((logicalRelation, index) => (
-                        <div key={index} className='flex justify-start items-center'>
+                        <div key={index} className="flex justify-start items-center">
                             <input
                                 type="checkbox"
                                 checked={logicalRelation === route.logicalRelation}
@@ -100,7 +100,7 @@ function RulesMenu({ route, onChange }: {
                         </div>
                     ))}
                 </div>
-                <div className='flex justify-start items-center gap-2 w-full'>
+                <div className="flex justify-start items-center gap-2 w-full">
                     <Select
                         value=""
                         onChange={e => onChange({ ...route, rules: [...route.rules, newRule(e.target.value as ERuleName)] })}
@@ -115,14 +115,14 @@ function RulesMenu({ route, onChange }: {
                             ))}
                     </Select>
                     <Button
-                        text='Remove All Rules'
+                        text="Remove All Rules"
                         icon={faTrashAlt}
                         onClick={() => onChange({ ...route, rules: [] })}
                     />
                 </div>
                 <div
-                    className='flex flex-col justify-start items-center gap-2 p-2 w-full'
-                    style={{ border: 'solid 1px grey' }}
+                    className="flex flex-col justify-start items-center gap-2 p-2 w-full"
+                    style={{ border: "solid 1px grey" }}
                 >
                     {route.rules.map((rule, index) => (
                         <Rule

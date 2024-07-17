@@ -60,7 +60,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 		visitorNeedsIpInfoData = campaign.IpInfoNeeded()
 	}
 
-	// If determining the destination requires ipinfoData, wait for the channel response
+	// If determining the destination requires ipInfoData, wait for the channel response
 	if visitorNeedsIpInfoData {
 		ipInfoData = <-ipidch
 	}
