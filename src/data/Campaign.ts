@@ -17,7 +17,16 @@ export async function getAllCampaigns(): Promise<TCampaign[]> {
     console.log(2);
     const proms: Promise<TCampaign>[] = campaigns.map(campaign => makeClientCampaign(campaign));
     console.log(3);
-    return Promise.all(proms);
+    const result: TCampaign[] = [];
+    for (const prom of proms) {
+        console.log(6);
+        const campaign = await prom;
+        console.log(7);
+        result.push(campaign);
+        console.log(8);
+    }
+    console.log(9);
+    return result;
 }
 
 export async function getCampaignById(id: number): Promise<TCampaign | null> {
