@@ -27,27 +27,28 @@ export default async function DashboardPage({ params, searchParams }: {
 
     console.log(4);
 
-    // const clicksProm = getAllClicks({
-    //     where: {
-    //         AND: [
-    //             timeframeFilter(timeframe),
-    //             reportItemFilter(reportItemName, reportItemId),
-    //         ],
-    //     },
-    // });
-
-    console.log(5);
-
-    const affilaiteNetworksProm = getAllAffiliateNetworks();
-    const campaignsProm = getAllCampaigns();
-    const flowsProm = getAllFlows();
-    const landingPagesProm = getAllLandingPages();
-    const offersProm = getAllOffers();
-    const trafficSourcesProm = getAllTrafficSources();
-
-    console.log(6);
-
     try {
+
+        // const clicksProm = getAllClicks({
+        //     where: {
+        //         AND: [
+        //             timeframeFilter(timeframe),
+        //             reportItemFilter(reportItemName, reportItemId),
+        //         ],
+        //     },
+        // });
+
+        console.log(5);
+
+        const affilaiteNetworksProm = getAllAffiliateNetworks();
+        const campaignsProm = getAllCampaigns();
+        const flowsProm = getAllFlows();
+        const landingPagesProm = getAllLandingPages();
+        const offersProm = getAllOffers();
+        const trafficSourcesProm = getAllTrafficSources();
+
+        console.log(6);
+
         // const clicks = await clicksProm;
         console.log(7);
         const affiliateNetworks = await affilaiteNetworksProm;
