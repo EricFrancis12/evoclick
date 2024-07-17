@@ -5,9 +5,9 @@ import cache, { makeRedisKeyFunc } from "../lib/cache";
 import db from "../lib/db";
 import { parseRoute, parseRoutes } from ".";
 import { campaignSchema } from "../lib/schemas";
-import { promFrom, safeParseJson } from "../lib/utils";
+import { safeParseJson } from "../lib/utils";
 import { REDIS_EXPIRY } from "../lib/constants";
-import { TCampaign, TCampaign_createRequest, TCampaign_updateRequest, TRoute } from "../lib/types";
+import { TCampaign, TCampaign_createRequest, TCampaign_updateRequest } from "../lib/types";
 
 const makeKey = makeRedisKeyFunc("campaign");
 
@@ -111,11 +111,9 @@ export async function deleteCampaignById(id: number): Promise<TCampaign> {
 
 async function makeClientCampaign(dbModel: Campaign): Promise<TCampaign> {
     const { flowMainRoute, flowRuleRoutes } = dbModel;
-    const mainRouteProm = flowMainRoute ? parseRoute(flowMainRoute) : promFrom(newRoute())();
-    const ruleRoutesProm = flowRuleRoutes ? parseRoutes(flowRuleRoutes) : promFrom(<TRoute[]>[])();
     return {
         ...dbModel,
-        flowMainRoute: await mainRouteProm,
-        flowRuleRoutes: await ruleRoutesProm,
+        flowMainRoute: flowMainRoute ? await parseRoute(flowMainRoute) : newRoute(),
+        flowRuleRoutes: flowRuleRoutes ? await parseRoutes(flowRuleRoutes) : [],
     };
 }
