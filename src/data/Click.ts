@@ -5,7 +5,7 @@ import { TClick } from "../lib/types";
 
 export async function getAllClicks(args: Prisma.ClickFindManyArgs = {}): Promise<TClick[]> {
     const clicks: Click[] = await db.click.findMany(args);
-    const proms: Promise<TClick>[] = clicks.map(cl => makeClientClick(cl));
+    const proms: Promise<TClick>[] = clicks.map(makeClientClick);
     return Promise.all(proms);
 }
 

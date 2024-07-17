@@ -11,7 +11,7 @@ const makeKey = makeRedisKeyFunc("trafficSource");
 
 export async function getAllTrafficSources(): Promise<TTrafficSource[]> {
     const trafficSources: TrafficSource[] = await db.trafficSource.findMany();
-    const proms: Promise<TTrafficSource>[] = trafficSources.map(ts => makeClientTrafficSource(ts));
+    const proms: Promise<TTrafficSource>[] = trafficSources.map(makeClientTrafficSource);
     return Promise.all(proms);
 }
 
@@ -32,9 +32,9 @@ export async function geTTrafficSourceById(id: number): Promise<TTrafficSource |
     });
 
     // If we fetch from the db successfully, create a new key for this traffic source in the cache
-    trafficSourceProm.then(trafficSource => {
+    trafficSourceProm.then(async (trafficSource) => {
         if (trafficSource && cache) {
-            cache.set(key, JSON.stringify(trafficSource), {
+            cache.set(key, JSON.stringify(await makeClientTrafficSource(trafficSource)), {
                 EX: REDIS_EXPIRY,
             });
         }
@@ -56,16 +56,16 @@ export async function createNewTrafficSource(creationRequest: TTrafficSource_cre
     });
 
     // If the creation was successful, create a new key for this new traffic source in the cache
-    trafficSourceProm.then(trafficSource => {
+    trafficSourceProm.then(async (trafficSource) => {
         if (trafficSource && cache) {
             const key = makeKey(trafficSource.id);
-            cache.set(key, JSON.stringify(trafficSource), {
+            cache.set(key, JSON.stringify(await makeClientTrafficSource(trafficSource)), {
                 EX: REDIS_EXPIRY,
             });
         }
     });
 
-    return trafficSourceProm.then(ts => makeClientTrafficSource(ts));
+    return trafficSourceProm.then(makeClientTrafficSource);
 }
 
 export async function updateTrafficSourceById(id: number, data: TTrafficSource_updateRequest): Promise<TTrafficSource> {
@@ -82,16 +82,16 @@ export async function updateTrafficSourceById(id: number, data: TTrafficSource_u
     });
 
     // If the update was successful, update the corresponding key for this traffic source in the cache
-    trafficSourceProm.then(trafficSource => {
+    trafficSourceProm.then(async (trafficSource) => {
         if (trafficSource && cache) {
             const key = makeKey(trafficSource.id);
-            cache.set(key, JSON.stringify(trafficSource), {
+            cache.set(key, JSON.stringify(await makeClientTrafficSource(trafficSource)), {
                 EX: REDIS_EXPIRY,
             });
         }
     });
 
-    return trafficSourceProm.then(ts => makeClientTrafficSource(ts));
+    return trafficSourceProm.then(makeClientTrafficSource);
 }
 
 export async function deleteTrafficSourceById(id: number): Promise<TTrafficSource> {
@@ -105,7 +105,7 @@ export async function deleteTrafficSourceById(id: number): Promise<TTrafficSourc
         where: { id },
     });
 
-    return trafficSourceProm.then(ts => makeClientTrafficSource(ts));
+    return trafficSourceProm.then(makeClientTrafficSource);
 }
 
 async function makeClientTrafficSource(dbModel: TrafficSource): Promise<TTrafficSource> {

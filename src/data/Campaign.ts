@@ -15,7 +15,7 @@ export async function getAllCampaigns(): Promise<TCampaign[]> {
     console.log(1);
     const campaigns: Campaign[] = await db.campaign.findMany();
     console.log(2);
-    const proms: Promise<TCampaign>[] = campaigns.map(campaign => makeClientCampaign(campaign));
+    const proms: Promise<TCampaign>[] = campaigns.map(makeClientCampaign);
     console.log(3);
     const result: TCampaign[] = [];
     for (const prom of proms) {
@@ -47,9 +47,9 @@ export async function getCampaignById(id: number): Promise<TCampaign | null> {
     });
 
     // If we fetch from the db successfully, create a new key for this campaign in the cache
-    campaignProm.then(campaign => {
+    campaignProm.then(async (campaign) => {
         if (campaign && cache) {
-            cache.set(key, JSON.stringify(campaign), {
+            cache.set(key, JSON.stringify(await makeClientCampaign(campaign)), {
                 EX: REDIS_EXPIRY,
             });
         }
@@ -65,22 +65,22 @@ export async function createNewCampaign(creationRequest: TCampaign_createRequest
             publicId: crypto.randomUUID() as string,
             // Changing flowMainRoute and flowRuleRoutes into strings because
             // they are saved as strings in the db
-            flowMainRoute: JSON.stringify(creationRequest.flowMainRoute),
-            flowRuleRoutes: JSON.stringify(creationRequest.flowRuleRoutes),
+            flowMainRoute: JSON.stringify(creationRequest.flowMainRoute ?? newRoute()),
+            flowRuleRoutes: JSON.stringify(creationRequest.flowRuleRoutes ?? []),
         }
     });
 
     // If the creation was successful, create a new key for this new campaign in the cache
-    campaignProm.then(campaign => {
+    campaignProm.then(async (campaign) => {
         if (campaign && cache) {
             const key = makeKey(campaign.id);
-            cache.set(key, JSON.stringify(campaign), {
+            cache.set(key, JSON.stringify(await makeClientCampaign(campaign)), {
                 EX: REDIS_EXPIRY,
             });
         }
     });
 
-    return campaignProm.then(campaign => makeClientCampaign(campaign));
+    return campaignProm.then(makeClientCampaign);
 }
 
 export async function updateCampaignById(id: number, data: TCampaign_updateRequest): Promise<TCampaign> {
@@ -90,22 +90,22 @@ export async function updateCampaignById(id: number, data: TCampaign_updateReque
             ...data,
             // Changing flowMainRoute and flowRuleRoutes into strings because
             // they are saved as strings in the db
-            flowMainRoute: JSON.stringify(data.flowMainRoute),
-            flowRuleRoutes: JSON.stringify(data.flowRuleRoutes),
+            flowMainRoute: JSON.stringify(data.flowMainRoute ?? newRoute()),
+            flowRuleRoutes: JSON.stringify(data.flowRuleRoutes ?? []),
         }
     });
 
     // If the update was successful, update the corresponding key for this campaign in the cache
-    campaignProm.then(campaign => {
+    campaignProm.then(async (campaign) => {
         if (campaign && cache) {
             const key = makeKey(campaign.id);
-            cache.set(key, JSON.stringify(campaign), {
+            cache.set(key, JSON.stringify(await makeClientCampaign(campaign)), {
                 EX: REDIS_EXPIRY,
             });
         }
     });
 
-    return campaignProm.then(campaign => makeClientCampaign(campaign));
+    return campaignProm.then(makeClientCampaign);
 }
 
 export async function deleteCampaignById(id: number): Promise<TCampaign> {
@@ -119,7 +119,7 @@ export async function deleteCampaignById(id: number): Promise<TCampaign> {
         where: { id },
     });
 
-    return campaignProm.then(campaign => makeClientCampaign(campaign));
+    return campaignProm.then(makeClientCampaign);
 }
 
 async function makeClientCampaign(dbModel: Campaign): Promise<TCampaign> {

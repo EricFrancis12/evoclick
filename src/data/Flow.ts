@@ -12,7 +12,7 @@ const makeKey = makeRedisKeyFunc("flow");
 
 export async function getAllFlows(): Promise<TSavedFlow[]> {
     const savedFlows: SavedFlow[] = await db.savedFlow.findMany();
-    const proms: Promise<TSavedFlow>[] = savedFlows.map(flow => makeClientFlow(flow));
+    const proms: Promise<TSavedFlow>[] = savedFlows.map(makeClientFlow);
     return Promise.all(proms);
 }
 
@@ -33,9 +33,9 @@ export async function getFlowById(id: number): Promise<TSavedFlow | null> {
     });
 
     // If we fetch from the db successfully, create a new key for this flow in the cache
-    flowProm.then(flow => {
+    flowProm.then(async (flow) => {
         if (flow && cache) {
-            cache.set(key, JSON.stringify(flow), {
+            cache.set(key, JSON.stringify(await makeClientFlow(flow)), {
                 EX: REDIS_EXPIRY,
             });
         }
@@ -50,22 +50,22 @@ export async function createNewFlow(creationRequest: TSavedFlow_createRequest): 
             ...creationRequest,
             // Changing mainRoute and ruleRoutes into strings because
             // they are saved as strings in the db
-            mainRoute: JSON.stringify(creationRequest.mainRoute),
-            ruleRoutes: JSON.stringify(creationRequest.ruleRoutes),
+            mainRoute: JSON.stringify(creationRequest.mainRoute ?? newRoute()),
+            ruleRoutes: JSON.stringify(creationRequest.ruleRoutes ?? []),
         }
     });
 
     // If the creation was successful, create a new key for this new flow in the cache
-    flowProm.then(flow => {
+    flowProm.then(async (flow) => {
         if (flow && cache) {
             const key = makeKey(flow.id);
-            cache.set(key, JSON.stringify(flow), {
+            cache.set(key, JSON.stringify(await makeClientFlow(flow)), {
                 EX: REDIS_EXPIRY,
             });
         }
     });
 
-    return flowProm.then(flow => makeClientFlow(flow));
+    return flowProm.then(makeClientFlow);
 }
 
 export async function updateFlowById(id: number, data: TSavedFlow_updateRequest): Promise<TSavedFlow> {
@@ -75,22 +75,22 @@ export async function updateFlowById(id: number, data: TSavedFlow_updateRequest)
             ...data,
             // Changing mainRoute and ruleRoutes into strings because
             // they are saved as strings in the db
-            mainRoute: JSON.stringify(data.mainRoute),
-            ruleRoutes: JSON.stringify(data.ruleRoutes),
+            mainRoute: JSON.stringify(data.mainRoute ?? newRoute()),
+            ruleRoutes: JSON.stringify(data.ruleRoutes ?? []),
         }
     });
 
     // If the update was successful, update the corresponding key for this flow in the cache
-    flowProm.then(flow => {
+    flowProm.then(async (flow) => {
         if (flow && cache) {
             const key = makeKey(flow.id);
-            cache.set(key, JSON.stringify(flow), {
+            cache.set(key, JSON.stringify(await makeClientFlow(flow)), {
                 EX: REDIS_EXPIRY,
             });
         }
     });
 
-    return flowProm.then(flow => makeClientFlow(flow));
+    return flowProm.then(makeClientFlow);
 }
 
 export async function deleteFlowById(id: number): Promise<TSavedFlow> {
@@ -104,7 +104,7 @@ export async function deleteFlowById(id: number): Promise<TSavedFlow> {
         where: { id },
     });
 
-    return flowProm.then(flow => makeClientFlow(flow));
+    return flowProm.then(makeClientFlow);
 }
 
 async function makeClientFlow(dbModel: SavedFlow): Promise<TSavedFlow> {
