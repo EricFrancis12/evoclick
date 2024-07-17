@@ -4,14 +4,13 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircle } from "@fortawesome/free-solid-svg-icons";
 import { ReportViewProvider, TPrimaryData } from "./ReportViewContext";
 import useActiveView from "@/hooks/useActiveView";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import Report from "./Report";
 import ReportSkeleton from "./ReportSkeleton";
-import Tab, { TabContainer } from "@/app/dashboard/ReportView/Tab";
+import Tab from "@/app/dashboard/ReportView/Tab";
+import TabSkeleton from "./Tab/TabSkeleton";
 import { TView, useViewsStore } from "@/lib/store";
 import { encodeTimeframe } from "@/lib/utils";
 import { EItemName, TClick } from "@/lib/types";
@@ -93,23 +92,5 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
                 </div>
             </div>
         </ReportViewProvider >
-    )
-}
-
-function TabSkeleton() {
-    return (
-        <TabContainer>
-            <div
-                className="flex items-center gap-2 h-[32px] w-[100px] bg-gray-100"
-                style={{
-                    userSelect: "none",
-                    padding: "6px 8px 6px 8px",
-                    borderRadius: "6px 6px 0 0",
-                }}
-            >
-                <FontAwesomeIcon icon={faCircle} className="text-md text-gray-200" />
-                <div className="h-2 w-full bg-gray-200 rounded-full" />
-            </div>
-        </TabContainer>
     )
 }

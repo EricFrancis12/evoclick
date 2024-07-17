@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { TView } from "@/lib/store";
+import TabContainer from "./TabContainer";
 
 export default function Tab({ view, onClick, onClose }: {
     view: TView;
@@ -42,16 +43,6 @@ export default function Tab({ view, onClick, onClose }: {
                 }
             </div>
         </TabContainer>
-    )
-}
-
-export function TabContainer({ children }: {
-    children: React.ReactNode;
-}) {
-    return (
-        <div className="flex items-end h-full mr-[8px]">
-            {children}
-        </div>
     )
 }
 
