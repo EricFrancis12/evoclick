@@ -20,6 +20,7 @@ export async function getAllCampaigns(): Promise<TCampaign[]> {
     const result: TCampaign[] = [];
     for (const prom of proms) {
         console.log(6);
+        console.log(prom);
         const campaign = await prom;
         console.log(7);
         result.push(campaign);
@@ -123,11 +124,13 @@ export async function deleteCampaignById(id: number): Promise<TCampaign> {
 
 async function makeClientCampaign(dbModel: Campaign): Promise<TCampaign> {
     console.log(4);
-    const { flowMainRoute, flowRuleRoutes } = dbModel;
+    const flowMainRoute = dbModel.flowMainRoute ? await parseRoute(dbModel.flowMainRoute) : newRoute();
     console.log(5);
+    const flowRuleRoutes = dbModel.flowRuleRoutes ? await parseRoutes(dbModel.flowRuleRoutes) : [];
+    console.log(6);
     return {
         ...dbModel,
-        flowMainRoute: flowMainRoute ? await parseRoute(flowMainRoute) : newRoute(),
-        flowRuleRoutes: flowRuleRoutes ? await parseRoutes(flowRuleRoutes) : [],
+        flowMainRoute,
+        flowRuleRoutes,
     };
 }
