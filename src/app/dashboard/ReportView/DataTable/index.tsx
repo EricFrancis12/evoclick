@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { TClick } from "@/lib/types";
 import Rows from "./Rows";
 import TitleRow from "./TitleRow";
 import { TView } from "@/lib/store";
+import { TClick } from "@/lib/types";
+import columnTitles from "./columnTitles";
 
 export type TColumn = {
     title: string;
@@ -30,49 +31,21 @@ export default function DataTable({ view, rows, setRows, depth = 0 }: {
     })));
 
     return (
-        <DataTableWrapper>
-            <TitleRow
-                name={view?.itemName}
-                columns={columns}
-                setColumns={setColumns}
-            />
-            <Rows
-                rows={rows}
-                setRows={setRows}
-                columns={columns}
-                view={view}
-                depth={depth}
-            />
-        </DataTableWrapper>
-    )
-}
-
-export function DataTableWrapper({ children }: {
-    children: React.ReactNode;
-}) {
-    return (
         <div className="relative flex flex-col min-h-[400px] max-w-[100vw] overflow-x-scroll">
             <div className="absolute top-0 left-0">
-                {children}
+                <TitleRow
+                    name={view?.itemName}
+                    columns={columns}
+                    setColumns={setColumns}
+                />
+                <Rows
+                    rows={rows}
+                    setRows={setRows}
+                    columns={columns}
+                    view={view}
+                    depth={depth}
+                />
             </div>
         </div>
     )
 }
-
-export const columnTitles = [
-    "Name",
-    "Visits",
-    "Clicks",
-    "Conversions",
-    "Revenue",
-    "Cost",
-    "Profit",
-    "CPV",
-    "CPC",
-    "CPCV",
-    "CTR",
-    "CVR",
-    "ROI",
-    "EPV",
-    "EPC",
-];

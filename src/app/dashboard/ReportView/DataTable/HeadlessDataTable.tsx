@@ -1,6 +1,6 @@
 "use client";
 
-import { useRows } from "../Report";
+import { useRows } from "@/hooks/useRows";
 import Rows from "./Rows";
 import { EItemName, TClick } from "@/lib/types";
 import { TView } from "@/lib/store";

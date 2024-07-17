@@ -2,17 +2,21 @@
 
 import { useEffect } from "react";
 import { faLink, faPencil, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { newPrimaryItemActionMenu, TActionMenu, TPrimaryData, useReportView } from "./ReportViewContext";
+import { TPrimaryData, useReportView } from "../ReportViewContext";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import CalendarButton from "@/components/CalendarButton";
 import RefreshButton from "@/components/RefreshButton";
 import ReportButton from "@/components/ReportButton";
-import ReportChain, { TReportChain } from "./ReportChain";
+import ReportChain, { TReportChain } from "../ReportChain";
+import LowerCPWrapper from "./LowerCPWrapper";
+import LowerCPRow from "./LowerCPRow";
 import { TView, useViewsStore } from "@/lib/store";
 import Button from "@/components/Button";
-import { encodeTimeframe } from "@/lib/utils";
+import { newPrimaryItemActionMenu } from "../ActionMenu";
+import { TActionMenu } from "../ActionMenu/types";
+import { encodeTimeframe, getPrimaryItemById, isPrimary } from "@/lib/utils";
 import { EItemName } from "@/lib/types";
-import { TRow } from "./DataTable";
+import { TRow } from "../DataTable";
 
 export default function LowerControlPanel({ view, onNewReport, reportItemName, rows, setRows }: {
     view: TView;
@@ -105,31 +109,6 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
     )
 }
 
-export function LowerCPWrapper({ children }: {
-    children: React.ReactNode;
-}) {
-    return (
-        <div
-            className="flex flex-col justify-center gap-6 w-full px-8 py-6 bg-[#ebedef]"
-            style={{ borderTop: "solid lightgrey 3px" }}
-        >
-            {children}
-        </div>
-    )
-}
-
-export function LowerCPRow({ children }: {
-    children: React.ReactNode
-}) {
-    return (
-        <div className="flex gap-6 w-full">
-            <div className="flex flex-wrap gap-2 justify-center items-center">
-                {children}
-            </div>
-        </div>
-    )
-}
-
 function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: number): TActionMenu | null {
     let actionMenu: TActionMenu | null = null;
     if (itemName === EItemName.AFFILIATE_NETWORK) {
@@ -208,22 +187,4 @@ function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: numb
         };
     }
     return actionMenu;
-}
-
-export function getPrimaryItemById<T extends keyof TPrimaryData>(
-    primaryData: TPrimaryData,
-    itemName: T,
-    id: number
-): TPrimaryData[T][number] | null {
-    const items = primaryData[itemName];
-    return items.find(item => item.id === id) ?? null;
-}
-
-export function isPrimary(itemName: EItemName): boolean {
-    return itemName === EItemName.AFFILIATE_NETWORK
-        || itemName === EItemName.CAMPAIGN
-        || itemName === EItemName.FLOW
-        || itemName === EItemName.LANDING_PAGE
-        || itemName === EItemName.OFFER
-        || itemName === EItemName.TRAFFIC_SOURCE;
 }

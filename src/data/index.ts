@@ -2,6 +2,7 @@ import { z } from "zod";
 import { tokenSchema, namedTokenSchema, routeSchema } from "../lib/schemas";
 import { newRoute, safeParseJson } from "@/lib/utils";
 import { TToken, TNamedToken, TRoute } from "../lib/types";
+import { newToken } from "@/app/dashboard/ReportView/TokenInput";
 
 export * from "./User";
 export * from "./AffiliateNetwork";
@@ -35,11 +36,4 @@ export async function parseTokens(jsonStr: string): Promise<TToken[]> {
 export async function parseNamedTokens(jsonStr: string): Promise<TNamedToken[]> {
     const { success, data } = await z.array(namedTokenSchema).spa(safeParseJson(jsonStr));
     return success ? data : [];
-}
-
-export function newToken(): TToken {
-    return {
-        queryParam: "",
-        value: "",
-    };
 }

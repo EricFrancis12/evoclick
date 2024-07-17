@@ -1,4 +1,5 @@
-import { TRoute, ELogicalRelation } from "./types";
+import { TPrimaryData } from "@/app/dashboard/ReportView/ReportViewContext";
+import { EItemName } from "../types";
 
 export function safeParseJson(jsonStr: string, resultIfError: unknown = {}): unknown {
     let result: unknown;
@@ -36,11 +37,28 @@ export function decodeTimeframe(str: string): [Date, Date] | null {
     return [new Date(nums[0]), new Date(nums[1])];
 }
 
-export function newRoute(): TRoute {
-    return {
-        isActive: true,
-        logicalRelation: ELogicalRelation.AND,
-        paths: [],
-        rules: [],
-    };
+export function getPrimaryItemById<T extends keyof TPrimaryData>(
+    primaryData: TPrimaryData,
+    itemName: T,
+    id: number
+): TPrimaryData[T][number] | null {
+    const items = primaryData[itemName];
+    return items.find(item => item.id === id) ?? null;
+}
+
+export function isPrimary(itemName: EItemName): boolean {
+    return itemName === EItemName.AFFILIATE_NETWORK
+        || itemName === EItemName.CAMPAIGN
+        || itemName === EItemName.FLOW
+        || itemName === EItemName.LANDING_PAGE
+        || itemName === EItemName.OFFER
+        || itemName === EItemName.TRAFFIC_SOURCE;
+}
+
+export function makeCampaignUrl(protocol: string, hostname: string, port: string, campaignPublicId: string): string {
+    return `${protocol}//${hostname}${port ? ":" + port : ""}/t?g=${campaignPublicId}`;
+}
+
+export function makeClickUrl(protocol: string, hostname: string, port: string) {
+    return `${protocol}//${hostname}${port ? ":" + port : ""}/click`;
 }
