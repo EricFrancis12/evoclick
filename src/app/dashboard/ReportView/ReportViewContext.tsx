@@ -9,14 +9,13 @@ import FlowBuilder from "./FlowBuilder";
 import TagsInput from "@/components/TagsInput";
 import Button from "@/components/Button";
 import { Input, Select, SelectionButtons } from "@/components/base";
-import { getPrimaryItemById } from "./LowerControlPanel";
 import { newRoute } from "@/lib/utils";
 import {
     createNewAffiliateNetworkAction, createNewCampaignAction, createNewFlowAction,
     createNewLandingPageAction, createNewOfferAction, createNewTrafficSourceAction,
     getAllAffiliateNetworksAction, getAllFlowsAction, getAllTrafficSourcesAction,
-    updateAffiliateNetworkAction, updateCampaignAction, updateFlowAction,
-    updateLandingPageAction, updateOfferAction, updateTrafficSourceAction
+    getOneCampaignAction, updateAffiliateNetworkAction, updateCampaignAction,
+    updateFlowAction, updateLandingPageAction, updateOfferAction, updateTrafficSourceAction
 } from "@/lib/actions";
 import {
     EItemName, TAffiliateNetwork, TCampaign, TClick, TSavedFlow,
@@ -719,13 +718,14 @@ function CampaignLinksBody({ actionMenu, setActionMenu }: {
     actionMenu: TCampaignLinksActionMenu;
     setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 }) {
-    const { primaryData } = useReportView();
-
     const [campaign, setCampaign] = useState<TCampaign | null>(null);
 
+    const getOneCampaign = getOneCampaignAction.bind(null);
+
     useEffect(() => {
-        const _campaign = getPrimaryItemById(primaryData, "campaigns", actionMenu.campaignId);
-        if (_campaign) setCampaign(_campaign);
+        getOneCampaign(actionMenu.campaignId)
+            .then(_campaign => setCampaign(_campaign))
+            .catch(() => toast.error("Error fetching Campaign"));
     }, []);
 
     return (
