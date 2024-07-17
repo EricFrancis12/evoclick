@@ -12,9 +12,10 @@ import { TCampaign, TCampaign_createRequest, TCampaign_updateRequest } from "../
 const makeKey = makeRedisKeyFunc("campaign");
 
 export async function getAllCampaigns(): Promise<TCampaign[]> {
-    const campaigns: Campaign[] = await db.campaign.findMany();
-    const proms: Promise<TCampaign>[] = campaigns.map(campaign => makeClientCampaign(campaign));
-    return Promise.all(proms);
+    // const campaigns: Campaign[] = await db.campaign.findMany();
+    // const proms: Promise<TCampaign>[] = campaigns.map(campaign => makeClientCampaign(campaign));
+    // return Promise.all(proms);
+    return [];
 }
 
 export async function getCampaignById(id: number): Promise<TCampaign | null> {
