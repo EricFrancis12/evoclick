@@ -3,6 +3,7 @@
 import { useRef, Fragment } from "react";
 import useDragger from "@/hooks/useDragger";
 import RowWrapper from "./RowWrapper";
+import CheckboxWrapper from "./CheckboxWrapper";
 import Cell from "./Cell";
 import { TColumn } from ".";
 
@@ -15,8 +16,8 @@ export default function TitleRow({ name, columns, setColumns }: {
 
     const startDrag = useDragger((e, i) => {
         if (typeof i === "number") {
-            const newWidth = `${parseFloat(columns[i].width) + e.clientX - mouseDownClientX.current}px`;
-            setColumns(columns.map((col, index) => index === i ? { ...col, width: newWidth } : col));
+            const width = `${parseFloat(columns[i].width) + e.clientX - mouseDownClientX.current}px`;
+            setColumns(columns.map((col, index) => index === i ? { ...col, width } : col));
         }
     });
 
@@ -27,9 +28,14 @@ export default function TitleRow({ name, columns, setColumns }: {
 
     return (
         <RowWrapper>
+            <CheckboxWrapper />
             {columns.map(({ title, width }, index) => (
                 <Fragment key={index}>
-                    <Cell value={index === 0 ? name : title} width={width} />
+                    <Cell
+                        value={index === 0 ? name : title}
+                        width={width}
+                        className="font-bold"
+                    />
                     <div className="relative h-auto w-[0px] overflow-visible">
                         <div
                             className="absolute top-0 left-0 h-full w-[1px] bg-blue-500 cursor-e-resize"

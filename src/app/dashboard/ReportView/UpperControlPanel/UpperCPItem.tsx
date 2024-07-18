@@ -4,22 +4,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import useActiveView from "@/hooks/useActiveView";
 import { EItemName } from "@/lib/types";
+import { itemNameToIcon } from "../Report";
 
-export type TUpperCPItem = {
+export default function UpperCPItem({ itemName, onClick = () => { } }: {
     itemName: EItemName;
-    icon: IconDefinition;
-};
-
-export default function UpperCPItem({ item, onClick = () => { } }: {
-    item: TUpperCPItem;
-    onClick?: (item: TUpperCPItem) => void;
+    onClick?: (item: EItemName) => void;
 }) {
     const activeView = useActiveView();
-    const isActive = activeView?.itemName === item.itemName;
+    const isActive = activeView?.itemName === itemName;
 
-    function handleClick(e: React.MouseEvent<HTMLDivElement>, item: TUpperCPItem) {
+    function handleClick(e: React.MouseEvent<HTMLDivElement>, itemName: EItemName) {
         e.stopPropagation();
-        onClick(item);
+        onClick(itemName);
     }
 
     return (
@@ -27,11 +23,11 @@ export default function UpperCPItem({ item, onClick = () => { } }: {
             <div
                 className={(isActive ? "text-white bg-[#1f76c6] " : "text-black bg-transparent ")
                     + "relative flex items-center py-1 px-2 rounded-sm cursor-pointer hover:bg-[#1f76c6] hover:text-white"}
-                onClick={e => handleClick(e, item)}
+                onClick={e => handleClick(e, itemName)}
             >
-                <FontAwesomeIcon icon={item.icon} className="mr-[4px]" />
+                <FontAwesomeIcon icon={itemNameToIcon(itemName)} className="mr-[4px]" />
                 <span className="mr-[4px]">
-                    {item.itemName}
+                    {itemName}
                 </span>
             </div>
         </div>

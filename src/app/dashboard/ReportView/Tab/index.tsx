@@ -5,14 +5,24 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { TView } from "@/lib/store";
 import TabContainer from "./TabContainer";
+import { getPrimaryItemById, isPrimary, itemNameToKeyOfPrimaryData } from "@/lib/utils";
+import { useReportView } from "../ReportViewContext";
 
-export default function Tab({ view, onClick, onClose }: {
+export default function Tab({ view, onClick, onClose, reportItemId }: {
     view: TView;
     onClick: (view: TView) => void;
     onClose?: (view: TView) => void;
+    reportItemId?: number;
 }) {
     const { type, reportItemName, icon } = view;
     const isActive = useIsTabActive(view);
+
+    const { primaryData } = useReportView();
+
+    const { primaryItemName } = reportItemName ? isPrimary(reportItemName) : { primaryItemName: null };
+    const key = primaryItemName ? itemNameToKeyOfPrimaryData(primaryItemName) : null;
+    const result = primaryItemName && key && reportItemId ? getPrimaryItemById(primaryData, key, reportItemId) : null;
+    const { name } = result || { name: "" };
 
     function handleClose(e: React.MouseEvent<HTMLOrSVGElement>) {
         e.stopPropagation();
@@ -33,7 +43,7 @@ export default function Tab({ view, onClick, onClose }: {
                 }}
             >
                 <FontAwesomeIcon icon={icon} />
-                <span>{type === "main" ? "Dashboard" : reportItemName}</span>
+                <span>{type === "main" ? "Dashboard" : `${reportItemName}${name ? ": " + name : ""}`}</span>
                 {onClose &&
                     <FontAwesomeIcon
                         icon={faClose}

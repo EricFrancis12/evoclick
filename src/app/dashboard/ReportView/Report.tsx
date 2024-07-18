@@ -1,6 +1,6 @@
 "use client";
 
-import { faBullseye } from "@fortawesome/free-solid-svg-icons";
+import { faBullseye, faFolder, faGlobe, faGlobeEurope, faHandshake, faLaptop, faMobile, faSitemap, faUsers, faWifi, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { useReportView } from "./ReportViewContext";
 import { useRows } from "@/hooks/useRows";
 import useQueryRouter from "@/hooks/useQueryRouter";
@@ -29,7 +29,7 @@ export default function Report({ view, reportItemName }: {
         const selectedRows = rows.filter(row => row.selected);
         if (selectedRows.length < 1) return;
         const newViewItemName = itemName !== EItemName.CAMPAIGN ? EItemName.CAMPAIGN : EItemName.OFFER;
-        const newView = newReportView(newViewItemName, faBullseye, itemName, selectedRows[0].id.toString());
+        const newView = newReportView(newViewItemName, itemNameToIcon(itemName), itemName, selectedRows[0].id.toString());
         if (!reportViews.some(v => v.itemName === newView.itemName && v.id === newView.id)) {
             addReportView(newView);
         }
@@ -44,7 +44,7 @@ export default function Report({ view, reportItemName }: {
     return rows
         ? <>
             <UpperControlPanel
-                onClick={item => updateViewItemNameById(id, item.itemName)}
+                onClick={itemName => updateViewItemNameById(id, itemName)}
                 reportItemName={reportItemName}
             />
             <LowerControlPanel
@@ -62,3 +62,30 @@ export default function Report({ view, reportItemName }: {
         </>
         : <ReportSkeleton />
 }
+
+export function itemNameToIcon(itemName: EItemName): IconDefinition {
+    return itemNameIconsMap[itemName];
+}
+
+const itemNameIconsMap: Record<EItemName, IconDefinition> = {
+    [EItemName.AFFILIATE_NETWORK]: faUsers,
+    [EItemName.CAMPAIGN]: faBullseye,
+    [EItemName.FLOW]: faSitemap,
+    [EItemName.LANDING_PAGE]: faFolder,
+    [EItemName.OFFER]: faHandshake,
+    [EItemName.TRAFFIC_SOURCE]: faGlobe,
+    [EItemName.IP]: faWifi,
+    [EItemName.ISP]: faWifi,
+    [EItemName.USER_AGENT]: faWifi,
+    [EItemName.LANGUAGE]: faGlobeEurope,
+    [EItemName.COUNTRY]: faGlobeEurope,
+    [EItemName.REGION]: faGlobeEurope,
+    [EItemName.CITY]: faGlobeEurope,
+    [EItemName.DEVICE_TYPE]: faLaptop,
+    [EItemName.DEVICE]: faLaptop,
+    [EItemName.SCREEN_RESOLUTION]: faLaptop,
+    [EItemName.OS]: faMobile,
+    [EItemName.OS_VERSION]: faMobile,
+    [EItemName.BROWSER_NAME]: faFolder,
+    [EItemName.BROWSER_VERSION]: faFolder,
+};

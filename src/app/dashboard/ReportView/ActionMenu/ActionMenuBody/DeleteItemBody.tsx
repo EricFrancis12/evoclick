@@ -3,7 +3,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { faCheckCircle, faDotCircle, faSpinner, faTrash, faXmarkCircle, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { TPrimaryData, useReportView } from "../../ReportViewContext";
+import { useReportView } from "../../ReportViewContext";
 import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import Button from "@/components/Button";
 import {
@@ -11,9 +11,12 @@ import {
     deleteLandingPageAction, deleteOfferAction, deleteTrafficSourceAction,
     revalidatePathAction
 } from "@/lib/actions";
-import { formatErr, getPrimaryItemById, isPrimary, itemNameToKeyOfPrimaryData } from "@/lib/utils";
+import { formatErr, getPrimaryItemById, itemNameToKeyOfPrimaryData } from "@/lib/utils";
 import { TActionMenu, TDeleteItemsActionMenu } from "../types";
-import { EItemName, TAffiliateNetwork, TCampaign, TLandingPage, TOffer, TPrimaryItemName, TSavedFlow, TTrafficSource } from "@/lib/types";
+import {
+    EItemName, TAffiliateNetwork, TCampaign, TLandingPage,
+    TOffer, TPrimaryItemName, TSavedFlow, TTrafficSource
+} from "@/lib/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type TDeletionStatus = "idle" | "pending" | "success" | "failed";

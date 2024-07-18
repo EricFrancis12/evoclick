@@ -26,12 +26,20 @@ export function Input({ name = "", placeholder = "", value, onChange }: {
     )
 }
 
-export function Select({ name = "", value, onChange, children, disabled }: {
+const selectClassName = "w-full px-2 py-1 ";
+const selectStyle = {
+    border: "solid 1px grey",
+    borderRadius: "6px"
+};
+
+export function Select({ name = "", value, onChange, children, disabled, className, style }: {
     name?: string;
     value: string | number | readonly string[] | undefined;
     onChange: React.ChangeEventHandler<HTMLSelectElement>;
     children: React.ReactNode;
     disabled?: boolean;
+    className?: string;
+    style?: React.CSSProperties;
 }) {
     return (
         <Wrapper>
@@ -40,17 +48,33 @@ export function Select({ name = "", value, onChange, children, disabled }: {
             </span>
             <select
                 disabled={disabled}
-                className="w-full px-2 py-1"
-                style={{
-                    border: "solid 1px grey",
-                    borderRadius: "6px"
-                }}
+                className={selectClassName + className}
+                style={{ ...selectStyle, ...style }}
                 value={value}
                 onChange={onChange}
             >
                 {children}
             </select>
         </Wrapper>
+    )
+}
+
+export function DummySelect({ children, className, style }: {
+    children: React.ReactNode;
+    className?: string;
+    style?: React.CSSProperties;
+}) {
+    return (
+        <div>
+            <Wrapper>
+                <div
+                    className={selectClassName + className}
+                    style={{ ...selectStyle, ...style }}
+                >
+                    {children}
+                </div>
+            </Wrapper>
+        </div>
     )
 }
 
@@ -91,11 +115,13 @@ export function SelectionButtons({ name = "", options, value, onClick, children 
     )
 }
 
-export function Wrapper({ children }: {
-    children: React.ReactNode
+export function Wrapper({ children, className, style }: {
+    children: React.ReactNode;
+    className?: string;
+    style?: React.CSSProperties;
 }) {
     return (
-        <div className="flex flex-col justify-start items-start w-full">
+        <div className={"flex flex-col justify-start items-start w-full " + className} style={style}>
             {children}
         </div>
     )

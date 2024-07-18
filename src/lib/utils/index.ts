@@ -1,6 +1,15 @@
 import { TPrimaryData } from "@/app/dashboard/ReportView/ReportViewContext";
 import { EItemName, TPrimaryItemName } from "../types";
 
+export function upperCaseFirstLetter(str: string): string {
+    if (str === "") return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function titleCase(str: string): string {
+    return str.split(" ").map(upperCaseFirstLetter).join(" ");
+}
+
 export function safeParseJson(jsonStr: string, resultIfError: unknown = {}): unknown {
     let result: unknown;
     try {
@@ -15,10 +24,6 @@ export function formatErr(err: unknown): string {
     if (typeof err === "string") return err;
     if (err instanceof Error) return err.message;
     return "Unknown error";
-}
-
-export function promFrom<T>(t: T): () => Promise<T> {
-    return async () => t;
 }
 
 // Determines whether an element contains overflowing nodes or not

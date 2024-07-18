@@ -16,10 +16,10 @@ export default function UpperControlPanelSkeleton({ reportItemName }: {
             {rows.map((row, index) => (
                 <UpperCPRow key={index}>
                     {row
-                        .filter(item => "itemName" in item ? item.itemName !== reportItemName : true)
+                        .filter(item => typeof item === "string" ? item !== reportItemName : true)
                         .map((item, _index) => (
                             <DummyItem key={_index} className="h-2">
-                                <span className="opacity-0">{"itemName" in item ? item.itemName : item.name}</span>
+                                <span className="opacity-0">{typeof item === "string" ? item : item.name}</span>
                             </DummyItem>
                         ))}
                 </UpperCPRow>

@@ -2,6 +2,7 @@
 
 import { useRows } from "@/hooks/useRows";
 import Rows from "./Rows";
+import { reportChainColors } from "../ReportChain";
 import { EItemName, TClick } from "@/lib/types";
 import { TView } from "@/lib/store";
 import { TColumn } from ".";
@@ -13,14 +14,19 @@ export default function HeadlessDataTable({ clicks, itemName, columns, view, dep
     view: TView;
     depth: number;
 }) {
+    const newDepth = depth + 1;
+
     return itemName
-        ? <div className="py-4 bg-blue-200">
+        ? <div
+            className="py-4 bg-blue-200"
+            style={{ backgroundColor: reportChainColors[newDepth]?.light }}
+        >
             <_Rows
                 clicks={clicks}
                 itemName={itemName}
                 columns={columns}
                 view={view}
-                depth={depth}
+                depth={newDepth}
             />
         </div>
         : "";
@@ -41,7 +47,7 @@ function _Rows({ clicks, itemName, columns, view, depth }: {
             setRows={setRows}
             columns={columns}
             view={view}
-            depth={depth + 1}
+            depth={depth}
         />
         : "";
 }

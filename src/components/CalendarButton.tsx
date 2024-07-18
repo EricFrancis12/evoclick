@@ -13,6 +13,7 @@ import "react-day-picker/dist/style.css";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { format, endOfDay } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { buttonStyle } from "./Button";
 
 export default function CalendarButton({ timeframe, onChange }: {
     timeframe: [Date, Date];
@@ -49,7 +50,7 @@ export function DateRangePicker({ initialTimeframe, onChange, className }: {
     }
 
     return (
-        <div className={cn("grid gap-2", className)}>
+        <div className={cn("grid gap-2", className)} style={buttonStyle}>
             <Popover>
                 <PopoverTrigger asChild>
                     <Button

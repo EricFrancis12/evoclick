@@ -109,6 +109,7 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
                         reportChain={view.reportChain}
                         onChange={handleReportChainChange}
                         omissions={reportItemName ? [view.itemName, reportItemName] : [view.itemName]}
+                        itemName={view.itemName}
                     />
                 }
                 {view.type === "main" &&

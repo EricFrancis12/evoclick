@@ -6,18 +6,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import useActiveView from "@/hooks/useActiveView";
 import useHover from "@/hooks/useHover";
-import { TUpperCPItem } from "./UpperCPItem";
 import { EItemName } from "@/lib/types";
 
 export type TUpperCPItemGroup = {
     name: string;
     icon: IconDefinition;
-    children: TUpperCPItem[];
+    children: EItemName[];
 };
 
 export default function UpperCPItemGroup({ itemGroup, onClick = () => { }, reportItemName }: {
     itemGroup: TUpperCPItemGroup;
-    onClick?: (item: TUpperCPItem) => void;
+    onClick?: (itemName: EItemName) => void;
     reportItemName?: EItemName;
 }) {
     const ref = useRef(null);
@@ -26,10 +25,10 @@ export default function UpperCPItemGroup({ itemGroup, onClick = () => { }, repor
     const activeView = useActiveView()
     const isActive = useGroupIsActive(itemGroup);
 
-    function handleClick(e: React.MouseEvent<HTMLDivElement>, item: TUpperCPItem) {
+    function handleClick(e: React.MouseEvent<HTMLDivElement>, itemName: EItemName) {
         e.stopPropagation();
         setHover(false);
-        onClick(item);
+        onClick(itemName);
     }
 
     return (
@@ -47,15 +46,15 @@ export default function UpperCPItemGroup({ itemGroup, onClick = () => { }, repor
                 {isHovered &&
                     <div className="absolute top-[100%] bg-white text-black border border-black rounded-sm">
                         {itemGroup.children
-                            .filter(item => item.itemName !== reportItemName)
-                            .map((item, index) => (
+                            .filter(itemName => itemName !== reportItemName)
+                            .map((itemName, index) => (
                                 <div
                                     key={index}
                                     className="p-1 bg-white hover:bg-blue-300"
-                                    onClick={e => handleClick(e, item)}
+                                    onClick={e => handleClick(e, itemName)}
                                 >
                                     <span style={{ whiteSpace: "nowrap" }}>
-                                        {item.itemName}
+                                        {itemName}
                                     </span>
                                 </div>
                             ))}
@@ -69,8 +68,8 @@ export default function UpperCPItemGroup({ itemGroup, onClick = () => { }, repor
 function useGroupIsActive(group: TUpperCPItemGroup): boolean {
     const activeView = useActiveView()
     if (!activeView) return false;
-    for (const item of group.children) {
-        if (item.itemName === activeView.itemName) return true;
+    for (const itemName of group.children) {
+        if (itemName === activeView.itemName) return true;
     }
     return false;
 }
