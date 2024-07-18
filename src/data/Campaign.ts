@@ -59,14 +59,16 @@ export async function getCampaignById(id: number): Promise<TCampaign | null> {
 }
 
 export async function createNewCampaign(creationRequest: TCampaign_createRequest): Promise<TCampaign> {
+    const mainRoute = creationRequest.flowMainRoute ?? newRoute();
+    const ruleRoutes = creationRequest.flowRuleRoutes ?? [];
     const campaignProm = db.campaign.create({
         data: {
             ...creationRequest,
             publicId: crypto.randomUUID() as string,
             // Changing flowMainRoute and flowRuleRoutes into strings because
             // they are saved as strings in the db
-            flowMainRoute: JSON.stringify(creationRequest.flowMainRoute ?? newRoute()),
-            flowRuleRoutes: JSON.stringify(creationRequest.flowRuleRoutes ?? []),
+            flowMainRoute: JSON.stringify(mainRoute),
+            flowRuleRoutes: JSON.stringify(ruleRoutes),
         }
     });
 
@@ -84,14 +86,16 @@ export async function createNewCampaign(creationRequest: TCampaign_createRequest
 }
 
 export async function updateCampaignById(id: number, data: TCampaign_updateRequest): Promise<TCampaign> {
+    const mainRoute = data.flowMainRoute ?? newRoute();
+    const ruleRoutes = data.flowRuleRoutes ?? [];
     const campaignProm = db.campaign.update({
         where: { id },
         data: {
             ...data,
             // Changing flowMainRoute and flowRuleRoutes into strings because
             // they are saved as strings in the db
-            flowMainRoute: JSON.stringify(data.flowMainRoute ?? newRoute()),
-            flowRuleRoutes: JSON.stringify(data.flowRuleRoutes ?? []),
+            flowMainRoute: JSON.stringify(mainRoute),
+            flowRuleRoutes: JSON.stringify(ruleRoutes),
         }
     });
 
