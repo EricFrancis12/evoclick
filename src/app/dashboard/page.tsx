@@ -36,23 +36,19 @@ export default async function DashboardPage({ params, searchParams }: {
         const trafficSourcesProm = getAllTrafficSources();
 
         const clicks = await clicksProm;
-        const affiliateNetworks = await affilaiteNetworksProm;
-        const campaigns = await campaignsProm;
-        const flows = await flowsProm;
-        const landingPages = await landingPagesProm;
-        const offers = await offersProm;
-        const trafficSources = await trafficSourcesProm;
+
+        const primaryData = {
+            affiliateNetworks: await affilaiteNetworksProm,
+            campaigns: await campaignsProm,
+            flows: await flowsProm,
+            landingPages: await landingPagesProm,
+            offers: await offersProm,
+            trafficSources: await trafficSourcesProm,
+        };
 
         return (
             <ReportView
-                primaryData={{
-                    affiliateNetworks,
-                    campaigns,
-                    flows,
-                    landingPages,
-                    offers,
-                    trafficSources,
-                }}
+                primaryData={primaryData}
                 clicks={clicks}
                 timeframe={timeframe}
                 reportItemName={reportItemName ?? undefined}
@@ -60,7 +56,7 @@ export default async function DashboardPage({ params, searchParams }: {
         )
     } catch (err) {
         console.error(err);
-        return "Error fetching clicks from db :(";
+        return "Error fetching data from db :(";
     }
 }
 

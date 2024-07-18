@@ -35,10 +35,15 @@ export default function CampaignBody({ actionMenu, setActionMenu }: {
     }, []);
 
     async function handleSave() {
+        if (!actionMenu.trafficSourceId) {
+            toast.error("A Traffic Source is required");
+            return;
+        };
         if (!actionMenu.flowType) {
             toast.error("A flow type is required");
             return;
         };
+
         try {
             const {
                 id, name, landingPageRotationType, offerRotationType, geoName, tags, trafficSourceId,

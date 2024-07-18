@@ -13,7 +13,7 @@ export function useRows(clicks: TClick[], itemName: EItemName) {
     useEffect(() => {
         const newRows = makeRows(clicks, itemName, makeEnrichWith(itemName, primaryData));
         setRows(newRows);
-    }, [clicks.length, itemName]);
+    }, [clicks.length, primaryData, itemName]);
 
     const value: [TRow[] | null, React.Dispatch<React.SetStateAction<TRow[] | null>>] = [rows, setRows];
     return value;
