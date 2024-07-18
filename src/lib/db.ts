@@ -4,16 +4,16 @@ const prismaClientSingleton = () => {
     const prisma = new PrismaClient({
         log: [
             {
-                emit: 'event',
-                level: 'error',
+                emit: "event",
+                level: "error",
             },
             {
-                emit: 'event',
-                level: 'info',
+                emit: "event",
+                level: "info",
             },
             {
-                emit: 'event',
-                level: 'warn',
+                emit: "event",
+                level: "warn",
             },
         ],
     });
@@ -21,9 +21,9 @@ const prismaClientSingleton = () => {
     if (process.env.NODE_ENV !== "test" // Prevents logs during tests
         && process.env.NEXT_PHASE !== "phase-production-build" // Prevents logs during next build
     ) {
-        prisma.$on('error', e => console.error(e.message));
-        prisma.$on('info', e => console.log(e.message));
-        prisma.$on('warn', e => console.log(e.message));
+        prisma.$on("error", e => console.error(e.message));
+        prisma.$on("info", e => console.log(e.message));
+        prisma.$on("warn", e => console.log(e.message));
     }
 
     return prisma;
