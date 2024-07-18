@@ -14,12 +14,7 @@ const makeKey = makeRedisKeyFunc("campaign");
 export async function getAllCampaigns(): Promise<TCampaign[]> {
     const campaigns: Campaign[] = await db.campaign.findMany();
     const proms: Promise<TCampaign>[] = campaigns.map(makeClientCampaign);
-    const result: TCampaign[] = [];
-    for (const prom of proms) {
-        const campaign = await prom;
-        result.push(campaign);
-    }
-    return result;
+    return Promise.all(proms);
 }
 
 export async function getCampaignById(id: number): Promise<TCampaign | null> {
