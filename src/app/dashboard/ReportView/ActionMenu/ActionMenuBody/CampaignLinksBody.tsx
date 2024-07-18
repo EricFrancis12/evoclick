@@ -22,7 +22,7 @@ export default function CampaignLinksBody({ actionMenu }: {
 
     useEffect(() => {
         getOneCampaign(actionMenu.campaignId)
-            .then(_campaign => setCampaign(_campaign))
+            .then(setCampaign)
             .catch(() => toast.error("Error fetching Campaign"));
     }, []);
 
@@ -30,6 +30,7 @@ export default function CampaignLinksBody({ actionMenu }: {
         <ActionMenuBodyWrapper>
             {campaign &&
                 <div className="flex flex-col gap-4 w-full p-2">
+                    <span>Campaign Name: {campaign.name}</span>
                     <CampaignLinksRows campaign={campaign} />
                 </div>
             }

@@ -1,6 +1,8 @@
 "use client";
 
-import { UpperCPWrapper, UpperCPRow, upperCPItems, upperCPItemGroups } from "../UpperControlPanel";
+import { upperCPItems, upperCPItemGroups } from "../UpperControlPanel";
+import UpperCPWrapper from "../UpperControlPanel/UpperCPWrapper";
+import UpperCPRow from "../UpperControlPanel/UpperCPRow";
 import { DummyItem } from "./DummyItem";
 import { EItemName } from "@/lib/types";
 

@@ -7,8 +7,10 @@ import LandingPageBody from "./LandingPageBody";
 import OfferBody from "./OfferBody";
 import TrafficSourceBody from "./TrafficSourceBody";
 import CampaignLinksBody from "./CampaignLinksBody";
+import DeleteItemBody from "./DeleteItemBody";
 import { EItemName } from "@/lib/types";
 import { TActionMenu } from "../types";
+import { isPrimary } from "@/lib/utils";
 
 export default function ActionMenuBody({ actionMenu, setActionMenu }: {
     actionMenu: TActionMenu;
@@ -29,6 +31,8 @@ export default function ActionMenuBody({ actionMenu, setActionMenu }: {
             return <TrafficSourceBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
         case "campaign links":
             return <CampaignLinksBody actionMenu={actionMenu} setActionMenu={setActionMenu} />
+        case "delete item":
+            return <DeleteItemBody actionMenu={actionMenu} setActionMenu={setActionMenu} />
         default:
             return "";
     }

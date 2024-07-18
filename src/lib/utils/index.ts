@@ -1,5 +1,5 @@
 import { TPrimaryData } from "@/app/dashboard/ReportView/ReportViewContext";
-import { EItemName } from "../types";
+import { EItemName, TPrimaryItemName } from "../types";
 
 export function safeParseJson(jsonStr: string, resultIfError: unknown = {}): unknown {
     let result: unknown;
@@ -43,20 +43,57 @@ export function decodeTimeframe(str: string): [Date, Date] | null {
 
 export function getPrimaryItemById<T extends keyof TPrimaryData>(
     primaryData: TPrimaryData,
-    itemName: T,
+    key: T,
     id: number
 ): TPrimaryData[T][number] | null {
-    const items = primaryData[itemName];
+    const items = primaryData[key];
     return items.find(item => item.id === id) ?? null;
 }
 
-export function isPrimary(itemName: EItemName): boolean {
-    return itemName === EItemName.AFFILIATE_NETWORK
+export function itemNameToKeyOfPrimaryData(itemName: TPrimaryItemName): keyof TPrimaryData {
+    switch (itemName) {
+        case EItemName.AFFILIATE_NETWORK:
+            return "affiliateNetworks";
+        case EItemName.CAMPAIGN:
+            return "campaigns";
+        case EItemName.FLOW:
+            return "flows";
+        case EItemName.LANDING_PAGE:
+            return "landingPages";
+        case EItemName.OFFER:
+            return "offers";
+        case EItemName.TRAFFIC_SOURCE:
+            return "trafficSources";
+    }
+}
+
+export type isPrimaryResult = {
+    bool: true;
+    primaryItemName: TPrimaryItemName;
+} | {
+    bool: false;
+    primaryItemName: null;
+};
+
+// Returns whether an EItemName is a TPrimaryItemName or not.
+// Uses a diverging union to transform EItemName into a TPrimaryItemName if bool is true
+export function isPrimary(itemName: EItemName): isPrimaryResult {
+    if (itemName === EItemName.AFFILIATE_NETWORK
         || itemName === EItemName.CAMPAIGN
         || itemName === EItemName.FLOW
         || itemName === EItemName.LANDING_PAGE
         || itemName === EItemName.OFFER
-        || itemName === EItemName.TRAFFIC_SOURCE;
+        || itemName === EItemName.TRAFFIC_SOURCE
+    ) {
+        return {
+            bool: true,
+            primaryItemName: itemName,
+        };
+    }
+    return {
+        bool: false,
+        primaryItemName: null,
+    };
 }
 
 export function makeCampaignUrl(protocol: string, hostname: string, port: string, campaignPublicId: string): string {

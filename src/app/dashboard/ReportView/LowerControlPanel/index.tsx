@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { faLink, faPencil, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faLink, faPencil, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { TPrimaryData, useReportView } from "../ReportViewContext";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import CalendarButton from "@/components/CalendarButton";
@@ -44,6 +44,16 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
         setActionMenu(makeActionMenu(primaryData, view.itemName, selectedRows[0].id));
     }
 
+    function handleDeleteItem() {
+        const { bool, primaryItemName } = isPrimary(view.itemName);
+        if (!bool) return;
+        setActionMenu({
+            type: "delete item",
+            primaryItemName,
+            ids: selectedRows.map(row => row.id).filter(id => typeof id === "number"),
+        });
+    }
+
     function handleReportChainChange(reportChain: TReportChain) {
         setRows(rows.map(row => ({ ...row, selected: false }))); // Deselect all rows on report chain change
         updateViewReportChainById(view.id, reportChain)
@@ -74,24 +84,21 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
                             onClick={onNewReport}
                             disabled={selectedRows.length < 1}
                         />
-                        {selectedRows.length > 0 && isPrimary(view.itemName)
-                            ? <Button
-                                text={`Edit ${view.itemName}`}
-                                icon={faPencil}
-                                onClick={handleEditItem}
-                            />
-                            : <Button
-                                text={`Create New ${isPrimary(view.itemName) ? view.itemName : EItemName.CAMPAIGN}`}
-                                icon={faPlus}
-                                onClick={handleCreateNewItem}
-                            />
-                        }
-                        {(selectedRows.length === 1 && view.itemName === EItemName.CAMPAIGN) &&
-                            <Button
-                                text="Get Campaign Links"
-                                icon={faLink}
-                                onClick={() => handleGetCampaignLinks(selectedRows[0].id)}
-                            />
+                        {isPrimary(view.itemName).bool &&
+                            <>
+                                <Button
+                                    text={`Edit ${view.itemName}`}
+                                    icon={faPencil}
+                                    disabled={selectedRows.length !== 1}
+                                    onClick={handleEditItem}
+                                />
+                                <Button
+                                    text={`Delete ${view.itemName}${selectedRows.length > 1 ? "s" : ""}`}
+                                    icon={faTrash}
+                                    disabled={selectedRows.length === 0}
+                                    onClick={handleDeleteItem}
+                                />
+                            </>
                         }
                     </>
                 }
@@ -103,6 +110,22 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
                         onChange={handleReportChainChange}
                         omissions={reportItemName ? [view.itemName, reportItemName] : [view.itemName]}
                     />
+                }
+                {view.type === "main" &&
+                    <>
+                        <Button
+                            text={`Create New ${isPrimary(view.itemName).bool ? view.itemName : EItemName.CAMPAIGN}`}
+                            icon={faPlus}
+                            onClick={handleCreateNewItem}
+                        />
+                        {(view.itemName === EItemName.CAMPAIGN && selectedRows.length > 0) &&
+                            <Button
+                                text="Get Campaign Links"
+                                icon={faLink}
+                                onClick={() => handleGetCampaignLinks(selectedRows[0].id)}
+                            />
+                        }
+                    </>
                 }
             </LowerCPRow>
         </LowerCPWrapper>

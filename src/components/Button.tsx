@@ -17,19 +17,18 @@ export default function Button({ children, disabled, icon, onClick, text = "", c
     return (
         <div className={className} style={{ userSelect: "none" }}>
             <div onClick={handleClick}
-                className={(!disabled ? "cursor-pointer hover:opacity-70 " : "opacity-40 ") + " px-2 py-2"}
+                className={(!disabled ? "cursor-pointer hover:opacity-70" : "opacity-40")
+                    + " flex justify-center items-center gap-2 px-2 py-2"}
                 style={{
                     border: "solid lightgrey 1px",
                     borderRadius: "6px",
                     backgroundImage: "linear-gradient(0deg,var(--color-gray5),var(--color-white))"
                 }}
             >
-                {icon && <FontAwesomeIcon icon={icon} className="mr-[4px]" />}
-                <span className="mr-[4px]">
-                    {children}
-                    {text}
-                </span>
-            </div >
+                {icon && <FontAwesomeIcon icon={icon} />}
+                {text && <span>{text}</span>}
+                {children}
+            </div>
         </div>
     )
 }

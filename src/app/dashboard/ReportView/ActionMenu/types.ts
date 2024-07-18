@@ -1,4 +1,4 @@
-import { EItemName, TNamedToken, TRoute, TToken } from "@/lib/types";
+import { EItemName, TAffiliateNetwork, TCampaign, TLandingPage, TNamedToken, TOffer, TPrimaryItemName, TRoute, TSavedFlow, TToken, TTrafficSource } from "@/lib/types";
 import { $Enums } from "@prisma/client";
 
 export type TActionMenu =
@@ -8,7 +8,8 @@ export type TActionMenu =
     | TLandingPageActionMenu
     | TOfferActionMenu
     | TTrafficSourceActionMenu
-    | TCampaignLinksActionMenu;
+    | TCampaignLinksActionMenu
+    | TDeleteItemsActionMenu;
 
 export type TAffiliateNetworkActionMenu = {
     type: EItemName.AFFILIATE_NETWORK;
@@ -81,4 +82,10 @@ export type TTrafficSourceActionMenu = {
 export type TCampaignLinksActionMenu = {
     type: "campaign links";
     campaignId: number;
+};
+
+export type TDeleteItemsActionMenu = {
+    type: "delete item",
+    primaryItemName: TPrimaryItemName;
+    ids: number[];
 };

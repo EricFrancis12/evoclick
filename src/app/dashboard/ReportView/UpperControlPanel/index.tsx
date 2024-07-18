@@ -5,6 +5,8 @@ import {
     faLaptop, faMobile, faSitemap, faUsers, faWifi
 } from "@fortawesome/free-solid-svg-icons";
 import { EItemName } from "@/lib/types";
+import UpperCPWrapper from "./UpperCPWrapper";
+import UpperCPRow from "./UpperCPRow";
 import UpperCPItem, { TUpperCPItem } from "./UpperCPItem";
 import UpperCPItemGroup, { TUpperCPItemGroup } from "./UpperCPItemGroup";
 
@@ -36,26 +38,6 @@ export default function UpperControlPanel({ onClick = () => { }, reportItemName 
                 ))}
             </UpperCPRow>
         </UpperCPWrapper>
-    )
-}
-
-export function UpperCPWrapper({ children }: {
-    children: React.ReactNode;
-}) {
-    return (
-        <div className="flex flex-col justify-center gap-6 w-full px-8 py-6 bg-[#ffffff]">
-            {children}
-        </div>
-    )
-}
-
-export function UpperCPRow({ children }: {
-    children: React.ReactNode;
-}) {
-    return (
-        <div className="flex flex-wrap gap-6 w-full">
-            {children}
-        </div>
     )
 }
 

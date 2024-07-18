@@ -126,6 +126,14 @@ export enum EItemName {
     BROWSER_VERSION = ERuleName.BROWSER_VERSION,
 };
 
+export type TPrimaryItemName =
+    EItemName.AFFILIATE_NETWORK
+    | EItemName.CAMPAIGN
+    | EItemName.FLOW
+    | EItemName.LANDING_PAGE
+    | EItemName.OFFER
+    | EItemName.TRAFFIC_SOURCE;
+
 export enum EDeviceType {
     DESKTOP = "desktop",
     MOBILE = "mobile",
