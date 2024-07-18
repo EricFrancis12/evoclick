@@ -45,13 +45,15 @@ export async function getFlowById(id: number): Promise<TSavedFlow | null> {
 }
 
 export async function createNewFlow(creationRequest: TSavedFlow_createRequest): Promise<TSavedFlow> {
+    const mainRoute = creationRequest.mainRoute ?? newRoute();
+    const ruleRoutes = creationRequest.ruleRoutes ?? [];
     const flowProm = db.savedFlow.create({
         data: {
             ...creationRequest,
             // Changing mainRoute and ruleRoutes into strings because
             // they are saved as strings in the db
-            mainRoute: JSON.stringify(creationRequest.mainRoute ?? newRoute()),
-            ruleRoutes: JSON.stringify(creationRequest.ruleRoutes ?? []),
+            mainRoute: JSON.stringify(mainRoute),
+            ruleRoutes: JSON.stringify(ruleRoutes),
         }
     });
 
@@ -69,14 +71,16 @@ export async function createNewFlow(creationRequest: TSavedFlow_createRequest): 
 }
 
 export async function updateFlowById(id: number, data: TSavedFlow_updateRequest): Promise<TSavedFlow> {
+    const mainRoute = data.mainRoute ?? newRoute();
+    const ruleRoutes = data.ruleRoutes ?? [];
     const flowProm = db.savedFlow.update({
         where: { id },
         data: {
             ...data,
             // Changing mainRoute and ruleRoutes into strings because
             // they are saved as strings in the db
-            mainRoute: JSON.stringify(data.mainRoute ?? newRoute()),
-            ruleRoutes: JSON.stringify(data.ruleRoutes ?? []),
+            mainRoute: JSON.stringify(mainRoute),
+            ruleRoutes: JSON.stringify(ruleRoutes),
         }
     });
 
