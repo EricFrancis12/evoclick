@@ -2,11 +2,11 @@
 
 import { useRows } from "@/hooks/useRows";
 import Rows from "./Rows";
-import Row from "./Row";
+import TotalRow from "./TotalRow";
 import { reportChainColors } from "../ReportChain";
-import { EItemName, TClick } from "@/lib/types";
 import { TView } from "@/lib/store";
-import { DEPTH_MARGIN, ROW_HEIGHT, TColumn } from ".";
+import { EItemName, TClick } from "@/lib/types";
+import { BASE_Z_INDEX, DEPTH_MARGIN, ROW_HEIGHT, TColumn } from ".";
 
 export default function HeadlessDataTable({ clicks, itemName, columns, view, depth }: {
     clicks: TClick[];
@@ -50,20 +50,31 @@ function _Rows({ clicks, itemName, columns, view, depth }: {
             <div
                 className="flex items-center px-1 font-bold"
                 style={{
-                    height: ROW_HEIGHT,
-                    marginLeft: `${DEPTH_MARGIN * 3}px`,
+                    position: "sticky",
+                    top: `${ROW_HEIGHT * depth}px`,
+                    height: `${ROW_HEIGHT}px`,
+                    paddingLeft: `${DEPTH_MARGIN * 3}px`,
+                    backgroundColor: reportChainColors[depth].light,
+                    zIndex: BASE_Z_INDEX - depth,
                 }}
             >
                 {itemName}
             </div>
             {rows &&
-                <Rows
-                    rows={rows}
-                    setRows={setRows}
-                    columns={columns}
-                    view={view}
-                    depth={depth}
-                />
+                <>
+                    <Rows
+                        rows={rows}
+                        setRows={setRows}
+                        columns={columns}
+                        view={view}
+                        depth={depth}
+                    />
+                    <TotalRow
+                        rows={rows}
+                        columns={columns}
+                        depth={depth}
+                    />
+                </>
             }
         </>
     )

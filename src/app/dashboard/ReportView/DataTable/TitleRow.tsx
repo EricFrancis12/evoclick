@@ -6,7 +6,7 @@ import RowWrapper from "./RowWrapper";
 import CheckboxWrapper from "./CheckboxWrapper";
 import PosNegIndicator from "./PosNegIndicator";
 import Cell from "./Cell";
-import { TColumn } from ".";
+import { BASE_Z_INDEX, TColumn } from ".";
 
 export default function TitleRow({ name, columns, setColumns }: {
     name: string;
@@ -28,7 +28,15 @@ export default function TitleRow({ name, columns, setColumns }: {
     }
 
     return (
-        <RowWrapper>
+        <RowWrapper
+            style={{
+                position: "sticky",
+                top: "0px",
+                borderTop: "solid grey 2px",
+                borderBottom: "solid grey 2px",
+                zIndex: BASE_Z_INDEX,
+            }}
+        >
             <PosNegIndicator value={0} disabled={true} />
             <CheckboxWrapper />
             {columns.map(({ title, width }, index) => (

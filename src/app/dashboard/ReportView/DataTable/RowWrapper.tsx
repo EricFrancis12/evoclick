@@ -2,9 +2,10 @@
 
 import { ROW_HEIGHT } from ".";
 
-export default function RowWrapper({ children, value = 0, selected, onClick = () => { } }: {
+export default function RowWrapper({ children, value = 0, style, selected, onClick = () => { } }: {
     children: React.ReactNode;
     value?: number;
+    style?: React.CSSProperties;
     // Having a selected value of undefined disables the hover, background color change, and onClick functionalities.
     // The title row should use undefined because we do not want the title row to have this funcionality,
     // and all other rows should use a boolean.
@@ -19,10 +20,10 @@ export default function RowWrapper({ children, value = 0, selected, onClick = ()
     return (
         <div
             className={(selected === undefined
-                ? ""
+                ? valueToBg(value)
                 : ((selected ? "bg-blue-300" : valueToBg(value) + " hover:bg-blue-200") + " cursor-pointer"))
                 + " flex items-center w-full pr-4"}
-            style={{ height: ROW_HEIGHT }}
+            style={{ ...style, height: `${ROW_HEIGHT}px` }}
             onClick={handleClick}
         >
             {children}

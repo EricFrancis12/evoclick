@@ -51,7 +51,7 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
 
     return (
         <ReportViewProvider primaryData={primaryData} clicks={clicks}>
-            <div className="h-screen w-full">
+            <div className="flex flex-col h-screen w-full">
                 <div className="flex h-[40px] w-[100vw] bg-[#2f918e]">
                     <div className="flex justify-center items-center h-full">
                         <Link href="/">
@@ -83,7 +83,7 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
                         : <TabSkeleton />
                     }
                 </div>
-                <div className="width-[100vw] text-sm">
+                <div className="flex flex-col flex-1 text-sm">
                     {activeView
                         ? <Report
                             view={activeView}

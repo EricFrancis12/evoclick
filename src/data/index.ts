@@ -14,9 +14,6 @@ export * from "./Offer";
 export * from "./TrafficSource";
 
 export async function parseRoute(jsonStr: string): Promise<TRoute> {
-    console.log(jsonStr);
-    console.log(typeof jsonStr);
-
     const { success, data } = await routeSchema.spa(safeParseJson(jsonStr));
     return success ? data : newRoute();
 }

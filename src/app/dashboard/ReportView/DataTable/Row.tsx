@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronUp, faChevronDown, faCircle, faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
+import { faChevronUp, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import RowWrapper from "./RowWrapper";
 import CheckboxWrapper from "./CheckboxWrapper";
 import Cell from "./Cell";
@@ -23,11 +23,8 @@ export default function Row({ row, columns, onSelected, view, depth }: {
     const cells = makeCells(row.clicks, row.name);
     const profit = typeof cells[6] === "number" ? cells[6] : 0;
 
-    useEffect(() => {
-        if (open) setOpen(false);
-    }, [view.reportChain]);
-
     function handleSelectionChange(selected: boolean) {
+        if (depth > 0) return;
         if (view.type === "report" && view.reportChain[0]?.itemName) return;
         onSelected(selected);
     }
@@ -37,20 +34,17 @@ export default function Row({ row, columns, onSelected, view, depth }: {
             <RowWrapper value={profit} selected={row.selected} onClick={handleSelectionChange}>
                 <PosNegIndicator value={profit} />
                 <CheckboxWrapper>
-                    {view?.type === "report" && view.reportChain[depth]?.itemName
-                        ? <FontAwesomeIcon
+                    {view?.type === "main"
+                        ? <input
+                            type="checkbox"
+                            checked={row.selected}
+                            onChange={() => handleSelectionChange(!row.selected)}
+                        />
+                        : (view?.type === "report" && view.reportChain[depth]?.itemName) &&
+                        < FontAwesomeIcon
                             icon={open ? faChevronUp : faChevronDown}
                             onClick={() => setOpen(prev => !prev)}
                         />
-                        : <>
-                            {row.selected !== undefined &&
-                                <input
-                                    type="checkbox"
-                                    checked={row.selected}
-                                    onChange={() => handleSelectionChange(!row.selected)}
-                                />
-                            }
-                        </>
                     }
                 </CheckboxWrapper>
                 {cells.map((value, index) => {
@@ -77,21 +71,21 @@ export default function Row({ row, columns, onSelected, view, depth }: {
     )
 }
 
-function makeCells(clicks: TClick[], name: string): (string | number)[] {
-    const numVisits = clicks.length;
-    const numClicks = clicks.filter(click => !!click.clickTime).length;
-    const numConversions = clicks.filter(click => !!click.convTime).length;
-    const revenue = clicks.reduce((total, click) => total + click.revenue, 0);
-    const cost = clicks.reduce((total, click) => total + click.cost, 0);
-    const profit = revenue - cost;
-    const cpv = (cost / numVisits) || 0;
-    const cpc = (cost / numClicks) || 0;
-    const cpcv = (cost / numConversions) || 0;
-    const ctr = (numClicks / numVisits) || 0;
-    const cvr = (numConversions / numVisits) || 0;
-    const roi = ((revenue - cost) / cost) || 0;
-    const epv = (revenue / numVisits) || 0;
-    const epc = (revenue / numClicks) || 0;
+export function makeCells(clicks: TClick[], name: string): (string | number)[] {
+    const numVisits = calcVisits(clicks);
+    const numClicks = calcClicks(clicks);
+    const numConversions = calcConversions(clicks);
+    const revenue = calcTotalRevenue(clicks);
+    const cost = calcTotalCost(clicks);
+    const profit = calcProfit(revenue, cost);
+    const cpv = calcCostPerVisit(cost, numVisits);
+    const cpc = calcCostPerClick(cost, numClicks);
+    const cpcv = calcCostPerConversion(cost, numConversions);
+    const ctr = calcClickThroughRate(numClicks, numVisits);
+    const cvr = calcConversionRate(numConversions, numVisits);
+    const roi = calcROI(revenue, cost);
+    const epv = calcEarningsPerVisit(revenue, numVisits);
+    const epc = calcEarningsPerClick(revenue, numClicks);
 
     return [
         name,
@@ -101,13 +95,69 @@ function makeCells(clicks: TClick[], name: string): (string | number)[] {
         revenue,
         cost,
         profit,
-        cpv,              // cost per visit
-        cpc,              // cost per click
-        cpcv,             // cost per conversion
-        ctr,              // clickthrough rate
-        cvr,              // conversion rate
-        roi,              // return on investment
-        epv,              // earnings per visit
-        epc,              // earnings per click    
+        cpv,
+        cpc,
+        cpcv,
+        ctr,
+        cvr,
+        roi,
+        epv,
+        epc
     ];
+}
+
+function calcVisits(clicks: TClick[]): number {
+    return clicks.length;
+}
+
+function calcClicks(clicks: TClick[]): number {
+    return clicks.filter(click => !!click.clickTime).length;
+}
+
+function calcConversions(clicks: TClick[]): number {
+    return clicks.filter(click => !!click.convTime).length;
+}
+
+function calcTotalRevenue(clicks: TClick[]): number {
+    return clicks.reduce((total, click) => total + click.revenue, 0);
+}
+
+function calcTotalCost(clicks: TClick[]): number {
+    return clicks.reduce((total, click) => total + click.cost, 0);
+}
+
+function calcProfit(revenue: number, cost: number): number {
+    return revenue - cost;
+}
+
+function calcCostPerVisit(cost: number, numVisits: number): number {
+    return numVisits ? cost / numVisits : 0;
+}
+
+function calcCostPerClick(cost: number, numClicks: number): number {
+    return numClicks ? cost / numClicks : 0;
+}
+
+function calcCostPerConversion(cost: number, numConversions: number): number {
+    return numConversions ? cost / numConversions : 0;
+}
+
+function calcClickThroughRate(numClicks: number, numVisits: number): number {
+    return numVisits ? numClicks / numVisits : 0;
+}
+
+function calcConversionRate(numConversions: number, numVisits: number): number {
+    return numVisits ? numConversions / numVisits : 0;
+}
+
+function calcROI(revenue: number, cost: number): number {
+    return cost ? (revenue - cost) / cost : 0;
+}
+
+function calcEarningsPerVisit(revenue: number, numVisits: number): number {
+    return numVisits ? revenue / numVisits : 0;
+}
+
+function calcEarningsPerClick(revenue: number, numClicks: number): number {
+    return numClicks ? revenue / numClicks : 0;
 }

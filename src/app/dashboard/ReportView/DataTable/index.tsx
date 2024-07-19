@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Rows from "./Rows";
 import TitleRow from "./TitleRow";
+import TotalRow from "./TotalRow";
+import dataTableColumns, { TDataTableColumn } from "./dataTableColumns";
 import { TView } from "@/lib/store";
 import { TClick } from "@/lib/types";
-import dataTableColumns, { TDataTableColumn } from "./dataTableColumns";
-import TotalRow from "./TotalRow";
 
-export const ROW_HEIGHT = "30px";
-export const DEPTH_MARGIN = 20;
+export const ROW_HEIGHT = 30; // pixels
+export const DEPTH_MARGIN = 20; // pixels
+export const BASE_Z_INDEX = 100;
 
 export type TColumn = TDataTableColumn & {
     width: number;
@@ -34,7 +35,7 @@ export default function DataTable({ view, rows, setRows, depth = 0 }: {
     })));
 
     return (
-        <div className="relative flex flex-col min-h-[400px] max-w-[100vw] overflow-x-scroll">
+        <div className="relative flex flex-col flex-1 max-w-[100vw] overflow-x-scroll">
             <div className="absolute top-0 left-0">
                 <TitleRow
                     name={view?.itemName}
@@ -48,7 +49,11 @@ export default function DataTable({ view, rows, setRows, depth = 0 }: {
                     view={view}
                     depth={depth}
                 />
-                <TotalRow columns={columns} />
+                <TotalRow
+                    rows={rows}
+                    columns={columns}
+                    depth={depth}
+                />
             </div>
         </div>
     )

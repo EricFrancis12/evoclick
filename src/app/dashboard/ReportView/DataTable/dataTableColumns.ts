@@ -6,6 +6,7 @@ export type TDataTableColumn = {
 };
 
 const toFixed2 = makeToFixedFunc(2);
+
 const $toFixed2 = (n: number) => "$" + toFixed2(n);
 const toFixed2Percentage = (n: number) => toFixed2(n * 100) + "%";
 
