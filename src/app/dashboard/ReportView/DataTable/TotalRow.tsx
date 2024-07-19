@@ -13,12 +13,12 @@ export default function TotalRow({ columns }: {
 
     return (
         <RowWrapper>
-            <PosNegIndicator value={77} />
+            <PosNegIndicator value={0} disabled={true} />
             <CheckboxWrapper />
             {columns.map(({ title, width }, index) => (
                 <Cell
                     key={index}
-                    value={77}
+                    value={""}
                     width={width}
                     className="font-bold"
                 />
