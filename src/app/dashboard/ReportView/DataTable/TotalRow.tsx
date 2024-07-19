@@ -7,6 +7,8 @@ import RowWrapper from "./RowWrapper";
 import { makeCells } from "./Row";
 import { BASE_Z_INDEX, DEPTH_MARGIN, TColumn, TRow } from ".";
 
+const border = "solid grey 2px";
+
 export default function TotalRow({ rows, columns, depth }: {
     rows: TRow[];
     columns: TColumn[];
@@ -22,9 +24,9 @@ export default function TotalRow({ rows, columns, depth }: {
             style={{
                 position: depth === 0 ? "sticky" : "static",
                 bottom: depth === 0 ? "0px" : undefined,
-                borderTop: "solid grey 2px",
-                borderBottom: "solid grey 2px",
-                borderLeft: depth === 0 ? undefined : "solid grey 2px",
+                borderTop: border,
+                borderBottom: border,
+                borderLeft: depth === 0 ? undefined : border,
                 zIndex: depth === 0 ? BASE_Z_INDEX : undefined,
             }}
         >

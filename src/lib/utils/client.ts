@@ -24,3 +24,13 @@ export function copyToClipboard(text: string) {
         toast.error("error copying text to clipboard");
     }
 }
+
+export function traverseParentsForRef(element: HTMLElement, ref: React.RefObject<HTMLElement>): boolean {
+    if (element === ref.current) {
+        return true; // Found the valid ref, return element
+    } else if (element !== document.body && !!element.parentNode) {
+        const parentElement = element.parentElement;
+        if (parentElement) return traverseParentsForRef(parentElement, ref); // Recursive call and return its result
+    }
+    return false; // If no valid ref found, return false
+}

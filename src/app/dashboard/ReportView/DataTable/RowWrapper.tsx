@@ -1,5 +1,6 @@
 "use client";
 
+import { useDialogueMenu } from "../contexts/DialogueMenuContext";
 import { ROW_HEIGHT } from ".";
 
 export default function RowWrapper({ children, value = 0, style, selected, onClick = () => { } }: {
@@ -12,9 +13,25 @@ export default function RowWrapper({ children, value = 0, style, selected, onCli
     selected?: boolean;
     onClick?: (bool: boolean) => void;
 }) {
+    const { dialogueMenu, setDialogueMenu } = useDialogueMenu();
+
     function handleClick() {
         if (selected === undefined) return;
         onClick(!selected);
+    }
+
+    function handleContextMenu(e: React.MouseEvent<HTMLDivElement>) {
+        if (selected === undefined) return;
+        e.preventDefault();
+        onClick(true);
+
+        // TODO: ...
+        setDialogueMenu({
+            top: e.clientY,
+            left: e.clientX,
+            open: !dialogueMenu.open,
+            items: ["hello", "hi", "yes", "eniohwoeirhwoiehrowheorhwoerhowe"],
+        });
     }
 
     return (
@@ -25,6 +42,7 @@ export default function RowWrapper({ children, value = 0, style, selected, onCli
                 + " flex items-center w-full pr-4"}
             style={{ ...style, height: `${ROW_HEIGHT}px` }}
             onClick={handleClick}
+            onContextMenu={handleContextMenu}
         >
             {children}
         </div>

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { DialogueViewProvider } from "./contexts/DialogueMenuContext";
 import { ReportViewProvider, TPrimaryData } from "./ReportViewContext";
 import useActiveView from "@/hooks/useActiveView";
 import useQueryRouter from "@/hooks/useQueryRouter";
@@ -51,48 +52,50 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
 
     return (
         <ReportViewProvider primaryData={primaryData} clicks={clicks}>
-            <div className="flex flex-col h-screen w-full">
-                <div className="flex h-[40px] w-[100vw] bg-[#2f918e]">
-                    <div className="flex justify-center items-center h-full">
-                        <Link href="/">
-                            <Image
-                                src="/assets/images/logo-no-bg.png"
-                                alt="Logo"
-                                height={35}
-                                width={35}
-                                className="mx-6"
-                            />
-                        </Link>
-                    </div>
-                    {activeView
-                        ? <>
-                            <Tab
-                                view={mainView}
-                                onClick={() => queryRouter.push("/dashboard", { timeframe: encodeTimeframe(mainView.timeframe) })}
-                            />
-                            {reportViews.map(view => (
-                                <Tab
-                                    key={view.id}
-                                    view={view}
-                                    reportItemId={reportItemId}
-                                    onClick={handleReportTabClick}
-                                    onClose={handleReportTabClose}
+            <DialogueViewProvider onClick={item => console.log(item)}>
+                <div className="flex flex-col h-screen w-full">
+                    <div className="flex h-[40px] w-[100vw] bg-[#2f918e]">
+                        <div className="flex justify-center items-center h-full">
+                            <Link href="/">
+                                <Image
+                                    src="/assets/images/logo-no-bg.png"
+                                    alt="Logo"
+                                    height={35}
+                                    width={35}
+                                    className="mx-6"
                                 />
-                            ))}
-                        </>
-                        : <TabSkeleton />
-                    }
+                            </Link>
+                        </div>
+                        {activeView
+                            ? <>
+                                <Tab
+                                    view={mainView}
+                                    onClick={() => queryRouter.push("/dashboard", { timeframe: encodeTimeframe(mainView.timeframe) })}
+                                />
+                                {reportViews.map(view => (
+                                    <Tab
+                                        key={view.id}
+                                        view={view}
+                                        reportItemId={reportItemId}
+                                        onClick={handleReportTabClick}
+                                        onClose={handleReportTabClose}
+                                    />
+                                ))}
+                            </>
+                            : <TabSkeleton />
+                        }
+                    </div>
+                    <div className="flex flex-col flex-1 text-sm">
+                        {activeView
+                            ? <Report
+                                view={activeView}
+                                reportItemName={reportItemName}
+                            />
+                            : <ReportSkeleton reportItemName={reportItemName} />
+                        }
+                    </div>
                 </div>
-                <div className="flex flex-col flex-1 text-sm">
-                    {activeView
-                        ? <Report
-                            view={activeView}
-                            reportItemName={reportItemName}
-                        />
-                        : <ReportSkeleton reportItemName={reportItemName} />
-                    }
-                </div>
-            </div>
-        </ReportViewProvider >
+            </DialogueViewProvider>
+        </ReportViewProvider>
     )
 }
