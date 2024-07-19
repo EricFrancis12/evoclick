@@ -50,7 +50,9 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
         setActionMenu({
             type: "delete item",
             primaryItemName,
-            ids: selectedRows.map(row => row.id).filter(id => typeof id === "number"),
+            ids: selectedRows.reduce((ids: number[], { id }) => {
+                return typeof id === "number" ? [...ids, id] : ids;
+            }, [])
         });
     }
 

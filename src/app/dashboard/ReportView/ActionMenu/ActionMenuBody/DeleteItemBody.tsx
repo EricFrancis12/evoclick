@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { faCheckCircle, faDotCircle, faSpinner, faTrash, faXmarkCircle, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faCheckCircle, faCircle, faSpinner,
+    faTrash, faXmarkCircle, IconDefinition
+} from "@fortawesome/free-solid-svg-icons";
 import { useReportView } from "../../ReportViewContext";
 import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import Button from "@/components/Button";
@@ -17,7 +21,6 @@ import {
     EItemName, TAffiliateNetwork, TCampaign, TLandingPage,
     TOffer, TPrimaryItemName, TSavedFlow, TTrafficSource
 } from "@/lib/types";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type TDeletionStatus = "idle" | "pending" | "success" | "failed";
 
@@ -34,23 +37,21 @@ export default function DeleteItemBody({ actionMenu, setActionMenu }: {
     const { primaryItemName, ids } = actionMenu;
     const { primaryData } = useReportView();
 
-    const [disabled, setDisabled] = useState<boolean>(false);
+    const [deleting, setDeleting] = useState<boolean>(false);
 
     const key = itemNameToKeyOfPrimaryData(primaryItemName);
     const [deletionItems, setDeletionItems] = useState<TDeletionItem[]>(
-        ids
-            .map(id => getPrimaryItemById(primaryData, key, id))
-            .filter(item => !!item)
-            .map(data => ({
-                data,
-                status: "idle",
-                error: "",
-            }))
+        ids.reduce((delItems: TDeletionItem[], id) => {
+            const data = getPrimaryItemById(primaryData, key, id);
+            return data
+                ? [...delItems, { data, status: "idle", error: "" }]
+                : delItems;
+        }, [])
     );
 
     async function handleDelete() {
-        if (disabled) return;
-        setDisabled(true);
+        if (deleting) return;
+        setDeleting(true);
 
         let deletedIds: number[] = [];
         let errCount = 0;
@@ -70,7 +71,7 @@ export default function DeleteItemBody({ actionMenu, setActionMenu }: {
         }
 
         setDeletionItems(prev => prev.filter((delItem => !deletedIds.includes(delItem.data.id))));
-        setDisabled(false);
+        setDeleting(false);
 
         if (deletedIds.length > 0) toast.success(`Deleted ${deletedIds.length} item(s)`);
 
@@ -90,8 +91,8 @@ export default function DeleteItemBody({ actionMenu, setActionMenu }: {
                 ))}
                 <Button
                     text="Yes"
-                    icon={disabled ? faSpinner : faTrash}
-                    disabled={disabled}
+                    icon={deleting ? faSpinner : faTrash}
+                    disabled={deleting}
                     onClick={handleDelete}
                 />
             </div>
@@ -102,12 +103,12 @@ export default function DeleteItemBody({ actionMenu, setActionMenu }: {
 type TDeleteItemFunc = (id: number, pathname?: string) => Promise<Object>;
 
 const deleteItemMap: Record<TPrimaryItemName, TDeleteItemFunc> = {
-    [EItemName.AFFILIATE_NETWORK]: deleteAffiliateNetworkAction as TDeleteItemFunc,
-    [EItemName.CAMPAIGN]: deleteCampaignAction as TDeleteItemFunc,
-    [EItemName.FLOW]: deleteFlowAction as TDeleteItemFunc,
-    [EItemName.LANDING_PAGE]: deleteLandingPageAction as TDeleteItemFunc,
-    [EItemName.OFFER]: deleteOfferAction as TDeleteItemFunc,
-    [EItemName.TRAFFIC_SOURCE]: deleteTrafficSourceAction as TDeleteItemFunc,
+    [EItemName.AFFILIATE_NETWORK]: deleteAffiliateNetworkAction,
+    [EItemName.CAMPAIGN]: deleteCampaignAction,
+    [EItemName.FLOW]: deleteFlowAction,
+    [EItemName.LANDING_PAGE]: deleteLandingPageAction,
+    [EItemName.OFFER]: deleteOfferAction,
+    [EItemName.TRAFFIC_SOURCE]: deleteTrafficSourceAction,
 };
 
 function statusToIcon(status: TDeletionStatus): IconDefinition {
@@ -119,6 +120,6 @@ function statusToIcon(status: TDeletionStatus): IconDefinition {
         case "failed":
             return faXmarkCircle;
         default:
-            return faDotCircle;
+            return faCircle;
     }
 }
