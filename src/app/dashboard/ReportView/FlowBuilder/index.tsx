@@ -2,7 +2,8 @@
 
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import Button from "@/components/Button";
-import Route, { newRoute, TReorderDirection } from "./Route";
+import Route, { TReorderDirection } from "./Route";
+import { newRoute } from "@/lib/utils/new";
 import { TRoute } from "@/lib/types";
 
 export type TFlowBuilder = {

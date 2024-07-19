@@ -6,16 +6,6 @@ import { useReportView } from "../ReportViewContext";
 import Section, { TSection } from "./Section";
 import { EItemName, TPath, TRoute } from "@/lib/types";
 
-export function newPath(): TPath {
-    return {
-        isActive: true,
-        weight: 100,
-        landingPageIds: [],
-        offerIds: [],
-        directLinkingEnabled: false,
-    };
-}
-
 export default function Path({ path, route, onChange, onDelete }: {
     path: TPath;
     route: TRoute;

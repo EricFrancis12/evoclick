@@ -7,10 +7,10 @@ import { PopoverContainer, PopoverFooter, PopoverLayer } from "@/components/popo
 import Button from "@/components/Button";
 import TagsInput from "@/components/TagsInput";
 import FlowBuilder from "../../FlowBuilder";
-import { newRoute } from "../../FlowBuilder/Route";
 import { Input } from "@/components/base";
 import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import ActionMenuFooter from "../ActionMenuFooter";
+import { newRoute } from "@/lib/utils/new";
 import { TActionMenu, TSavedFlowActionMenu } from "../types";
 
 export default function SavedFlowBody({ actionMenu, setActionMenu }: {

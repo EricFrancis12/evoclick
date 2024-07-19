@@ -1,8 +1,7 @@
 import { z } from "zod";
 import { tokenSchema, namedTokenSchema, routeSchema } from "../lib/schemas";
 import { safeParseJson } from "@/lib/utils";
-import { newRoute } from "@/app/dashboard/ReportView/FlowBuilder/Route";
-import { newToken } from "@/app/dashboard/ReportView/TokenInput";
+import { newRoute, newToken } from "@/lib/utils";
 import { TToken, TNamedToken, TRoute } from "../lib/types";
 
 export * from "./User";
@@ -15,6 +14,9 @@ export * from "./Offer";
 export * from "./TrafficSource";
 
 export async function parseRoute(jsonStr: string): Promise<TRoute> {
+    console.log(jsonStr);
+    console.log(typeof jsonStr);
+
     const { success, data } = await routeSchema.spa(safeParseJson(jsonStr));
     return success ? data : newRoute();
 }

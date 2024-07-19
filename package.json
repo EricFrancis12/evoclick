@@ -6,6 +6,8 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
+        "seed_data": "ts-node scripts/seed_data.ts",
+        "seed_clicks": "ts-node scripts/seed_clicks.ts",
         "lint": "next lint",
         "test": "jest && go test ./... -v",
         "e2e": "npx cypress run",

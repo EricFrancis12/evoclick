@@ -2,14 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronUp, faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import { faChevronUp, faChevronDown, faCircle, faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
 import RowWrapper from "./RowWrapper";
 import CheckboxWrapper from "./CheckboxWrapper";
 import Cell from "./Cell";
 import HeadlessDataTable from "./HeadlessDataTable";
+import PosNegIndicator from "./PosNegIndicator";
 import { TClick } from "@/lib/types";
 import { TView } from "@/lib/store";
-import { TColumn, TRow } from ".";
+import { DEPTH_MARGIN, TColumn, TRow } from ".";
 
 export default function Row({ row, columns, onSelected, view, depth }: {
     row: TRow;
@@ -20,6 +21,7 @@ export default function Row({ row, columns, onSelected, view, depth }: {
 }) {
     const [open, setOpen] = useState<boolean>(false);
     const cells = makeCells(row.clicks, row.name);
+    const profit = typeof cells[6] === "number" ? cells[6] : 0;
 
     useEffect(() => {
         if (open) setOpen(false);
@@ -32,7 +34,8 @@ export default function Row({ row, columns, onSelected, view, depth }: {
 
     return (
         <>
-            <RowWrapper selected={row.selected} onClick={handleSelectionChange}>
+            <RowWrapper value={profit} selected={row.selected} onClick={handleSelectionChange}>
+                <PosNegIndicator value={profit} />
                 <CheckboxWrapper>
                     {view?.type === "report" && view.reportChain[depth]?.itemName
                         ? <FontAwesomeIcon
@@ -50,13 +53,16 @@ export default function Row({ row, columns, onSelected, view, depth }: {
                         </>
                     }
                 </CheckboxWrapper>
-                {cells.map((value, index) => (
-                    <Cell
-                        key={index}
-                        value={value}
-                        width={columns[index].width}
-                    />
-                ))}
+                {cells.map((value, index) => {
+                    const { width, format } = columns[index];
+                    return (
+                        <Cell
+                            key={index}
+                            value={format && typeof value === "number" ? format(value) : value}
+                            width={index === 0 ? width - DEPTH_MARGIN * depth : width}
+                        />
+                    )
+                })}
             </RowWrapper >
             {open && view?.type === "report" &&
                 <HeadlessDataTable
@@ -71,7 +77,7 @@ export default function Row({ row, columns, onSelected, view, depth }: {
     )
 }
 
-function makeCells(clicks: TClick[], name: string): (number | string)[] {
+function makeCells(clicks: TClick[], name: string): (string | number)[] {
     const numVisits = clicks.length;
     const numClicks = clicks.filter(click => !!click.clickTime).length;
     const numConversions = clicks.filter(click => !!click.convTime).length;

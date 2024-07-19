@@ -3,7 +3,8 @@
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import Button from "@/components/Button";
 import { Select } from "@/components/base";
-import Rule, { newRule } from "./Rule";
+import Rule from "./Rule";
+import { newRule } from "@/lib/utils/new";
 import { TRoute, ELogicalRelation, ERuleName } from "@/lib/types";
 
 export default function RulesMenu({ route, onChange }: {

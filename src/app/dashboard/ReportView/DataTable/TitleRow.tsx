@@ -4,6 +4,7 @@ import { useRef, Fragment } from "react";
 import useDragger from "@/hooks/useDragger";
 import RowWrapper from "./RowWrapper";
 import CheckboxWrapper from "./CheckboxWrapper";
+import PosNegIndicator from "./PosNegIndicator";
 import Cell from "./Cell";
 import { TColumn } from ".";
 
@@ -16,7 +17,7 @@ export default function TitleRow({ name, columns, setColumns }: {
 
     const startDrag = useDragger((e, i) => {
         if (typeof i === "number") {
-            const width = `${parseFloat(columns[i].width) + e.clientX - mouseDownClientX.current}px`;
+            const width = columns[i].width + e.clientX - mouseDownClientX.current;
             setColumns(columns.map((col, index) => index === i ? { ...col, width } : col));
         }
     });
@@ -28,6 +29,7 @@ export default function TitleRow({ name, columns, setColumns }: {
 
     return (
         <RowWrapper>
+            <PosNegIndicator value={0} disabled={true} />
             <CheckboxWrapper />
             {columns.map(({ title, width }, index) => (
                 <Fragment key={index}>

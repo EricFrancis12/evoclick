@@ -2,10 +2,11 @@
 
 import { useRows } from "@/hooks/useRows";
 import Rows from "./Rows";
+import Row from "./Row";
 import { reportChainColors } from "../ReportChain";
 import { EItemName, TClick } from "@/lib/types";
 import { TView } from "@/lib/store";
-import { TColumn } from ".";
+import { DEPTH_MARGIN, ROW_HEIGHT, TColumn } from ".";
 
 export default function HeadlessDataTable({ clicks, itemName, columns, view, depth }: {
     clicks: TClick[];
@@ -18,8 +19,11 @@ export default function HeadlessDataTable({ clicks, itemName, columns, view, dep
 
     return itemName
         ? <div
-            className="py-4 bg-blue-200"
-            style={{ backgroundColor: reportChainColors[newDepth]?.light }}
+            className="py-4"
+            style={{
+                backgroundColor: reportChainColors[newDepth]?.light,
+                paddingLeft: `${DEPTH_MARGIN}px`
+            }}
         >
             <_Rows
                 clicks={clicks}
@@ -41,13 +45,26 @@ function _Rows({ clicks, itemName, columns, view, depth }: {
 }) {
     const [rows, setRows] = useRows(clicks, itemName);
 
-    return rows
-        ? <Rows
-            rows={rows}
-            setRows={setRows}
-            columns={columns}
-            view={view}
-            depth={depth}
-        />
-        : "";
+    return (
+        <>
+            <div
+                className="flex items-center px-1 font-bold"
+                style={{
+                    height: ROW_HEIGHT,
+                    marginLeft: `${DEPTH_MARGIN * 3}px`,
+                }}
+            >
+                {itemName}
+            </div>
+            {rows &&
+                <Rows
+                    rows={rows}
+                    setRows={setRows}
+                    columns={columns}
+                    view={view}
+                    depth={depth}
+                />
+            }
+        </>
+    )
 }

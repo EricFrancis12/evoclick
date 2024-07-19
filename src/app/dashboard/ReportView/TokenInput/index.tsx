@@ -5,20 +5,6 @@ import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { Input } from "@/components/base";
 import { TNamedToken, TToken } from "@/lib/types";
 
-export function newToken(): TToken {
-    return {
-        queryParam: "",
-        value: "",
-    };
-}
-
-export function newNamedToken(): TNamedToken {
-    return {
-        ...newToken(),
-        name: "",
-    };
-}
-
 export default function TokenInput({ token, onChange, onDelete, title = "" }: {
     token: TToken | TNamedToken;
     onChange: (t: typeof token) => void;

@@ -10,7 +10,8 @@ import { Input } from "@/components/base";
 import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import ActionMenuFooter from "../ActionMenuFooter";
 import TokenInputWrapper from "../../TokenInput/TokenInputWrapper";
-import TokenInput, { newToken, newNamedToken } from "../../TokenInput";
+import TokenInput from "../../TokenInput";
+import { newToken, newNamedToken } from "@/lib/utils/new";
 import { TActionMenu, TTrafficSourceActionMenu } from "../types";
 import { TNamedToken } from "@/lib/types";
 

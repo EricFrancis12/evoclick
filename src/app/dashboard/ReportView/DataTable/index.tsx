@@ -5,12 +5,15 @@ import Rows from "./Rows";
 import TitleRow from "./TitleRow";
 import { TView } from "@/lib/store";
 import { TClick } from "@/lib/types";
-import columnTitles from "./columnTitles";
+import dataTableColumns, { TDataTableColumn } from "./dataTableColumns";
+import TotalRow from "./TotalRow";
 
-export type TColumn = {
-    title: string;
-    width: string;
-};
+export const ROW_HEIGHT = "30px";
+export const DEPTH_MARGIN = 20;
+
+export type TColumn = TDataTableColumn & {
+    width: number;
+}
 
 export type TRow = {
     id: number | string;
@@ -25,9 +28,9 @@ export default function DataTable({ view, rows, setRows, depth = 0 }: {
     setRows: (newRows: TRow[]) => void;
     depth?: number;
 }) {
-    const [columns, setColumns] = useState<TColumn[]>(columnTitles.map((title, index) => ({
-        title,
-        width: index === 0 ? "300px" : "100px",
+    const [columns, setColumns] = useState<TColumn[]>(dataTableColumns.map((col, index) => ({
+        ...col,
+        width: index === 0 ? 300 : 100,
     })));
 
     return (
@@ -45,6 +48,7 @@ export default function DataTable({ view, rows, setRows, depth = 0 }: {
                     view={view}
                     depth={depth}
                 />
+                <TotalRow columns={columns} />
             </div>
         </div>
     )

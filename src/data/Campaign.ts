@@ -1,13 +1,12 @@
 import crypto from "crypto";
 import { Campaign } from "@prisma/client";
-import { newRoute } from "@/app/dashboard/ReportView/FlowBuilder/Route";
 import cache, { makeRedisKeyFunc } from "../lib/cache";
 import db from "../lib/db";
 import { parseRoute, parseRoutes } from ".";
 import { campaignSchema } from "../lib/schemas";
-import { safeParseJson } from "../lib/utils";
+import { safeParseJson, newRoute } from "../lib/utils";
 import { REDIS_EXPIRY } from "../lib/constants";
-import { ELogicalRelation, TCampaign, TCampaign_createRequest, TCampaign_updateRequest } from "../lib/types";
+import { ELogicalRelation, TCampaign, TCampaign_createRequest, TCampaign_updateRequest, TRoute } from "../lib/types";
 
 const makeKey = makeRedisKeyFunc("campaign");
 
@@ -119,11 +118,11 @@ export async function deleteCampaignById(id: number): Promise<TCampaign> {
 }
 
 async function makeClientCampaign(dbModel: Campaign): Promise<TCampaign> {
-    const flowMainRoute = dbModel.flowMainRoute ? await parseRoute(dbModel.flowMainRoute) : newRoute();
-    const flowRuleRoutes = dbModel.flowRuleRoutes ? await parseRoutes(dbModel.flowRuleRoutes) : [];
+    const flowMainRouteProm = dbModel.flowMainRoute ? parseRoute(dbModel.flowMainRoute) : newRoute();
+    const flowRuleRoutesProm = dbModel.flowRuleRoutes ? parseRoutes(dbModel.flowRuleRoutes) : [];
     return {
         ...dbModel,
-        flowMainRoute,
-        flowRuleRoutes,
+        flowMainRoute: await flowMainRouteProm,
+        flowRuleRoutes: await flowRuleRoutesProm,
     };
 }

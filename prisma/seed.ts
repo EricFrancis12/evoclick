@@ -2,71 +2,10 @@
 // because the seed command that runs this file "npx prisma db seed"
 // uses ts-node under the hood,
 // and it's not able to recognize that syntax in the current tsconfig.
-import { $Enums } from "@prisma/client";
 import prisma from "../src/lib/db";
-import {
-    affiliateNetworkSeedData, campaignSeedData, savedFlowSeedData,
-    landingPageSeedData, offerSeedData, trafficSourceData
-} from "./seedData";
+import seedData, { main } from "./seedData";
 
-async function main() {
-    const affiliateNetwork = await prisma.affiliateNetwork.create({
-        data: affiliateNetworkSeedData,
-    });
-
-    const offer = await prisma.offer.create({
-        data: {
-            ...offerSeedData,
-            affiliateNetworkId: affiliateNetwork.id,
-        },
-    });
-
-    const landingPage = await prisma.landingPage.create({
-        data: landingPageSeedData,
-    });
-
-    const flow = await prisma.savedFlow.create({
-        data: {
-            ...savedFlowSeedData,
-            mainRoute: JSON.stringify({
-                ...savedFlowSeedData.mainRoute,
-                paths: [
-                    {
-                        directLinkingEnabled: false,
-                        isActive: true,
-                        landingPageIds: [landingPage.id],
-                        offerIds: [offer.id],
-                        weight: 100,
-                    },
-                ],
-            }),
-            ruleRoutes: JSON.stringify(savedFlowSeedData.ruleRoutes),
-        },
-    });
-
-    const trafficSource = await prisma.trafficSource.create({
-        data: {
-            ...trafficSourceData,
-            externalIdToken: JSON.stringify(trafficSourceData.externalIdToken),
-            costToken: JSON.stringify(trafficSourceData.costToken),
-            customTokens: JSON.stringify(trafficSourceData.customTokens),
-        },
-    });
-
-    await prisma.campaign.create({
-        data: {
-            ...campaignSeedData,
-            flowType: $Enums.FlowType.SAVED,
-            savedFlowId: flow.id,
-            trafficSourceId: trafficSource.id,
-            flowMainRoute: null,
-            flowRuleRoutes: null,
-            flowUrl: null,
-        },
-    });
-}
-
-main()
+main(seedData)
     .catch(err => {
         console.error(err);
         process.exit(1);

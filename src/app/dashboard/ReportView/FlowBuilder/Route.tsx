@@ -6,19 +6,11 @@ import { faChevronDown, faChevronUp, faPencilAlt, faTrashAlt } from "@fortawesom
 import { PopoverContainer, PopoverFooter, PopoverLayer } from "@/components/popover";
 import Button from "@/components/Button";
 import RulesMenu from "./RulesMenu";
-import Path, { newPath } from "./Path";
-import { ELogicalRelation, TRoute } from "@/lib/types";
+import Path from "./Path";
+import { newPath } from "@/lib/utils/new";
+import { TRoute } from "@/lib/types";
 
 export type TReorderDirection = "up" | "down";
-
-export function newRoute(): TRoute {
-    return {
-        isActive: true,
-        logicalRelation: ELogicalRelation.AND,
-        paths: [],
-        rules: [],
-    };
-}
 
 export default function Route({ type, route, onChange, onDelete, onReorder = () => { } }: {
     type: "main" | "rule";

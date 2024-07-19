@@ -10,7 +10,7 @@ import TagsInput from "@/components/TagsInput";
 import { Input, Select, SelectionButtons } from "@/components/base";
 import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import ActionMenuFooter from "../ActionMenuFooter";
-import { newRoute } from "../../FlowBuilder/Route";
+import { newRoute } from "@/lib/utils/new";
 import { TActionMenu, TCampaignActionMenu } from "../types";
 import { TSavedFlow, TTrafficSource } from "@/lib/types";
 import { $Enums } from "@prisma/client";

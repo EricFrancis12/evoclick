@@ -1,6 +1,8 @@
 import { TPrimaryData } from "@/app/dashboard/ReportView/ReportViewContext";
 import { EItemName, TPrimaryItemName } from "../types";
 
+export * from "./new";
+
 export function upperCaseFirstLetter(str: string): string {
     if (str === "") return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -24,6 +26,17 @@ export function formatErr(err: unknown): string {
     if (typeof err === "string") return err;
     if (err instanceof Error) return err.message;
     return "Unknown error";
+}
+
+export function randomIntInRange(min: number, max: number): number {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export function randItemFromArray<T>(arr: T[]): T {
+    if (arr.length === 0) throw new Error("Cannot select random item from an array of length 0");
+    return arr[randomIntInRange(0, arr.length - 1)];
 }
 
 // Determines whether an element contains overflowing nodes or not

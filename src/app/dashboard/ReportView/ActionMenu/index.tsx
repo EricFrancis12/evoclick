@@ -19,21 +19,3 @@ export default function ActionMenu({ actionMenu, setActionMenu }: {
         </div>
     )
 }
-
-export function newPrimaryItemActionMenu(itemName: EItemName): TActionMenu {
-    if (itemName === EItemName.AFFILIATE_NETWORK
-        || itemName === EItemName.FLOW
-        || itemName === EItemName.LANDING_PAGE
-        || itemName === EItemName.OFFER
-        || itemName === EItemName.TRAFFIC_SOURCE
-    ) {
-        return {
-            type: itemName,
-            itemName,
-        } as TActionMenu;
-    }
-    return {
-        type: EItemName.CAMPAIGN,
-        itemName: EItemName.CAMPAIGN,
-    };
-}

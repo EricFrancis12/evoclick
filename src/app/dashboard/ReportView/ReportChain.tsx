@@ -14,8 +14,8 @@ export type TReportChainLink = null | {
 // Maps the depth of the report chain (index) to a color
 export const reportChainColors: { light: string, dark: string }[] = [
     { light: "#696969", dark: "#d3d3d3" }, // grey
-    { light: "#fbdcd1", dark: "#ffa07a" }, // orange
-    { light: "#e2ffe2", dark: "#90ee90" }, // green
+    { light: "#ffffe0", dark: "#ffd700" }, // yellow
+    { light: "#e6e6fa", dark: "#9370db" }, // purple
 ];
 
 export default function ReportChain({ reportChain, onChange, omissions = [], itemName }: {
