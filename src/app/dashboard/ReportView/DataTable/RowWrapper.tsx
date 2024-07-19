@@ -1,11 +1,12 @@
 "use client";
 
-import { useDialogueMenu } from "../contexts/DialogueMenuContext";
+import { TDialogueMenuItem, useDialogueMenu } from "../contexts/DialogueMenuContext";
 import { ROW_HEIGHT } from ".";
 
-export default function RowWrapper({ children, value = 0, style, selected, onClick = () => { } }: {
+export default function RowWrapper({ children, value = 0, dialogueMenuItems = [], style, selected, onClick = () => { } }: {
     children: React.ReactNode;
     value?: number;
+    dialogueMenuItems?: TDialogueMenuItem[];
     style?: React.CSSProperties;
     // Having a selected value of undefined disables the hover, background color change, and onClick functionalities.
     // The title row should use undefined because we do not want the title row to have this funcionality,
@@ -13,7 +14,7 @@ export default function RowWrapper({ children, value = 0, style, selected, onCli
     selected?: boolean;
     onClick?: (bool: boolean) => void;
 }) {
-    const { dialogueMenu, setDialogueMenu } = useDialogueMenu();
+    const { setDialogueMenu } = useDialogueMenu();
 
     function handleClick() {
         if (selected === undefined) return;
@@ -25,12 +26,11 @@ export default function RowWrapper({ children, value = 0, style, selected, onCli
         e.preventDefault();
         onClick(true);
 
-        // TODO: ...
         setDialogueMenu({
             top: e.clientY,
             left: e.clientX,
-            open: !dialogueMenu.open,
-            items: ["hello", "hi", "yes", "eniohwoeirhwoiehrowheorhwoerhowe"],
+            open: true,
+            items: dialogueMenuItems,
         });
     }
 

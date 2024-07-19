@@ -52,7 +52,7 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
 
     return (
         <ReportViewProvider primaryData={primaryData} clicks={clicks}>
-            <DialogueViewProvider onClick={item => console.log(item)}>
+            <DialogueViewProvider>
                 <div className="flex flex-col h-screen w-full">
                     <div className="flex h-[40px] w-[100vw] bg-[#2f918e]">
                         <div className="flex justify-center items-center h-full">

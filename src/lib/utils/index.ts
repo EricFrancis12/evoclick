@@ -68,8 +68,8 @@ export function getPrimaryItemById<T extends keyof TPrimaryData>(
     return items.find(item => item.id === id) ?? null;
 }
 
-export function itemNameToKeyOfPrimaryData(itemName: TPrimaryItemName): keyof TPrimaryData {
-    switch (itemName) {
+export function primaryItemNameToKeyOfPrimaryData(primaryItemName: TPrimaryItemName): keyof TPrimaryData {
+    switch (primaryItemName) {
         case EItemName.AFFILIATE_NETWORK:
             return "affiliateNetworks";
         case EItemName.CAMPAIGN:

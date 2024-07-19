@@ -2,15 +2,24 @@
 
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronUp, faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import {
+    faChevronUp, faChevronDown, faShuffle, faPencil,
+    faTrash, faCopy, faLink, faExternalLink
+} from "@fortawesome/free-solid-svg-icons";
+import { TDialogueMenuItem } from "../contexts/DialogueMenuContext";
+import useNewReport from "@/hooks/useNewReport";
 import RowWrapper from "./RowWrapper";
 import CheckboxWrapper from "./CheckboxWrapper";
 import Cell from "./Cell";
 import HeadlessDataTable from "./HeadlessDataTable";
 import PosNegIndicator from "./PosNegIndicator";
-import { TClick } from "@/lib/types";
+import { makeActionMenu } from "../LowerControlPanel";
 import { TView } from "@/lib/store";
 import { DEPTH_MARGIN, TColumn, TRow } from ".";
+import { EItemName, TClick } from "@/lib/types";
+import { useReportView } from "../ReportViewContext";
+import { getPrimaryItemById, isPrimary, primaryItemNameToKeyOfPrimaryData } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/utils/client";
 
 export default function Row({ row, columns, onSelected, view, depth }: {
     row: TRow;
@@ -19,9 +28,15 @@ export default function Row({ row, columns, onSelected, view, depth }: {
     view: TView;
     depth: number;
 }) {
+    const { primaryData, setActionMenu } = useReportView();
+
     const [open, setOpen] = useState<boolean>(false);
     const cells = makeCells(row.clicks, row.name);
     const profit = typeof cells[6] === "number" ? cells[6] : 0;
+
+    const { bool, primaryItemName } = isPrimary(view.itemName);
+
+    const newReport = useNewReport();
 
     function handleSelectionChange(selected: boolean) {
         if (depth > 0) return;
@@ -29,9 +44,66 @@ export default function Row({ row, columns, onSelected, view, depth }: {
         onSelected(selected);
     }
 
+    const dialogueMenuItems: TDialogueMenuItem[] = [
+        {
+            text: "Report",
+            icon: faShuffle,
+            onClick: () => newReport(view.itemName, row.id.toString(), view.timeframe),
+        },
+        {
+            text: "Edit",
+            icon: faPencil,
+            onClick: () => {
+                if (typeof row.id !== "number") return;
+                setActionMenu(makeActionMenu(primaryData, view.itemName, row.id));
+            },
+        },
+        {
+            text: "Delete",
+            icon: faTrash,
+            onClick: () => {
+                if (!primaryItemName || typeof row.id !== "number") return;
+                setActionMenu({ type: "delete item", primaryItemName, ids: [row.id] });
+            },
+        },
+        {
+            text: "Copy URL",
+            icon: faCopy,
+            onClick: () => {
+                if (!primaryItemName || !hasURLProp(primaryItemName) || typeof row.id !== "number") return;
+                const key = primaryItemNameToKeyOfPrimaryData(primaryItemName);
+                const item = getPrimaryItemById(primaryData, key, row.id);
+                if (item && "url" in item) copyToClipboard(item.url);
+            },
+        },
+        {
+            text: "Open URL",
+            icon: faExternalLink,
+            onClick: () => {
+                if (!primaryItemName || !hasURLProp(primaryItemName) || typeof row.id !== "number") return;
+                const key = primaryItemNameToKeyOfPrimaryData(primaryItemName);
+                const item = getPrimaryItemById(primaryData, key, row.id);
+                if (item && "url" in item) window.open(item.url, "_blank");
+            },
+        },
+        {
+            text: "Campaign Links",
+            icon: faLink,
+            onClick: () => {
+                if (view.itemName !== EItemName.CAMPAIGN || typeof row.id !== "number") return;
+                setActionMenu({ type: "campaign links", campaignId: row.id })
+            },
+        },
+    ];
+
     return (
         <>
-            <RowWrapper value={profit} selected={row.selected} onClick={handleSelectionChange}>
+            <RowWrapper
+                value={profit}
+                selected={row.selected}
+                onClick={handleSelectionChange}
+                dialogueMenuItems={dialogueMenuItems}
+            >
                 <PosNegIndicator value={profit} />
                 <CheckboxWrapper>
                     {view?.type === "main"
@@ -69,6 +141,13 @@ export default function Row({ row, columns, onSelected, view, depth }: {
             }
         </>
     )
+}
+
+function hasURLProp(itemName: EItemName): boolean {
+    if (itemName === EItemName.LANDING_PAGE
+        || itemName === EItemName.OFFER
+    ) return true;
+    return false;
 }
 
 export function makeCells(clicks: TClick[], name: string): (string | number)[] {

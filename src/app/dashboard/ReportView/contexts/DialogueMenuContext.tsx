@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useContext, useState, useRef, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { traverseParentsForRef } from "@/lib/utils/client";
 
 const zIndex = 4000;
@@ -9,7 +11,13 @@ export type TDialogueMenu = {
     top: number;
     left: number;
     open: boolean;
-    items: string[];
+    items: TDialogueMenuItem[];
+};
+
+export type TDialogueMenuItem = {
+    text: string;
+    icon?: IconDefinition;
+    onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 };
 
 export type TDialogueMenuContext = {
@@ -26,9 +34,8 @@ export function useDialogueMenu() {
     }
     return context;
 }
-export function DialogueViewProvider({ children, onClick = () => { } }: {
+export function DialogueViewProvider({ children }: {
     children: React.ReactNode;
-    onClick?: (item: string) => void;
 }) {
     const ref = useRef<HTMLDivElement | null>(null);
 
@@ -63,9 +70,9 @@ export function DialogueViewProvider({ children, onClick = () => { } }: {
         };
     }, [open]);
 
-    function handleClick(item: string) {
+    function handleClick(e: React.MouseEvent<HTMLDivElement>, item: TDialogueMenuItem) {
         setDialogueMenu(prev => ({ ...prev, open: false }));
-        onClick(item);
+        if (item.onClick) item.onClick(e);
     }
 
     const value = {
@@ -89,7 +96,7 @@ export function DialogueViewProvider({ children, onClick = () => { } }: {
                 >
                     <div className="relative">
                         <div
-                            className="absolute bg-blue-400 border border-black"
+                            className="absolute bg-slate-100 border border-black rounded-lg overflow-hidden"
                             style={{
                                 top: 0,
                                 // Opens to the left or right side of the user's cursor,
@@ -101,10 +108,12 @@ export function DialogueViewProvider({ children, onClick = () => { } }: {
                             {items.map((item, index) => (
                                 <div
                                     key={index}
-                                    className="flex justify-center items-center w-full p-2 cursor-pointer hover:bg-blue-200"
-                                    onClick={() => handleClick(item)}
+                                    className="flex items-center gap-2 w-full px-3 py-1 border cursor-pointer hover:bg-blue-300"
+                                    style={{ whiteSpace: "nowrap" }}
+                                    onClick={e => handleClick(e, item)}
                                 >
-                                    {item}
+                                    {item.icon && <FontAwesomeIcon icon={item.icon} />}
+                                    {item.text}
                                 </div>
                             ))}
                         </div>

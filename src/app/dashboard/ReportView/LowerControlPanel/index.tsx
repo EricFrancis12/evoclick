@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { faLink, faPencil, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { TPrimaryData, useReportView } from "../ReportViewContext";
+import useNewReport from "@/hooks/useNewReport";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import CalendarButton from "@/components/CalendarButton";
 import RefreshButton from "@/components/RefreshButton";
@@ -17,9 +18,8 @@ import { encodeTimeframe, getPrimaryItemById, isPrimary, newPrimaryItemActionMen
 import { EItemName } from "@/lib/types";
 import { TRow } from "../DataTable";
 
-export default function LowerControlPanel({ view, onNewReport, reportItemName, rows, setRows }: {
+export default function LowerControlPanel({ view, reportItemName, rows, setRows }: {
     view: TView;
-    onNewReport: () => void;
     reportItemName?: EItemName;
     rows: TRow[];
     setRows: (newRows: TRow[]) => void;
@@ -32,6 +32,13 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
     useEffect(() => {
         updateViewReportChainById(view.id, [{}, null]);
     }, [view.itemName]);
+
+    const newReport = useNewReport();
+    // Finds the first row that is selected and creates a report for it
+    function handleNewReport() {
+        if (selectedRows.length < 1) return;
+        newReport(view.itemName, selectedRows[0].id.toString(), view.timeframe);
+    }
 
     function handleCreateNewItem() {
         setActionMenu(newPrimaryItemActionMenu(view.itemName));
@@ -82,7 +89,7 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
                 {view.type === "main" &&
                     <>
                         <ReportButton
-                            onClick={onNewReport}
+                            onClick={handleNewReport}
                             disabled={selectedRows.length < 1}
                         />
                         {isPrimary(view.itemName).bool &&
@@ -134,7 +141,7 @@ export default function LowerControlPanel({ view, onNewReport, reportItemName, r
     )
 }
 
-function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: number): TActionMenu | null {
+export function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: number): TActionMenu | null {
     let actionMenu: TActionMenu | null = null;
     if (itemName === EItemName.AFFILIATE_NETWORK) {
         const an = getPrimaryItemById(primaryData, "affiliateNetworks", id);

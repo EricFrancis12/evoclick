@@ -10,7 +10,7 @@ import { TClick } from "@/lib/types";
 
 export const ROW_HEIGHT = 30; // pixels
 export const DEPTH_MARGIN = 20; // pixels
-export const BASE_Z_INDEX = 100;
+export const BASE_Z_INDEX = 50;
 
 export type TColumn = TDataTableColumn & {
     width: number;
