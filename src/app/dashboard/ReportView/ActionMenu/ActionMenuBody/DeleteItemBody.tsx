@@ -15,7 +15,7 @@ import {
     deleteLandingPageAction, deleteOfferAction, deleteTrafficSourceAction,
     revalidatePathAction
 } from "@/lib/actions";
-import { formatErr, getPrimaryItemById, primaryItemNameToKeyOfPrimaryData } from "@/lib/utils";
+import { formatErr, getPrimaryItemById } from "@/lib/utils";
 import { TActionMenu, TDeleteItemsActionMenu } from "../types";
 import {
     EItemName, TAffiliateNetwork, TCampaign, TLandingPage,
@@ -39,10 +39,9 @@ export default function DeleteItemBody({ actionMenu, setActionMenu }: {
 
     const [deleting, setDeleting] = useState<boolean>(false);
 
-    const key = primaryItemNameToKeyOfPrimaryData(primaryItemName);
     const [deletionItems, setDeletionItems] = useState<TDeletionItem[]>(
         ids.reduce((delItems: TDeletionItem[], id) => {
-            const data = getPrimaryItemById(primaryData, key, id);
+            const data = getPrimaryItemById(primaryData, primaryItemName, id);
             return data
                 ? [...delItems, { data, status: "idle", error: "" }]
                 : delItems;

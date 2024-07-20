@@ -1,28 +1,26 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { TView } from "@/lib/store";
 import TabContainer from "./TabContainer";
-import { getPrimaryItemById, isPrimary, primaryItemNameToKeyOfPrimaryData } from "@/lib/utils";
-import { useReportView } from "../ReportViewContext";
+import { getPrimaryItemById, itemNameIsPrimary } from "@/lib/utils";
+import { TPrimaryData, useReportView } from "../ReportViewContext";
+import { EItemName } from "@/lib/types";
 
 export default function Tab({ view, onClick, onClose, reportItemId }: {
     view: TView;
     onClick: (view: TView) => void;
     onClose?: (view: TView) => void;
-    reportItemId?: number;
+    reportItemId?: string;
 }) {
     const { type, reportItemName, icon } = view;
     const isActive = useIsTabActive(view);
 
     const { primaryData } = useReportView();
-
-    const { primaryItemName } = reportItemName ? isPrimary(reportItemName) : { primaryItemName: null };
-    const key = primaryItemName ? primaryItemNameToKeyOfPrimaryData(primaryItemName) : null;
-    const result = primaryItemName && key && reportItemId ? getPrimaryItemById(primaryData, key, reportItemId) : null;
-    const { name } = result || { name: "" };
+    const tabName = useReportTabName(primaryData, reportItemName, reportItemId ?? null);
 
     function handleClose(e: React.MouseEvent<HTMLOrSVGElement>) {
         e.stopPropagation();
@@ -43,7 +41,7 @@ export default function Tab({ view, onClick, onClose, reportItemId }: {
                 }}
             >
                 <FontAwesomeIcon icon={icon} />
-                <span>{type === "main" ? "Dashboard" : `${reportItemName}${name ? ": " + name : ""}`}</span>
+                <span>{type === "main" ? "Dashboard" : `${reportItemName}${tabName ? ": " + tabName : ""}`}</span>
                 {onClose &&
                     <FontAwesomeIcon
                         icon={faClose}
@@ -56,16 +54,31 @@ export default function Tab({ view, onClick, onClose, reportItemId }: {
     )
 }
 
-function useIsTabActive(view: TView): boolean {
+function useReportTabName(primaryData: TPrimaryData, reportItemName: EItemName | null, reportItemId: string | null): string {
+    if (!reportItemName || !reportItemId) return "";
+
+    const { primaryItemName } = itemNameIsPrimary(reportItemName);
+    if (!primaryItemName) return reportItemId;
+
+    const id = parseInt(reportItemId);
+    if (!id) return "";
+
+    return getPrimaryItemById(primaryData, primaryItemName, id)?.name || "";
+}
+
+export function useIsTabActive(view: TView): boolean {
     const params = useParams();
+    if (isActiveMainTab(view, params)) return true;
+    if (isActiveReportTab(view, params)) return true;
+    return false;
+}
 
-    const isActiveMainTab = view.type === "main" && !params.id;
-    if (isActiveMainTab) return true;
+export function isActiveMainTab(view: TView, params: Params): boolean {
+    return view.type === "main" && !params.id;
+}
 
-    const isActiveReportTab = view.type === "report"
+export function isActiveReportTab(view: TView, params: Params): boolean {
+    return view.type === "report"
         && typeof params.id === "string"
         && decodeURIComponent(params.id) === view.id;
-    if (isActiveReportTab) return true;
-
-    return false;
 }

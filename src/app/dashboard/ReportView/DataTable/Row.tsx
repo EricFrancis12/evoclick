@@ -18,7 +18,7 @@ import { TView } from "@/lib/store";
 import { DEPTH_MARGIN, TColumn, TRow } from ".";
 import { EItemName, TClick } from "@/lib/types";
 import { useReportView } from "../ReportViewContext";
-import { getPrimaryItemById, isPrimary, primaryItemNameToKeyOfPrimaryData } from "@/lib/utils";
+import { getPrimaryItemById, itemNameIsPrimary } from "@/lib/utils";
 import { copyToClipboard } from "@/lib/utils/client";
 
 export default function Row({ row, columns, onSelected, view, depth }: {
@@ -34,7 +34,7 @@ export default function Row({ row, columns, onSelected, view, depth }: {
     const cells = makeCells(row.clicks, row.name);
     const profit = typeof cells[6] === "number" ? cells[6] : 0;
 
-    const { bool, primaryItemName } = isPrimary(view.itemName);
+    const { primaryItemName } = itemNameIsPrimary(view.itemName);
 
     const newReport = useNewReport();
 
@@ -71,8 +71,7 @@ export default function Row({ row, columns, onSelected, view, depth }: {
             icon: faCopy,
             onClick: () => {
                 if (!primaryItemName || !hasURLProp(primaryItemName) || typeof row.id !== "number") return;
-                const key = primaryItemNameToKeyOfPrimaryData(primaryItemName);
-                const item = getPrimaryItemById(primaryData, key, row.id);
+                const item = getPrimaryItemById(primaryData, primaryItemName, row.id);
                 if (item && "url" in item) copyToClipboard(item.url);
             },
         },
@@ -81,8 +80,7 @@ export default function Row({ row, columns, onSelected, view, depth }: {
             icon: faExternalLink,
             onClick: () => {
                 if (!primaryItemName || !hasURLProp(primaryItemName) || typeof row.id !== "number") return;
-                const key = primaryItemNameToKeyOfPrimaryData(primaryItemName);
-                const item = getPrimaryItemById(primaryData, key, row.id);
+                const item = getPrimaryItemById(primaryData, primaryItemName, row.id);
                 if (item && "url" in item) window.open(item.url, "_blank");
             },
         },

@@ -10,7 +10,6 @@ import CampaignLinksBody from "./CampaignLinksBody";
 import DeleteItemBody from "./DeleteItemBody";
 import { EItemName } from "@/lib/types";
 import { TActionMenu } from "../types";
-import { isPrimary } from "@/lib/utils";
 
 export default function ActionMenuBody({ actionMenu, setActionMenu }: {
     actionMenu: TActionMenu;

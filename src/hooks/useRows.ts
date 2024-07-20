@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { itemNameToClickProp } from "@/lib/utils/maps";
 import { TPrimaryData, useReportView } from "@/app/dashboard/ReportView/ReportViewContext";
-import { EItemName, TClick } from "@/lib/types";
 import { TRow } from "@/app/dashboard/ReportView/DataTable";
+import { EItemName, TClick } from "@/lib/types";
 
 export function useRows(clicks: TClick[], itemName: EItemName) {
     const { primaryData } = useReportView();
@@ -82,30 +83,3 @@ function itemNameInPrimaryData(itemName: EItemName, primaryData: TPrimaryData) {
             return undefined;
     }
 }
-
-function itemNameToClickProp(itemName: EItemName): keyof TClick | undefined {
-    return clickPropsMap[itemName];
-}
-
-const clickPropsMap: Record<EItemName, keyof TClick> = {
-    [EItemName.AFFILIATE_NETWORK]: "affiliateNetworkId",
-    [EItemName.CAMPAIGN]: "campaignId",
-    [EItemName.FLOW]: "savedFlowId",
-    [EItemName.LANDING_PAGE]: "landingPageId",
-    [EItemName.OFFER]: "offerId",
-    [EItemName.TRAFFIC_SOURCE]: "trafficSourceId",
-    [EItemName.IP]: "ip",
-    [EItemName.ISP]: "isp",
-    [EItemName.USER_AGENT]: "userAgent",
-    [EItemName.LANGUAGE]: "language",
-    [EItemName.COUNTRY]: "country",
-    [EItemName.REGION]: "region",
-    [EItemName.CITY]: "city",
-    [EItemName.DEVICE_TYPE]: "deviceType",
-    [EItemName.DEVICE]: "device",
-    [EItemName.SCREEN_RESOLUTION]: "screenResolution",
-    [EItemName.OS]: "os",
-    [EItemName.OS_VERSION]: "osVersion",
-    [EItemName.BROWSER_NAME]: "browserName",
-    [EItemName.BROWSER_VERSION]: "browserVersion",
-};

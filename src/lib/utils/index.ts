@@ -59,16 +59,17 @@ export function decodeTimeframe(str: string): [Date, Date] | null {
     return [new Date(nums[0]), new Date(nums[1])];
 }
 
-export function getPrimaryItemById<T extends keyof TPrimaryData>(
+export function getPrimaryItemById(
     primaryData: TPrimaryData,
-    key: T,
+    primaryItemName: TPrimaryItemName,
     id: number
-): TPrimaryData[T][number] | null {
+): TPrimaryData[keyof TPrimaryData][number] | null {
+    const key: keyof TPrimaryData = primaryItemNameToKeyOfPrimaryData(primaryItemName);
     const items = primaryData[key];
     return items.find(item => item.id === id) ?? null;
 }
 
-export function primaryItemNameToKeyOfPrimaryData(primaryItemName: TPrimaryItemName): keyof TPrimaryData {
+function primaryItemNameToKeyOfPrimaryData(primaryItemName: TPrimaryItemName): keyof TPrimaryData {
     switch (primaryItemName) {
         case EItemName.AFFILIATE_NETWORK:
             return "affiliateNetworks";
@@ -85,17 +86,17 @@ export function primaryItemNameToKeyOfPrimaryData(primaryItemName: TPrimaryItemN
     }
 }
 
-export type isPrimaryResult = {
-    bool: true;
+export type itemNameIsPrimaryResult = {
+    isPrimary: true;
     primaryItemName: TPrimaryItemName;
 } | {
-    bool: false;
+    isPrimary: false;
     primaryItemName: null;
 };
 
 // Returns whether an EItemName is a TPrimaryItemName or not.
 // Uses a diverging union to transform EItemName into a TPrimaryItemName if bool is true
-export function isPrimary(itemName: EItemName): isPrimaryResult {
+export function itemNameIsPrimary(itemName: EItemName): itemNameIsPrimaryResult {
     if (itemName === EItemName.AFFILIATE_NETWORK
         || itemName === EItemName.CAMPAIGN
         || itemName === EItemName.FLOW
@@ -104,12 +105,12 @@ export function isPrimary(itemName: EItemName): isPrimaryResult {
         || itemName === EItemName.TRAFFIC_SOURCE
     ) {
         return {
-            bool: true,
+            isPrimary: true,
             primaryItemName: itemName,
         };
     }
     return {
-        bool: false,
+        isPrimary: false,
         primaryItemName: null,
     };
 }

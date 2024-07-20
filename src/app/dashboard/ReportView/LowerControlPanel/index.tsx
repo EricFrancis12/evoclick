@@ -14,7 +14,7 @@ import LowerCPRow from "./LowerCPRow";
 import { TView, useViewsStore } from "@/lib/store";
 import Button from "@/components/Button";
 import { TActionMenu } from "../ActionMenu/types";
-import { encodeTimeframe, getPrimaryItemById, isPrimary, newPrimaryItemActionMenu } from "@/lib/utils";
+import { encodeTimeframe, getPrimaryItemById, itemNameIsPrimary, newPrimaryItemActionMenu } from "@/lib/utils";
 import { EItemName } from "@/lib/types";
 import { TRow } from "../DataTable";
 
@@ -51,8 +51,8 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
     }
 
     function handleDeleteItem() {
-        const { bool, primaryItemName } = isPrimary(view.itemName);
-        if (!bool) return;
+        const { isPrimary, primaryItemName } = itemNameIsPrimary(view.itemName);
+        if (!isPrimary) return;
         setActionMenu({
             type: "delete item",
             primaryItemName,
@@ -92,7 +92,7 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
                             onClick={handleNewReport}
                             disabled={selectedRows.length < 1}
                         />
-                        {isPrimary(view.itemName).bool &&
+                        {itemNameIsPrimary(view.itemName).isPrimary &&
                             <>
                                 <Button
                                     text={`Edit ${view.itemName}`}
@@ -123,7 +123,7 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
                 {view.type === "main" &&
                     <>
                         <Button
-                            text={`Create New ${isPrimary(view.itemName).bool ? view.itemName : EItemName.CAMPAIGN}`}
+                            text={`Create New ${itemNameIsPrimary(view.itemName).isPrimary ? view.itemName : EItemName.CAMPAIGN}`}
                             icon={faPlus}
                             onClick={handleCreateNewItem}
                         />
@@ -144,7 +144,7 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
 export function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: number): TActionMenu | null {
     let actionMenu: TActionMenu | null = null;
     if (itemName === EItemName.AFFILIATE_NETWORK) {
-        const an = getPrimaryItemById(primaryData, "affiliateNetworks", id);
+        const an = getPrimaryItemById(primaryData, itemName, id);
         actionMenu = {
             type: itemName,
             itemName,
@@ -154,7 +154,7 @@ export function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, i
             tags: an?.tags,
         };
     } else if (itemName === EItemName.CAMPAIGN) {
-        const ca = getPrimaryItemById(primaryData, "campaigns", id);
+        const ca = getPrimaryItemById(primaryData, itemName, id);
         actionMenu = {
             type: itemName,
             itemName,
@@ -172,7 +172,7 @@ export function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, i
             flowRuleRoutes: ca?.flowRuleRoutes ?? undefined,
         };
     } else if (itemName === EItemName.FLOW) {
-        const fl = getPrimaryItemById(primaryData, "flows", id);
+        const fl = getPrimaryItemById(primaryData, itemName, id);
         actionMenu = {
             type: itemName,
             itemName,
@@ -183,7 +183,7 @@ export function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, i
             tags: fl?.tags ?? undefined,
         };
     } else if (itemName === EItemName.LANDING_PAGE) {
-        const lp = getPrimaryItemById(primaryData, "landingPages", id);
+        const lp = getPrimaryItemById(primaryData, itemName, id);
         actionMenu = {
             type: itemName,
             itemName,
@@ -193,7 +193,7 @@ export function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, i
             tags: lp?.tags,
         };
     } else if (itemName === EItemName.OFFER) {
-        const o = getPrimaryItemById(primaryData, "offers", id);
+        const o = getPrimaryItemById(primaryData, itemName, id);
         actionMenu = {
             type: itemName,
             itemName,
@@ -205,7 +205,7 @@ export function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, i
             affiliateNetworkId: o?.affiliateNetworkId,
         };
     } else if (itemName === EItemName.TRAFFIC_SOURCE) {
-        const ts = getPrimaryItemById(primaryData, "trafficSources", id);
+        const ts = getPrimaryItemById(primaryData, itemName, id);
         actionMenu = {
             type: itemName,
             itemName,

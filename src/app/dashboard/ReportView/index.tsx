@@ -21,7 +21,7 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
     clicks: TClick[];
     timeframe: [Date, Date];
     reportItemName?: EItemName;
-    reportItemId?: number;
+    reportItemId?: string;
 }) {
     const { mainView, reportViews, updateViewOnPageLoad, removeReportViewById } = useViewsStore(store => store);
 
