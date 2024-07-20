@@ -11,6 +11,8 @@ import (
 
 func Click(w http.ResponseWriter, r *http.Request) {
 	timestamp, ctx, storer := pkg.InitVisit()
+	defer storer.Client.Disconnect()
+	defer storer.Cache.Close()
 
 	clickPublicId := getCookieValue(r, pkg.CookieNameClickPublicID)
 	if clickPublicId == "" {

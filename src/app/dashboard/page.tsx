@@ -46,6 +46,8 @@ export default async function DashboardPage({ params, searchParams }: {
             trafficSources: await trafficSourcesProm,
         };
 
+        console.log(clicks.length);
+
         return (
             <ReportView
                 primaryData={primaryData}

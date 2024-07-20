@@ -11,6 +11,7 @@
         "lint": "next lint",
         "test": "jest && go test ./... -v",
         "e2e": "npx cypress run",
+        "load_test": "ts-node scripts/load_test.ts",
         "vercel-install": "npm install && yum install golang -y",
         "vercel-build": "prisma generate && next build",
         "prepare": "husky"

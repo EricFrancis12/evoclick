@@ -16,6 +16,8 @@ import (
 
 func T(w http.ResponseWriter, r *http.Request) {
 	timestamp, ctx, storer := pkg.InitVisit()
+	defer storer.Client.Disconnect()
+	defer storer.Cache.Close()
 
 	g := getGValue(r)
 	if g == "" {
