@@ -86,6 +86,18 @@ export type TPath = {
     directLinkingEnabled: boolean;
 };
 
+export type IPInfoData = {
+    ip: string;
+    hostname: string;
+    city: string;
+    region: string;
+    country: string;
+    loc: string;
+    org: string;
+    postal: string;
+    timezone: string;
+};
+
 export enum ERuleName {
     IP = "IP",
     ISP = "ISP",

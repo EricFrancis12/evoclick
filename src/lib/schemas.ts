@@ -3,9 +3,7 @@ import { z } from "zod";
 import { toZod } from "tozod";
 import {
     TAffiliateNetwork, TLandingPage, TOffer, TToken, TNamedToken, TTrafficSource, TUser,
-    TPath, ELogicalRelation, ERuleName,
-    TSavedFlow,
-    TCampaign
+    TPath, ELogicalRelation, ERuleName, IPInfoData
 } from "./types";
 
 export const userSchema: toZod<TUser> = z.object({
@@ -115,4 +113,16 @@ export const trafficSourceSchema: toZod<TTrafficSource> = z.object({
     tags: z.array(z.string()),
     createdAt: z.date(),
     updatedAt: z.date(),
+});
+
+export const IPInfoDataSchema: toZod<IPInfoData> = z.object({
+    ip: z.string(),
+    hostname: z.string(),
+    city: z.string(),
+    region: z.string(),
+    country: z.string(),
+    loc: z.string(),
+    org: z.string(),
+    postal: z.string(),
+    timezone: z.string(),
 });
