@@ -8,12 +8,15 @@ export type TUser_createRequest = Omit<TUser, omissions>;
 export type TUser_updateRequest = Omit<Partial<TUser>, omissions>;
 
 // Extending Affiliate Network model
-export type TAffiliateNetwork = AffiliateNetwork;
+export type TAffiliateNetwork = AffiliateNetwork & {
+    primaryItemName: EItemName.AFFILIATE_NETWORK;
+};
 export type TAffiliateNetwork_createRequest = Omit<TAffiliateNetwork, omissions>;
 export type TAffiliateNetwork_updateRequest = Omit<Partial<TAffiliateNetwork>, omissions>;
 
 // Extending Campaign model
 export type TCampaign = Omit<Campaign, "flowMainRoute" | "flowRuleRoutes"> & {
+    primaryItemName: EItemName.CAMPAIGN;
     flowMainRoute: TRoute | null;
     flowRuleRoutes: TRoute[] | null;
 };
@@ -22,6 +25,7 @@ export type TCampaign_updateRequest = Omit<Partial<TCampaign>, omissions>;
 
 // Extending Flow model
 export type TSavedFlow = Omit<SavedFlow, "mainRoute" | "ruleRoutes"> & {
+    primaryItemName: EItemName.FLOW;
     mainRoute: TRoute;
     ruleRoutes: TRoute[];
 };
@@ -29,17 +33,22 @@ export type TSavedFlow_createRequest = Omit<TSavedFlow, omissions>;
 export type TSavedFlow_updateRequest = Omit<Partial<TSavedFlow>, omissions>;
 
 // Extending Landing Page model
-export type TLandingPage = LandingPage;
+export type TLandingPage = LandingPage & {
+    primaryItemName: EItemName.LANDING_PAGE;
+};
 export type TLandingPage_createRequest = Omit<TLandingPage, omissions>;
 export type TLandingPage_updateRequest = Omit<Partial<TLandingPage>, omissions>;
 
 // Extending Offer model
-export type TOffer = Offer;
+export type TOffer = Offer & {
+    primaryItemName: EItemName.OFFER;
+};
 export type TOffer_createRequest = Omit<TOffer, omissions>;
 export type TOffer_updateRequest = Omit<Partial<TOffer>, omissions>;
 
 // Extending Traffic Source model
 export type TTrafficSource = Omit<TrafficSource, "externalIdToken" | "costToken" | "customTokens"> & {
+    primaryItemName: EItemName.TRAFFIC_SOURCE;
     externalIdToken: TToken;
     costToken: TToken;
     customTokens: TNamedToken[];

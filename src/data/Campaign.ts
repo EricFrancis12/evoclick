@@ -6,13 +6,13 @@ import { parseRoute, parseRoutes } from ".";
 import { campaignSchema } from "../lib/schemas";
 import { safeParseJson, newRoute } from "../lib/utils";
 import { REDIS_EXPIRY } from "../lib/constants";
-import { ELogicalRelation, TCampaign, TCampaign_createRequest, TCampaign_updateRequest, TRoute } from "../lib/types";
+import { EItemName, ELogicalRelation, TCampaign, TCampaign_createRequest, TCampaign_updateRequest, TRoute } from "../lib/types";
 
 const makeKey = makeRedisKeyFunc("campaign");
 
 export async function getAllCampaigns(): Promise<TCampaign[]> {
-    const campaigns: Campaign[] = await db.campaign.findMany();
-    const proms: Promise<TCampaign>[] = campaigns.map(makeClientCampaign);
+    const models: Campaign[] = await db.campaign.findMany();
+    const proms: Promise<TCampaign>[] = models.map(makeClientCampaign);
     return Promise.all(proms);
 }
 
@@ -122,6 +122,7 @@ async function makeClientCampaign(dbModel: Campaign): Promise<TCampaign> {
     const flowRuleRoutesProm = dbModel.flowRuleRoutes ? parseRoutes(dbModel.flowRuleRoutes) : [];
     return {
         ...dbModel,
+        primaryItemName: EItemName.CAMPAIGN,
         flowMainRoute: await flowMainRouteProm,
         flowRuleRoutes: await flowRuleRoutesProm,
     };

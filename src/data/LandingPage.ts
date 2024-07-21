@@ -1,14 +1,15 @@
+import { LandingPage } from "@prisma/client";
 import cache, { makeRedisKeyFunc } from "../lib/cache";
 import db from "../lib/db";
 import { landingPageSchema } from "../lib/schemas";
 import { REDIS_EXPIRY } from "@/lib/constants";
 import { safeParseJson } from "../lib/utils";
-import { TLandingPage, TLandingPage_createRequest, TLandingPage_updateRequest } from "../lib/types";
+import { EItemName, TLandingPage, TLandingPage_createRequest, TLandingPage_updateRequest } from "../lib/types";
 
 const makeKey = makeRedisKeyFunc("landingPage");
 
 export async function getAllLandingPages(): Promise<TLandingPage[]> {
-    return db.landingPage.findMany();
+    return db.offer.findMany().then(models => models.map(makeClientLandingPage));
 }
 
 export async function getLandingPageById(id: number): Promise<TLandingPage | null> {
@@ -36,7 +37,7 @@ export async function getLandingPageById(id: number): Promise<TLandingPage | nul
         }
     });
 
-    return landingPageProm;
+    return landingPageProm.then(lp => lp ? makeClientLandingPage(lp) : null);
 }
 
 export async function createNewLandingPage(creationRequest: TLandingPage_createRequest): Promise<TLandingPage> {
@@ -54,7 +55,7 @@ export async function createNewLandingPage(creationRequest: TLandingPage_createR
         }
     });
 
-    return landingPageProm;
+    return landingPageProm.then(makeClientLandingPage);
 }
 
 export async function updateLandingPageById(id: number, data: TLandingPage_updateRequest): Promise<TLandingPage> {
@@ -73,7 +74,7 @@ export async function updateLandingPageById(id: number, data: TLandingPage_updat
         }
     });
 
-    return landingPageProm;
+    return landingPageProm.then(makeClientLandingPage);
 }
 
 export async function deleteLandingPageById(id: number): Promise<TLandingPage> {
@@ -83,7 +84,16 @@ export async function deleteLandingPageById(id: number): Promise<TLandingPage> {
         cache.del(key);
     }
 
-    return db.landingPage.delete({
+    const landingPageProm = db.landingPage.delete({
         where: { id },
     });
+
+    return landingPageProm.then(makeClientLandingPage);
+}
+
+function makeClientLandingPage(dbModel: LandingPage): TLandingPage {
+    return {
+        ...dbModel,
+        primaryItemName: EItemName.LANDING_PAGE,
+    };
 }

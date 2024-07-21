@@ -13,7 +13,7 @@ import TokenInputWrapper from "../../TokenInput/TokenInputWrapper";
 import TokenInput from "../../TokenInput";
 import { newToken, newNamedToken } from "@/lib/utils/new";
 import { TActionMenu, TTrafficSourceActionMenu } from "../types";
-import { TNamedToken } from "@/lib/types";
+import { EItemName, TNamedToken } from "@/lib/types";
 
 export default function TrafficSourceBody({ actionMenu, setActionMenu }: {
     actionMenu: TTrafficSourceActionMenu;
@@ -29,6 +29,7 @@ export default function TrafficSourceBody({ actionMenu, setActionMenu }: {
                 toast.success("Traffic Source was updated successfully");
             } else {
                 await createNewTrafficSourceAction({
+                    primaryItemName: EItemName.TRAFFIC_SOURCE,
                     name: name ?? "",
                     externalIdToken: externalIdToken ?? newToken(),
                     costToken: costToken ?? newToken(),

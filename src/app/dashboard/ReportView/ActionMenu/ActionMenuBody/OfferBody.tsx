@@ -8,7 +8,7 @@ import { Input, Select } from "@/components/base";
 import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import ActionMenuFooter from "../ActionMenuFooter";
 import { TActionMenu, TOfferActionMenu } from "../types";
-import { TAffiliateNetwork } from "@/lib/types";
+import { EItemName, TAffiliateNetwork } from "@/lib/types";
 
 export default function OfferBody({ actionMenu, setActionMenu }: {
     actionMenu: TOfferActionMenu;
@@ -30,6 +30,7 @@ export default function OfferBody({ actionMenu, setActionMenu }: {
                 toast.success("Offer was updated successfully");
             } else if (affiliateNetworkId !== undefined) {
                 await createNewOfferAction({
+                    primaryItemName: EItemName.OFFER,
                     name: name ?? "",
                     url: url ?? "",
                     payout: payout ?? 0,

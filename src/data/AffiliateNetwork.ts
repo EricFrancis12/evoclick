@@ -1,14 +1,15 @@
+import { AffiliateNetwork } from "@prisma/client";
 import cache, { makeRedisKeyFunc } from "../lib/cache";
 import db from "../lib/db";
 import { affiliateNetworkSchema } from "../lib/schemas";
 import { safeParseJson } from "../lib/utils";
 import { REDIS_EXPIRY } from "@/lib/constants";
-import { TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest } from "../lib/types";
+import { EItemName, TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest } from "../lib/types";
 
 const makeKey = makeRedisKeyFunc("affiliateNetwork");
 
 export async function getAllAffiliateNetworks(): Promise<TAffiliateNetwork[]> {
-    return db.affiliateNetwork.findMany();
+    return db.affiliateNetwork.findMany().then(model => model.map(makeClientAffiliateNetwork));
 }
 
 export async function getAffiliateNetworkById(id: number): Promise<TAffiliateNetwork | null> {
@@ -36,7 +37,7 @@ export async function getAffiliateNetworkById(id: number): Promise<TAffiliateNet
         }
     });
 
-    return affiliateNetworkProm;
+    return affiliateNetworkProm.then(an => an ? makeClientAffiliateNetwork(an) : null);
 }
 
 export async function createNewAffiliateNetwork(creationRequest: TAffiliateNetwork_createRequest): Promise<TAffiliateNetwork> {
@@ -54,7 +55,7 @@ export async function createNewAffiliateNetwork(creationRequest: TAffiliateNetwo
         }
     });
 
-    return affiliateNetworkProm;
+    return affiliateNetworkProm.then(makeClientAffiliateNetwork);
 }
 
 export async function updateAffiliateNetworkById(id: number, data: TAffiliateNetwork_updateRequest): Promise<TAffiliateNetwork> {
@@ -73,7 +74,7 @@ export async function updateAffiliateNetworkById(id: number, data: TAffiliateNet
         }
     });
 
-    return affiliateNetworkProm;
+    return affiliateNetworkProm.then(makeClientAffiliateNetwork);
 }
 
 export async function deleteAffiliateNetworkById(id: number): Promise<TAffiliateNetwork> {
@@ -83,7 +84,16 @@ export async function deleteAffiliateNetworkById(id: number): Promise<TAffiliate
         cache.del(key);
     }
 
-    return db.affiliateNetwork.delete({
+    const affiliateNetworkProm = db.affiliateNetwork.delete({
         where: { id },
     });
+
+    return affiliateNetworkProm.then(makeClientAffiliateNetwork);
+}
+
+function makeClientAffiliateNetwork(dbModel: AffiliateNetwork): TAffiliateNetwork {
+    return {
+        ...dbModel,
+        primaryItemName: EItemName.AFFILIATE_NETWORK,
+    };
 }

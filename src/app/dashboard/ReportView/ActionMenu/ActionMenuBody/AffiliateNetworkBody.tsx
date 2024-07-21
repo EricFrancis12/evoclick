@@ -7,6 +7,7 @@ import { Input } from "@/components/base";
 import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import ActionMenuFooter from "../ActionMenuFooter";
 import { TActionMenu, TAffiliateNetworkActionMenu } from "../types";
+import { EItemName } from "@/lib/types";
 
 export default function AffiliateNetworkBody({ actionMenu, setActionMenu }: {
     actionMenu: TAffiliateNetworkActionMenu;
@@ -20,6 +21,7 @@ export default function AffiliateNetworkBody({ actionMenu, setActionMenu }: {
                 toast.success("Affiliate Network was updated successfully");
             } else {
                 await createNewAffiliateNetworkAction({
+                    primaryItemName: EItemName.AFFILIATE_NETWORK,
                     name: name ?? "",
                     defaultNewOfferString: defaultNewOfferString ?? "",
                     tags: tags ?? [],

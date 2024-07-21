@@ -1,12 +1,11 @@
 import { $Enums } from "@prisma/client";
 import { z } from "zod";
-import { toZod } from "tozod";
 import {
-    TAffiliateNetwork, TLandingPage, TOffer, TToken, TNamedToken, TTrafficSource, TUser,
-    TPath, ELogicalRelation, ERuleName, IPInfoData
+    TUser, TAffiliateNetwork, TCampaign, TSavedFlow, TLandingPage, TOffer, TTrafficSource, TToken, TNamedToken,
+    TPath, TRoute, TRule, ERuleName, ELogicalRelation, IPInfoData, EItemName
 } from "./types";
 
-export const userSchema: toZod<TUser> = z.object({
+export const userSchema: z.ZodType<TUser> = z.object({
     id: z.number(),
     name: z.string(),
     hashedPassword: z.string(),
@@ -14,7 +13,8 @@ export const userSchema: toZod<TUser> = z.object({
     updatedAt: z.date(),
 });
 
-export const affiliateNetworkSchema: toZod<TAffiliateNetwork> = z.object({
+export const affiliateNetworkSchema: z.ZodType<TAffiliateNetwork> = z.object({
+    primaryItemName: z.literal(EItemName.AFFILIATE_NETWORK),
     id: z.number(),
     name: z.string(),
     defaultNewOfferString: z.string(),
@@ -23,13 +23,13 @@ export const affiliateNetworkSchema: toZod<TAffiliateNetwork> = z.object({
     updatedAt: z.date(),
 });
 
-export const ruleSchema = z.object({
+export const ruleSchema: z.ZodType<TRule> = z.object({
     ruleName: z.nativeEnum(ERuleName),
     includes: z.boolean(),
     data: z.array(z.string()),
 });
 
-export const pathSchema: toZod<TPath> = z.object({
+export const pathSchema: z.ZodType<TPath> = z.object({
     isActive: z.boolean(),
     weight: z.number(),
     landingPageIds: z.array(z.number()),
@@ -37,14 +37,15 @@ export const pathSchema: toZod<TPath> = z.object({
     directLinkingEnabled: z.boolean(),
 });
 
-export const routeSchema = z.object({
+export const routeSchema: z.ZodType<TRoute> = z.object({
     isActive: z.boolean(),
     logicalRelation: z.nativeEnum(ELogicalRelation),
     paths: z.array(pathSchema),
     rules: z.array(ruleSchema),
 });
 
-export const savedFlowSchema = z.object({
+export const savedFlowSchema: z.ZodType<TSavedFlow> = z.object({
+    primaryItemName: z.literal(EItemName.FLOW),
     id: z.number(),
     name: z.string(),
     mainRoute: routeSchema,
@@ -54,7 +55,8 @@ export const savedFlowSchema = z.object({
     updatedAt: z.date(),
 });
 
-export const campaignSchema = z.object({
+export const campaignSchema: z.ZodType<TCampaign> = z.object({
+    primaryItemName: z.literal(EItemName.CAMPAIGN),
     id: z.number(),
     publicId: z.string(),
     name: z.string(),
@@ -72,7 +74,8 @@ export const campaignSchema = z.object({
     flowRuleRoutes: z.array(routeSchema).nullable(),
 });
 
-export const landingPageSchema: toZod<TLandingPage> = z.object({
+export const landingPageSchema: z.ZodType<TLandingPage> = z.object({
+    primaryItemName: z.literal(EItemName.LANDING_PAGE),
     id: z.number(),
     name: z.string(),
     url: z.string(),
@@ -81,7 +84,8 @@ export const landingPageSchema: toZod<TLandingPage> = z.object({
     updatedAt: z.date(),
 });
 
-export const offersSchema: toZod<TOffer> = z.object({
+export const offersSchema: z.ZodType<TOffer> = z.object({
+    primaryItemName: z.literal(EItemName.OFFER),
     id: z.number(),
     name: z.string(),
     url: z.string(),
@@ -92,18 +96,19 @@ export const offersSchema: toZod<TOffer> = z.object({
     affiliateNetworkId: z.number(),
 });
 
-export const tokenSchema: toZod<TToken> = z.object({
+export const tokenSchema: z.ZodType<TToken> = z.object({
     queryParam: z.string(),
     value: z.string(),
 });
 
-export const namedTokenSchema: toZod<TNamedToken> = z.object({
+export const namedTokenSchema: z.ZodType<TNamedToken> = z.object({
     queryParam: z.string(),
     value: z.string(),
     name: z.string(),
 });
 
-export const trafficSourceSchema: toZod<TTrafficSource> = z.object({
+export const trafficSourceSchema: z.ZodType<TTrafficSource> = z.object({
+    primaryItemName: z.literal(EItemName.TRAFFIC_SOURCE),
     id: z.number(),
     name: z.string(),
     postbackUrl: z.nullable(z.string()),
@@ -115,7 +120,7 @@ export const trafficSourceSchema: toZod<TTrafficSource> = z.object({
     updatedAt: z.date(),
 });
 
-export const IPInfoDataSchema: toZod<IPInfoData> = z.object({
+export const IPInfoDataSchema: z.ZodType<IPInfoData> = z.object({
     ip: z.string(),
     hostname: z.string(),
     city: z.string(),

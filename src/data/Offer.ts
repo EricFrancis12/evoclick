@@ -1,14 +1,15 @@
+import { Offer } from "@prisma/client";
 import cache, { makeRedisKeyFunc } from "../lib/cache";
 import db from "../lib/db";
 import { offersSchema } from "../lib/schemas";
 import { REDIS_EXPIRY } from "../lib/constants";
 import { safeParseJson } from "../lib/utils";
-import { TOffer, TOffer_createRequest, TOffer_updateRequest } from "../lib/types";
+import { EItemName, TOffer, TOffer_createRequest, TOffer_updateRequest } from "../lib/types";
 
 const makeKey = makeRedisKeyFunc("offer");
 
 export async function getAllOffers(): Promise<TOffer[]> {
-    return db.offer.findMany();
+    return db.offer.findMany().then(models => models.map(makeClientOffer));
 }
 
 export async function getOfferById(id: number): Promise<TOffer | null> {
@@ -36,7 +37,7 @@ export async function getOfferById(id: number): Promise<TOffer | null> {
         }
     });
 
-    return offerProm;
+    return offerProm.then(o => o ? makeClientOffer(o) : null);
 }
 
 export async function createNewOffer(creationRequest: TOffer_createRequest): Promise<TOffer> {
@@ -54,7 +55,7 @@ export async function createNewOffer(creationRequest: TOffer_createRequest): Pro
         }
     });
 
-    return offerProm;
+    return offerProm.then(makeClientOffer);
 }
 
 export async function updateOfferById(id: number, data: TOffer_updateRequest): Promise<TOffer> {
@@ -73,7 +74,7 @@ export async function updateOfferById(id: number, data: TOffer_updateRequest): P
         }
     });
 
-    return offerProm;
+    return offerProm.then(makeClientOffer);
 }
 
 export async function deleteOfferById(id: number): Promise<TOffer> {
@@ -83,7 +84,16 @@ export async function deleteOfferById(id: number): Promise<TOffer> {
         cache.del(key);
     }
 
-    return db.offer.delete({
+    const offerProm = db.offer.delete({
         where: { id },
     });
+
+    return offerProm.then(makeClientOffer);
+}
+
+function makeClientOffer(dbModel: Offer): TOffer {
+    return {
+        ...dbModel,
+        primaryItemName: EItemName.OFFER,
+    };
 }

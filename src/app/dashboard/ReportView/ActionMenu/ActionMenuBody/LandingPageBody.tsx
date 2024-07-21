@@ -7,6 +7,7 @@ import { Input } from "@/components/base";
 import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import ActionMenuFooter from "../ActionMenuFooter";
 import { TActionMenu, TLandingPageActionMenu } from "../types";
+import { EItemName } from "@/lib/types";
 
 export default function LandingPageBody({ actionMenu, setActionMenu }: {
     actionMenu: TLandingPageActionMenu;
@@ -20,6 +21,7 @@ export default function LandingPageBody({ actionMenu, setActionMenu }: {
                 toast.success("Landing Page was updated successfully");
             } else {
                 await createNewLandingPageAction({
+                    primaryItemName: EItemName.LANDING_PAGE,
                     name: name ?? "",
                     url: url ?? "",
                     tags: tags ?? [],

@@ -5,13 +5,13 @@ import { parseToken, parseNamedTokens } from ".";
 import { trafficSourceSchema } from "../lib/schemas";
 import { REDIS_EXPIRY } from "../lib/constants";
 import { safeParseJson } from "../lib/utils";
-import { TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest } from "../lib/types";
+import { EItemName, TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest } from "../lib/types";
 
 const makeKey = makeRedisKeyFunc("trafficSource");
 
 export async function getAllTrafficSources(): Promise<TTrafficSource[]> {
-    const trafficSources: TrafficSource[] = await db.trafficSource.findMany();
-    const proms: Promise<TTrafficSource>[] = trafficSources.map(makeClientTrafficSource);
+    const models: TrafficSource[] = await db.trafficSource.findMany();
+    const proms: Promise<TTrafficSource>[] = models.map(makeClientTrafficSource);
     return Promise.all(proms);
 }
 
@@ -114,6 +114,7 @@ async function makeClientTrafficSource(dbModel: TrafficSource): Promise<TTraffic
     const customTokensProm = parseNamedTokens(dbModel.customTokens);
     return {
         ...dbModel,
+        primaryItemName: EItemName.TRAFFIC_SOURCE,
         externalIdToken: await externalIdTokenProm,
         costToken: await costTokenProm,
         customTokens: await customTokensProm,

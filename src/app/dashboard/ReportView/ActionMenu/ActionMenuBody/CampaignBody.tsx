@@ -12,7 +12,7 @@ import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import ActionMenuFooter from "../ActionMenuFooter";
 import { newRoute } from "@/lib/utils/new";
 import { TActionMenu, TCampaignActionMenu } from "../types";
-import { TSavedFlow, TTrafficSource } from "@/lib/types";
+import { EItemName, TSavedFlow, TTrafficSource } from "@/lib/types";
 import { $Enums } from "@prisma/client";
 
 export default function CampaignBody({ actionMenu, setActionMenu }: {
@@ -66,6 +66,7 @@ export default function CampaignBody({ actionMenu, setActionMenu }: {
                 toast.success("Campaign was updated successfully");
             } else if (trafficSourceId !== undefined) {
                 await createNewCampaignAction({
+                    primaryItemName: EItemName.CAMPAIGN,
                     name: name ?? "",
                     landingPageRotationType: landingPageRotationType ?? $Enums.RotationType.RANDOM,
                     offerRotationType: offerRotationType ?? $Enums.RotationType.RANDOM,

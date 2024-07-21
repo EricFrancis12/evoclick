@@ -4,8 +4,8 @@ import {
     offersSchema, routeSchema, ruleSchema
 } from "./schemas";
 import {
-    ELogicalRelation, ERuleName, TAffiliateNetwork, TCampaign, TSavedFlow, TLandingPage,
-    TOffer, TPath, TRoute, TRule
+    TAffiliateNetwork, TCampaign, TSavedFlow, TLandingPage, TOffer,
+    TPath, TRoute, TRule, ERuleName, ELogicalRelation, EItemName
 } from "./types";
 
 describe("Testing Schemas", () => {
@@ -13,6 +13,7 @@ describe("Testing Schemas", () => {
         expect(campaignSchema.safeParse({}).success).toEqual(false);
 
         const boilerplateCampaign: TCampaign = {
+            primaryItemName: EItemName.CAMPAIGN,
             id: 1,
             publicId: "e83htr892ujhoo3hnfksl04utynh23873towow",
             name: "My Campaign",
@@ -90,6 +91,7 @@ describe("Testing Schemas", () => {
         expect(savedFlowSchema.safeParse({}).success).toEqual(false);
 
         const boilerplateSavedFlow: TSavedFlow = {
+            primaryItemName: EItemName.FLOW,
             id: 3,
             name: "My Saved Flow",
             mainRoute: boilerplateRoute1,
@@ -102,6 +104,7 @@ describe("Testing Schemas", () => {
     });
 
     const boilerplateAffiliateNetwork: TAffiliateNetwork = {
+        primaryItemName: EItemName.AFFILIATE_NETWORK,
         id: 5,
         name: "My Affiliate Network",
         defaultNewOfferString: "?click_id=",
@@ -119,6 +122,7 @@ describe("Testing Schemas", () => {
         expect(landingPageSchema.safeParse({}).success).toEqual(false);
 
         const boilerplateLandingPage: TLandingPage = {
+            primaryItemName: EItemName.LANDING_PAGE,
             id: 6,
             name: "My Landing Page",
             url: "https://example.com/lp",
@@ -133,6 +137,7 @@ describe("Testing Schemas", () => {
         expect(offersSchema.safeParse({}).success).toEqual(false);
 
         const boilerplateOffer: TOffer = {
+            primaryItemName: EItemName.OFFER,
             id: 7,
             name: "My Offer",
             url: "https://example.com/offer",

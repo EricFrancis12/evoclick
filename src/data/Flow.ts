@@ -5,13 +5,13 @@ import { parseRoute, parseRoutes } from ".";
 import { savedFlowSchema } from "../lib/schemas";
 import { REDIS_EXPIRY } from "@/lib/constants";
 import { safeParseJson, newRoute } from "../lib/utils";
-import { TSavedFlow, TSavedFlow_createRequest, TSavedFlow_updateRequest } from "../lib/types";
+import { EItemName, TSavedFlow, TSavedFlow_createRequest, TSavedFlow_updateRequest } from "../lib/types";
 
 const makeKey = makeRedisKeyFunc("flow");
 
 export async function getAllFlows(): Promise<TSavedFlow[]> {
-    const savedFlows: SavedFlow[] = await db.savedFlow.findMany();
-    const proms: Promise<TSavedFlow>[] = savedFlows.map(makeClientFlow);
+    const models: SavedFlow[] = await db.savedFlow.findMany();
+    const proms: Promise<TSavedFlow>[] = models.map(makeClientFlow);
     return Promise.all(proms);
 }
 
@@ -116,6 +116,7 @@ async function makeClientFlow(dbModel: SavedFlow): Promise<TSavedFlow> {
     const ruleRoutesProm = parseRoutes(ruleRoutes);
     return {
         ...dbModel,
+        primaryItemName: EItemName.FLOW,
         mainRoute: await mainRouteProm,
         ruleRoutes: await ruleRoutesProm,
     };

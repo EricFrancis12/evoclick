@@ -12,6 +12,7 @@ import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import ActionMenuFooter from "../ActionMenuFooter";
 import { newRoute } from "@/lib/utils/new";
 import { TActionMenu, TSavedFlowActionMenu } from "../types";
+import { EItemName } from "@/lib/types";
 
 export default function SavedFlowBody({ actionMenu, setActionMenu }: {
     actionMenu: TSavedFlowActionMenu;
@@ -27,6 +28,7 @@ export default function SavedFlowBody({ actionMenu, setActionMenu }: {
                 toast.success("Saved Flow was updated successfully");
             } else {
                 await createNewFlowAction({
+                    primaryItemName: EItemName.FLOW,
                     name: name ?? "",
                     mainRoute: mainRoute ?? newRoute(),
                     ruleRoutes: ruleRoutes ?? [],

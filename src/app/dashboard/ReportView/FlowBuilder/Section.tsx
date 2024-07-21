@@ -148,7 +148,7 @@ export default function Section({ section, path, onChange }: {
     )
 }
 
-function makeItems(ids: number[], section: TSection): typeof section.options {
+function makeItems(ids: number[], section: TSection) {
     const result = [];
     for (const id of ids) {
         const item = section.options.find(option => option.id === id);

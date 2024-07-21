@@ -142,80 +142,79 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
 }
 
 export function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: number): TActionMenu | null {
+    const { primaryItemName } = itemNameIsPrimary(itemName);
+    if (!primaryItemName) return null;
+
     let actionMenu: TActionMenu | null = null;
-    if (itemName === EItemName.AFFILIATE_NETWORK) {
-        const an = getPrimaryItemById(primaryData, itemName, id);
+    const item = getPrimaryItemById(primaryData, primaryItemName, id);
+
+    if (item?.primaryItemName === EItemName.AFFILIATE_NETWORK) {
         actionMenu = {
-            type: itemName,
-            itemName,
-            id: an?.id,
-            name: an?.name,
-            defaultNewOfferString: an?.defaultNewOfferString,
-            tags: an?.tags,
+            type: item?.primaryItemName,
+            itemName: item?.primaryItemName,
+            id: item?.id,
+            name: item?.name,
+            defaultNewOfferString: item?.defaultNewOfferString,
+            tags: item?.tags,
         };
-    } else if (itemName === EItemName.CAMPAIGN) {
-        const ca = getPrimaryItemById(primaryData, itemName, id);
+    } else if (item?.primaryItemName === EItemName.CAMPAIGN) {
         actionMenu = {
-            type: itemName,
-            itemName,
-            id: ca?.id,
-            name: ca?.name,
-            landingPageRotationType: ca?.landingPageRotationType,
-            offerRotationType: ca?.offerRotationType,
-            geoName: ca?.geoName,
-            tags: ca?.tags,
-            trafficSourceId: ca?.trafficSourceId,
-            flowType: ca?.flowType,
-            savedFlowId: ca?.savedFlowId ?? undefined,
-            flowUrl: ca?.flowUrl ?? undefined,
-            flowMainRoute: ca?.flowMainRoute ?? undefined,
-            flowRuleRoutes: ca?.flowRuleRoutes ?? undefined,
+            type: item?.primaryItemName,
+            itemName: item?.primaryItemName,
+            id: item?.id,
+            name: item?.name,
+            landingPageRotationType: item?.landingPageRotationType,
+            offerRotationType: item?.offerRotationType,
+            geoName: item?.geoName,
+            tags: item?.tags,
+            trafficSourceId: item?.trafficSourceId,
+            flowType: item?.flowType,
+            savedFlowId: item?.savedFlowId ?? undefined,
+            flowUrl: item?.flowUrl ?? undefined,
+            flowMainRoute: item?.flowMainRoute ?? undefined,
+            flowRuleRoutes: item?.flowRuleRoutes ?? undefined,
         };
-    } else if (itemName === EItemName.FLOW) {
-        const fl = getPrimaryItemById(primaryData, itemName, id);
+    } else if (item?.primaryItemName === EItemName.FLOW) {
         actionMenu = {
-            type: itemName,
-            itemName,
-            id: fl?.id,
-            name: fl?.name ?? undefined,
-            mainRoute: fl?.mainRoute ?? undefined,
-            ruleRoutes: fl?.ruleRoutes ?? undefined,
-            tags: fl?.tags ?? undefined,
+            type: item?.primaryItemName,
+            itemName: item?.primaryItemName,
+            id: item?.id,
+            name: item?.name ?? undefined,
+            mainRoute: item?.mainRoute ?? undefined,
+            ruleRoutes: item?.ruleRoutes ?? undefined,
+            tags: item?.tags ?? undefined,
         };
-    } else if (itemName === EItemName.LANDING_PAGE) {
-        const lp = getPrimaryItemById(primaryData, itemName, id);
+    } else if (item?.primaryItemName === EItemName.LANDING_PAGE) {
         actionMenu = {
-            type: itemName,
-            itemName,
-            id: lp?.id,
-            name: lp?.name,
-            url: lp?.url,
-            tags: lp?.tags,
+            type: item?.primaryItemName,
+            itemName: item?.primaryItemName,
+            id: item?.id,
+            name: item?.name,
+            url: item?.url,
+            tags: item?.tags,
         };
-    } else if (itemName === EItemName.OFFER) {
-        const o = getPrimaryItemById(primaryData, itemName, id);
+    } else if (item?.primaryItemName === EItemName.OFFER) {
         actionMenu = {
-            type: itemName,
-            itemName,
-            id: o?.id,
-            name: o?.name,
-            payout: o?.payout,
-            url: o?.url,
-            tags: o?.tags,
-            affiliateNetworkId: o?.affiliateNetworkId,
+            type: item?.primaryItemName,
+            itemName: item?.primaryItemName,
+            id: item?.id,
+            name: item?.name,
+            payout: item?.payout,
+            url: item?.url,
+            tags: item?.tags,
+            affiliateNetworkId: item?.affiliateNetworkId,
         };
-    } else if (itemName === EItemName.TRAFFIC_SOURCE) {
-        const ts = getPrimaryItemById(primaryData, itemName, id);
+    } else if (item?.primaryItemName === EItemName.TRAFFIC_SOURCE) {
         actionMenu = {
-            type: itemName,
-            itemName,
-            id: ts?.id,
-            name: ts?.name,
-            externalIdToken: ts?.externalIdToken,
-            costToken: ts?.costToken,
-            customTokens: ts?.customTokens,
-            postbackUrl: ts?.postbackUrl,
-            tags: ts?.tags,
+            type: item?.primaryItemName,
+            itemName: item?.primaryItemName,
+            id: item?.id,
+            name: item?.name,
+            externalIdToken: item?.externalIdToken,
+            costToken: item?.costToken,
+            customTokens: item?.customTokens,
+            postbackUrl: item?.postbackUrl,
+            tags: item?.tags,
         };
     }
     return actionMenu;
