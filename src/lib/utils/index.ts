@@ -1,6 +1,7 @@
 import { TPrimaryData } from "@/app/dashboard/ReportView/ReportViewContext";
 import { EItemName, TPrimaryItemName } from "../types";
 
+export * from "./maps"
 export * from "./new";
 
 export function upperCaseFirstLetter(str: string): string {
@@ -38,12 +39,6 @@ export function randItemFromArray<T>(arr: T[]): T | null {
     return arr[randomIntInRange(0, arr.length - 1)] ?? null;
 }
 
-// Determines whether an element contains overflowing nodes or not
-export function isOverflown(ref: React.RefObject<HTMLElement>) {
-    if (!ref?.current) return false;
-    return ref.current.scrollHeight > ref.current.clientHeight || ref.current.scrollWidth > ref.current.clientWidth;
-}
-
 export function encodeTimeframe(timeframe: [Date, Date]): string {
     return timeframe.map(date => date.getTime()).join(",");
 }
@@ -66,17 +61,17 @@ export function getPrimaryItemById(
     return primaryData[primaryItemName].find(item => item.id === id) ?? null;
 }
 
-export type itemNameIsPrimaryResult = {
-    isPrimary: true;
+export type isPrimaryResult = {
+    ok: true;
     primaryItemName: TPrimaryItemName;
 } | {
-    isPrimary: false;
+    ok: false;
     primaryItemName: null;
 };
 
 // Returns whether an EItemName is a TPrimaryItemName or not.
-// Uses a diverging union to transform EItemName into a TPrimaryItemName if bool is true
-export function itemNameIsPrimary(itemName: EItemName): itemNameIsPrimaryResult {
+// Uses a discriminating union to transform EItemName into a TPrimaryItemName, switching on ok.
+export function isPrimary(itemName: EItemName): isPrimaryResult {
     if (itemName === EItemName.AFFILIATE_NETWORK
         || itemName === EItemName.CAMPAIGN
         || itemName === EItemName.FLOW
@@ -85,12 +80,12 @@ export function itemNameIsPrimary(itemName: EItemName): itemNameIsPrimaryResult 
         || itemName === EItemName.TRAFFIC_SOURCE
     ) {
         return {
-            isPrimary: true,
+            ok: true,
             primaryItemName: itemName,
         };
     }
     return {
-        isPrimary: false,
+        ok: false,
         primaryItemName: null,
     };
 }

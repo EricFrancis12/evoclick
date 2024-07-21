@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { TView } from "@/lib/store";
 import TabContainer from "./TabContainer";
-import { getPrimaryItemById, itemNameIsPrimary } from "@/lib/utils";
+import { getPrimaryItemById, isPrimary } from "@/lib/utils";
 import { TPrimaryData, useReportView } from "../ReportViewContext";
 import { EItemName } from "@/lib/types";
 
@@ -57,7 +57,7 @@ export default function Tab({ view, onClick, onClose, reportItemId }: {
 function useReportTabName(primaryData: TPrimaryData, reportItemName: EItemName | null, reportItemId: string | null): string {
     if (!reportItemName || !reportItemId) return "";
 
-    const { primaryItemName } = itemNameIsPrimary(reportItemName);
+    const { primaryItemName } = isPrimary(reportItemName);
     if (!primaryItemName) return reportItemId;
 
     const id = parseInt(reportItemId);

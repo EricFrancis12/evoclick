@@ -46,9 +46,9 @@ export default function TitleRow({ name, columns, setColumns }: {
                         width={width}
                         className="font-bold"
                     />
-                    <div className="relative h-auto w-[0px] overflow-visible">
+                    <div className="relative h-full w-[0px] overflow-visible">
                         <div
-                            className="absolute top-0 left-0 h-full w-[1px] bg-blue-500 cursor-e-resize"
+                            className="absolute top-0 left-0 h-full w-[2px] cursor-e-resize"
                             onMouseDown={e => handleMouseDown(e, index)}
                         />
                     </div>

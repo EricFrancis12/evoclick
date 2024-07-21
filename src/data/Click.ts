@@ -10,9 +10,8 @@ export async function getAllClicks(args: Prisma.ClickFindManyArgs = {}): Promise
 }
 
 async function makeClientClick(dbModel: Click): Promise<TClick> {
-    const tokensProm = parseTokens(dbModel.tokens);
     return {
         ...dbModel,
-        tokens: await tokensProm,
+        tokens: await parseTokens(dbModel.tokens),
     };
 }

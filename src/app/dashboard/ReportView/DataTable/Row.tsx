@@ -18,7 +18,7 @@ import { TView } from "@/lib/store";
 import { DEPTH_MARGIN, safeIndexCols, TColumn, TRow } from ".";
 import { EItemName, TClick } from "@/lib/types";
 import { useReportView } from "../ReportViewContext";
-import { getPrimaryItemById, itemNameIsPrimary } from "@/lib/utils";
+import { getPrimaryItemById, isPrimary } from "@/lib/utils";
 import { copyToClipboard } from "@/lib/utils/client";
 
 export default function Row({ row, columns, onSelected, view, depth }: {
@@ -34,7 +34,7 @@ export default function Row({ row, columns, onSelected, view, depth }: {
     const cells = makeCells(row.clicks, row.name);
     const profit = typeof cells[6] === "number" ? cells[6] : 0;
 
-    const { primaryItemName } = itemNameIsPrimary(view.itemName);
+    const { primaryItemName } = isPrimary(view.itemName);
 
     const newReport = useNewReport();
 

@@ -6,7 +6,7 @@ import {
 } from "@/data";
 import ReportView from "./ReportView";
 import { defaultTimeframe } from "@/lib/constants";
-import { decodeTimeframe, itemNameIsPrimary } from "@/lib/utils";
+import { decodeTimeframe, isPrimary } from "@/lib/utils";
 import { clickPropsMap } from "@/lib/utils/maps";
 import { EItemName } from "@/lib/types";
 
@@ -94,8 +94,7 @@ function timeframeFilter([start, end]: [Date, Date]): Prisma.ClickWhereInput {
 function reportItemFilter(reportItemName: EItemName | null, reportItemId: string | null): Prisma.ClickWhereInput {
     if (reportItemName === null || reportItemId === null) return {};
 
-    const { isPrimary } = itemNameIsPrimary(reportItemName);
-    if (isPrimary) {
+    if (isPrimary(reportItemName).ok) {
         const id = parseInt(reportItemId);
         if (!id) return {};
 

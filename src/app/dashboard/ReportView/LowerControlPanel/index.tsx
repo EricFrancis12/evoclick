@@ -13,9 +13,9 @@ import LowerCPWrapper from "./LowerCPWrapper";
 import LowerCPRow from "./LowerCPRow";
 import { TView, useViewsStore } from "@/lib/store";
 import Button from "@/components/Button";
-import { TActionMenu } from "../ActionMenu/types";
-import { encodeTimeframe, getPrimaryItemById, itemNameIsPrimary, newPrimaryItemActionMenu } from "@/lib/utils";
-import { EItemName } from "@/lib/types";
+import { TActionMenu, TAffiliateNetworkActionMenu, TCampaignActionMenu, TLandingPageActionMenu, TOfferActionMenu, TSavedFlowActionMenu, TTrafficSourceActionMenu } from "../ActionMenu/types";
+import { encodeTimeframe, getPrimaryItemById, isPrimary, newPrimaryItemActionMenu } from "@/lib/utils";
+import { EItemName, TAffiliateNetwork, TCampaign, TLandingPage, TOffer, TSavedFlow, TTrafficSource } from "@/lib/types";
 import { TRow } from "../DataTable";
 
 export default function LowerControlPanel({ view, reportItemName, rows, setRows }: {
@@ -50,8 +50,8 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
     }
 
     function handleDeleteItem() {
-        const { isPrimary, primaryItemName } = itemNameIsPrimary(view.itemName);
-        if (!isPrimary) return;
+        const { ok, primaryItemName } = isPrimary(view.itemName);
+        if (!ok) return;
         setActionMenu({
             type: "delete item",
             primaryItemName,
@@ -91,7 +91,7 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
                             onClick={handleNewReport}
                             disabled={selectedRows.length < 1}
                         />
-                        {itemNameIsPrimary(view.itemName).isPrimary &&
+                        {isPrimary(view.itemName).ok &&
                             <>
                                 <Button
                                     text={`Edit ${view.itemName}`}
@@ -122,7 +122,7 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
                 {view.type === "main" &&
                     <>
                         <Button
-                            text={`Create New ${itemNameIsPrimary(view.itemName).isPrimary ? view.itemName : EItemName.CAMPAIGN}`}
+                            text={`Create New ${isPrimary(view.itemName).ok ? view.itemName : EItemName.CAMPAIGN}`}
                             icon={faPlus}
                             onClick={handleCreateNewItem}
                         />
@@ -141,80 +141,82 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
 }
 
 export function makeActionMenu(primaryData: TPrimaryData, itemName: EItemName, id: number): TActionMenu | null {
-    const { primaryItemName } = itemNameIsPrimary(itemName);
-    if (!primaryItemName) return null;
-
-    let actionMenu: TActionMenu | null = null;
-    const item = getPrimaryItemById(primaryData, primaryItemName, id);
-
-    if (item?.primaryItemName === EItemName.AFFILIATE_NETWORK) {
-        actionMenu = {
-            type: item?.primaryItemName,
-            itemName: item?.primaryItemName,
-            id: item?.id,
-            name: item?.name,
-            defaultNewOfferString: item?.defaultNewOfferString,
-            tags: item?.tags,
-        };
-    } else if (item?.primaryItemName === EItemName.CAMPAIGN) {
-        actionMenu = {
-            type: item?.primaryItemName,
-            itemName: item?.primaryItemName,
-            id: item?.id,
-            name: item?.name,
-            landingPageRotationType: item?.landingPageRotationType,
-            offerRotationType: item?.offerRotationType,
-            geoName: item?.geoName,
-            tags: item?.tags,
-            trafficSourceId: item?.trafficSourceId,
-            flowType: item?.flowType,
-            savedFlowId: item?.savedFlowId ?? undefined,
-            flowUrl: item?.flowUrl ?? undefined,
-            flowMainRoute: item?.flowMainRoute ?? undefined,
-            flowRuleRoutes: item?.flowRuleRoutes ?? undefined,
-        };
-    } else if (item?.primaryItemName === EItemName.FLOW) {
-        actionMenu = {
-            type: item?.primaryItemName,
-            itemName: item?.primaryItemName,
-            id: item?.id,
-            name: item?.name ?? undefined,
-            mainRoute: item?.mainRoute ?? undefined,
-            ruleRoutes: item?.ruleRoutes ?? undefined,
-            tags: item?.tags ?? undefined,
-        };
-    } else if (item?.primaryItemName === EItemName.LANDING_PAGE) {
-        actionMenu = {
-            type: item?.primaryItemName,
-            itemName: item?.primaryItemName,
-            id: item?.id,
-            name: item?.name,
-            url: item?.url,
-            tags: item?.tags,
-        };
-    } else if (item?.primaryItemName === EItemName.OFFER) {
-        actionMenu = {
-            type: item?.primaryItemName,
-            itemName: item?.primaryItemName,
-            id: item?.id,
-            name: item?.name,
-            payout: item?.payout,
-            url: item?.url,
-            tags: item?.tags,
-            affiliateNetworkId: item?.affiliateNetworkId,
-        };
-    } else if (item?.primaryItemName === EItemName.TRAFFIC_SOURCE) {
-        actionMenu = {
-            type: item?.primaryItemName,
-            itemName: item?.primaryItemName,
-            id: item?.id,
-            name: item?.name,
-            externalIdToken: item?.externalIdToken,
-            costToken: item?.costToken,
-            customTokens: item?.customTokens,
-            postbackUrl: item?.postbackUrl,
-            tags: item?.tags,
-        };
+    const { primaryItemName } = isPrimary(itemName);
+    if (primaryItemName) {
+        const item = getPrimaryItemById(primaryData, primaryItemName, id);
+        switch (item?.primaryItemName) {
+            case EItemName.AFFILIATE_NETWORK:
+                return newAffiliateNetworkActionMenu(item);
+            case EItemName.CAMPAIGN:
+                return newCampaignActionMenu(item);
+            case EItemName.FLOW:
+                return newSavedFlowActionMenu(item);
+            case EItemName.LANDING_PAGE:
+                return newLandingPageActionMenu(item);
+            case EItemName.OFFER:
+                return newOfferActionMenu(item);
+            case EItemName.TRAFFIC_SOURCE:
+                return newTrafficSourceActionMenu(item);
+        }
     }
-    return actionMenu;
+    return null;
+}
+
+
+function newAffiliateNetworkActionMenu(affiliateNetwork: TAffiliateNetwork): TAffiliateNetworkActionMenu {
+    return {
+        ...affiliateNetwork,
+        type: EItemName.AFFILIATE_NETWORK,
+        itemName: EItemName.AFFILIATE_NETWORK,
+    };
+}
+
+function newCampaignActionMenu(campaign: TCampaign): TCampaignActionMenu {
+    const { savedFlowId, flowUrl, flowMainRoute, flowRuleRoutes } = campaign;
+    return {
+        ...campaign,
+        type: EItemName.CAMPAIGN,
+        itemName: EItemName.CAMPAIGN,
+        savedFlowId: savedFlowId ?? undefined,
+        flowUrl: flowUrl ?? undefined,
+        flowMainRoute: flowMainRoute ?? undefined,
+        flowRuleRoutes: flowRuleRoutes ?? undefined,
+    };
+}
+
+function newSavedFlowActionMenu(savedFlow: TSavedFlow): TSavedFlowActionMenu {
+    const { id, name, mainRoute, ruleRoutes, tags } = savedFlow;
+    return {
+        type: EItemName.FLOW,
+        itemName: EItemName.FLOW,
+        id,
+        name: name ?? undefined,
+        mainRoute: mainRoute ?? undefined,
+        ruleRoutes: ruleRoutes ?? undefined,
+        tags: tags ?? undefined,
+    };
+}
+
+function newLandingPageActionMenu(landingPage: TLandingPage): TLandingPageActionMenu {
+    return {
+        ...landingPage,
+        type: EItemName.LANDING_PAGE,
+        itemName: EItemName.LANDING_PAGE,
+    };
+}
+
+function newOfferActionMenu(offer: TOffer): TOfferActionMenu {
+    return {
+        ...offer,
+        type: EItemName.OFFER,
+        itemName: EItemName.OFFER,
+    };
+}
+
+function newTrafficSourceActionMenu(trafficSource: TTrafficSource): TTrafficSourceActionMenu {
+    return {
+        ...trafficSource,
+        type: EItemName.TRAFFIC_SOURCE,
+        itemName: EItemName.TRAFFIC_SOURCE,
+    };
 }

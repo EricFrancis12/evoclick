@@ -5,7 +5,7 @@ import { itemNameToClickProp } from "@/lib/utils/maps";
 import { TPrimaryData, useReportView } from "@/app/dashboard/ReportView/ReportViewContext";
 import { TRow } from "@/app/dashboard/ReportView/DataTable";
 import { EItemName, TClick } from "@/lib/types";
-import { itemNameIsPrimary } from "@/lib/utils";
+import { isPrimary } from "@/lib/utils";
 
 export function useRows(clicks: TClick[], itemName: EItemName) {
     const { primaryData } = useReportView();
@@ -62,7 +62,7 @@ function makeRows(clicks: TClick[], itemName: EItemName, enrichmentItems?: TEnri
 }
 
 function makeEnrichmentItems(itemName: EItemName, primaryData: TPrimaryData): TEnrichmentItem[] | undefined {
-    const { primaryItemName } = itemNameIsPrimary(itemName);
+    const { primaryItemName } = isPrimary(itemName);
     if (!primaryItemName) return undefined;
     return primaryData[primaryItemName]?.map(({ id, name }) => ({ id, name: name || "" }));
 }
