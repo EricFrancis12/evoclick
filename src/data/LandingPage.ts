@@ -9,7 +9,7 @@ import { EItemName, TLandingPage, TLandingPage_createRequest, TLandingPage_updat
 const makeKey = makeRedisKeyFunc("landingPage");
 
 export async function getAllLandingPages(): Promise<TLandingPage[]> {
-    return db.offer.findMany().then(models => models.map(makeClientLandingPage));
+    return db.landingPage.findMany().then(models => models.map(makeClientLandingPage));
 }
 
 export async function getLandingPageById(id: number): Promise<TLandingPage | null> {

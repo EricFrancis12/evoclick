@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { itemNameToClickProp } from "@/lib/utils/maps";
 import { TPrimaryData, useReportView } from "@/app/dashboard/ReportView/ReportViewContext";
 import { TRow } from "@/app/dashboard/ReportView/DataTable";
-import { EItemName, TClick } from "@/lib/types";
-import { isPrimary } from "@/lib/utils";
+import { EItemName, TClick, TPrimaryItemName } from "@/lib/types";
+import { getPrimaryItemById, isPrimary } from "@/lib/utils";
 
 export function useRows(clicks: TClick[], itemName: EItemName) {
     const { primaryData } = useReportView();
@@ -13,7 +13,7 @@ export function useRows(clicks: TClick[], itemName: EItemName) {
     const [rows, setRows] = useState<TRow[] | null>(null);
 
     useEffect(() => {
-        const newRows = makeRows(clicks, itemName, makeEnrichmentItems(itemName, primaryData));
+        const newRows = makeRows(primaryData, clicks, itemName, makeEnrichmentItems(itemName, primaryData));
         setRows(newRows);
     }, [clicks.length, primaryData, itemName]);
 
@@ -26,40 +26,59 @@ type TEnrichmentItem = {
     name: string;
 };
 
-function makeRows(clicks: TClick[], itemName: EItemName, enrichmentItems?: TEnrichmentItem[]): TRow[] {
-    const rows = clicks.reduce((rows: TRow[], click: TClick) => {
+function makeRows(
+    primaryData: TPrimaryData,
+    clicks: TClick[],
+    itemName: EItemName,
+    enrichmentItems?: TEnrichmentItem[]
+): TRow[] {
+    const rows = new Map<number | string, TRow>();
+    const { primaryItemName } = isPrimary(itemName);
+
+    for (const click of clicks) {
         const clickProp = itemNameToClickProp(itemName);
-        const value = clickProp ? click[clickProp] : null;
-        if (value && (typeof value === "number" || typeof value === "string")) {
-            const row = rows.find(row => row.id === value);
-            if (row) {
-                row.clicks.push(click);
-            } else {
-                rows.push({
+        const value = click[clickProp];
+
+        if (typeof value === "number" || typeof value === "string") {
+            if (!rows.has(value)) {
+                rows.set(value, {
                     id: value,
-                    name: typeof value === "string" ? value : "",
-                    clicks: [click],
+                    name: newRowName(primaryData, primaryItemName, value),
+                    clicks: [],
+                    selected: false,
+                });
+            }
+            rows.get(value)!.clicks.push(click);
+        }
+    }
+
+    if (enrichmentItems) {
+        for (const { id, name } of enrichmentItems) {
+            if (!rows.has(id)) {
+                rows.set(id, {
+                    id,
+                    name,
+                    clicks: [],
                     selected: false,
                 });
             }
         }
-        return rows;
-    }, []);
-
-    if (enrichmentItems) {
-        for (const { id, name } of enrichmentItems) {
-            if (rows.some(row => row.id === id)) continue;
-            rows.push({
-                id,
-                name,
-                clicks: [],
-                selected: false,
-            });
-        }
     }
 
-    return rows;
+    return Array.from(rows.values());
 }
+
+function newRowName(primaryData: TPrimaryData, primaryItemName: TPrimaryItemName | null, value: string | number): string {
+    if (typeof value === "number" && primaryItemName !== null) {
+        const primaryItem = getPrimaryItemById(primaryData, primaryItemName, value);
+        if (primaryItem) return primaryItem.name;
+    }
+
+    if (value && typeof value === "string") return value;
+
+    return "unknown";
+}
+
 
 function makeEnrichmentItems(itemName: EItemName, primaryData: TPrimaryData): TEnrichmentItem[] | undefined {
     const { primaryItemName } = isPrimary(itemName);
