@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/EricFrancis12/evoclick/pkg"
@@ -170,9 +171,10 @@ func fetchtrafficSource(ctx context.Context, storer *pkg.Storer, id int, ch chan
 }
 
 func getGValue(r *http.Request) string {
-	g := r.URL.Query().Get("g")
+	qp := string(pkg.QueryParamG)
+	g := r.URL.Query().Get(strings.ToLower(qp))
 	if g == "" {
-		g = r.URL.Query().Get("G")
+		g = r.URL.Query().Get(strings.ToUpper(qp))
 	}
 	return g
 }

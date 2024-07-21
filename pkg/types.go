@@ -195,3 +195,9 @@ const (
 	DestTypeURL         DestType = "url"
 	DestTypeCatchAll    DestType = "catchAll"
 )
+
+type QueryParam string
+
+const (
+	QueryParamG QueryParam = "g"
+)
