@@ -7,6 +7,8 @@ import (
 )
 
 const (
+	EnvPort                string = "PORT"
+	EnvApiPort             string = "API_PORT"
 	EnvNodeEnv             string = "NODE_ENV"
 	EnvCatchAllRedirectUrl string = "CATCH_ALL_REDIRECT_URL"
 	EnvIpInfoToken         string = "IP_INFO_TOKEN"

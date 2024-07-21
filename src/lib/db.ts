@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { Env } from "./types";
 
 const prismaClientSingleton = () => {
     const prisma = new PrismaClient({
@@ -18,8 +19,8 @@ const prismaClientSingleton = () => {
         ],
     });
 
-    if (process.env.NODE_ENV !== "test" // Prevents logs during tests
-        && process.env.NEXT_PHASE !== "phase-production-build" // Prevents logs during next build
+    if (process.env[Env.NODE_ENV] !== "test" // Prevents logs during tests
+        && process.env[Env.NEXT_PHASE] !== "phase-production-build" // Prevents logs during next build
     ) {
         prisma.$on("error", e => console.error(e.message));
         prisma.$on("info", e => console.log(e.message));

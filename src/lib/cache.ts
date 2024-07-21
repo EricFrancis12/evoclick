@@ -1,4 +1,5 @@
 import { createClient, RedisClientType } from "redis";
+import { Env } from "./types";
 
 export const makeRedisKeyFunc = (prefix: string) => (id: number | string) => `${prefix}:${id}`;
 
@@ -6,12 +7,12 @@ export const makeRedisKeyFunc = (prefix: string) => (id: number | string) => `${
 let cache: RedisClientType | undefined;
 
 // If a REDIS_URL is provided, a Redis client will be created
-if (process.env.REDIS_URL
-    && process.env.NODE_ENV !== "test" // Prevents connecting to Redis during tests
-    && process.env.NEXT_PHASE !== "phase-production-build" // Prevents connecting to Redis during next build
+if (process.env[Env.REDIS_URL]
+    && process.env[Env.NODE_ENV] !== "test" // Prevents connecting to Redis during tests
+    && process.env[Env.NEXT_PHASE] !== "phase-production-build" // Prevents connecting to Redis during next build
 ) {
     cache = createClient({
-        url: process.env.REDIS_URL,
+        url: process.env[Env.REDIS_URL],
         socket: {
             reconnectStrategy: 5000, // If disconnected, try to reconnect every 5 seconds
         },

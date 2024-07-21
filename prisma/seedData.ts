@@ -1,6 +1,9 @@
+import dotenv from "dotenv";
 import { $Enums } from "@prisma/client";
 import prisma from "../src/lib/db";
-import { ELogicalRelation, TNamedToken, TRoute, TToken } from "../src/lib/types";
+import { ELogicalRelation, TNamedToken, TRoute, TToken, Env } from "../src/lib/types";
+
+dotenv.config();
 
 const tags = ["placeholder", "example"];
 
@@ -13,7 +16,7 @@ export type TAffiliateNetworkSeedData = typeof affiliateNetworkSeedData;
 
 export const offerSeedData = {
     name: "My First Offer",
-    url: "http://localhost:3001/assets/sample-offer.html",
+    url: `http://localhost:${process.env[Env.API_PORT]}/assets/sample-offer.html`,
     payout: 80,
     tags,
 };
@@ -21,7 +24,7 @@ export type TOfferSeedData = typeof offerSeedData;
 
 export const landingPageSeedData = {
     name: "My First Landing Page",
-    url: "http://localhost:3001/assets/sample-landing-page.html",
+    url: `http://localhost:${process.env[Env.API_PORT]}/assets/sample-landing-page.html`,
     tags,
 };
 export type TLandingPageSeedData = typeof landingPageSeedData;
@@ -61,7 +64,7 @@ export const trafficSourceSeedData = {
         },
     ],
     name: "My First Traffic Source",
-    postbackUrl: "http://localhost:3001/postback/test",
+    postbackUrl: `http://localhost:${process.env[Env.API_PORT]}/postback/test`,
     tags,
 };
 export type TTrafficSourceSeedData = typeof trafficSourceSeedData;

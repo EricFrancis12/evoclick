@@ -9,7 +9,7 @@ import { generateRootUser } from "./auth";
 import { JWT_EXPIRY, JWT_SECRET } from "./constants";
 import * as data from "../data";
 import {
-    TUser, ECookieName, TClick,
+    Env, TUser, ECookieName, TClick,
     TAffiliateNetwork, TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest,
     TCampaign, TCampaign_createRequest, TCampaign_updateRequest,
     TSavedFlow, TSavedFlow_createRequest, TSavedFlow_updateRequest,
@@ -27,7 +27,7 @@ export async function loginAction(formData: FormData): Promise<TUser | null> {
     }
 
     try {
-        if (username === process.env.ROOT_USERNAME && password === process.env.ROOT_PASSWORD) {
+        if (username === process.env[Env.ROOT_USERNAME] && password === process.env[Env.ROOT_PASSWORD]) {
             const rootUser = generateRootUser();
             if (rootUser) {
                 // Set JWT

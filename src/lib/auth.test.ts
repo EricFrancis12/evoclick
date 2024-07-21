@@ -1,4 +1,5 @@
 import { generateRootUser, isRootUser } from "./auth";
+import { Env } from "./types";
 
 describe("Testing auth", () => {
     const OLD_ENV = process.env;
@@ -14,20 +15,20 @@ describe("Testing auth", () => {
     });
 
     test("Testing Root User properties", () => {
-        process.env.ROOT_USERNAME = undefined;
+        process.env[Env.ROOT_USERNAME] = undefined;
         expect(generateRootUser()).toEqual(null);
 
-        process.env.ROOT_USERNAME = "";
+        process.env[Env.ROOT_USERNAME] = "";
         expect(generateRootUser()).toEqual(null);
 
-        process.env.ROOT_USERNAME = ADMIN;
+        process.env[Env.ROOT_USERNAME] = ADMIN;
         expect(generateRootUser()?.id).toEqual(-1);
         expect(generateRootUser()?.name).toEqual(ADMIN);
         expect(generateRootUser()?.hashedPassword).toEqual("");
     });
 
     test("Testing isRootUser()", () => {
-        process.env.ROOT_USERNAME = ADMIN;
+        process.env[Env.ROOT_USERNAME] = ADMIN;
 
         const rootUser = generateRootUser();
         if (rootUser === null) {

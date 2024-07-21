@@ -2,8 +2,11 @@ import { argv } from "process";
 import http from "http";
 import { campaignSeedData } from "../prisma/seedData";
 import { makeCampaignUrl } from "../src/lib/utils";
+import { Env } from "../src/lib/types";
 
-const url = makeCampaignUrl("http:", "localhost", "3001", campaignSeedData.publicId);
+if (!process.env[Env.API_PORT]) throw new Error("Environment varaible API_PORT not set.");
+
+const url = makeCampaignUrl("http:", "localhost", process.env[Env.API_PORT], campaignSeedData.publicId);
 const duration = 30_000; // ms
 
 (async function () {

@@ -10,11 +10,10 @@ import (
 	"time"
 
 	"github.com/EricFrancis12/evoclick/api"
+	"github.com/EricFrancis12/evoclick/pkg"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
-
-const port = "3001"
 
 type APIServer struct {
 	listenAddr string
@@ -32,6 +31,11 @@ func main() {
 	}
 	if err := os.Setenv("NODE_ENV", "development"); err != nil {
 		log.Fatal("error setting ENV: " + err.Error())
+	}
+
+	port := os.Getenv(pkg.EnvApiPort)
+	if port == "" {
+		log.Fatal("api port not set")
 	}
 
 	if TCPPortOpen("localhost", port) {
