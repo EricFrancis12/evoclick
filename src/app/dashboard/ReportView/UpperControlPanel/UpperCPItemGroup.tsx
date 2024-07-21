@@ -32,35 +32,37 @@ export default function UpperCPItemGroup({ itemGroup, onClick = () => { }, repor
     }
 
     return (
-        <div className="flex bg-transparent">
-            <div
-                ref={ref}
-                className={(isActive ? "text-white bg-[#1f76c6] " : "text-black bg-transparent ")
-                    + "relative flex items-center py-1 px-2 rounded-sm cursor-pointer hover:bg-[#1f76c6] hover:text-white"}
-            >
-                <FontAwesomeIcon icon={itemGroup.icon} className="mr-[4px]" />
-                <span className="mr-[4px]">
-                    {isActive && activeView?.itemName ? activeView.itemName : itemGroup.name}
-                </span>
-                <FontAwesomeIcon icon={isHovered ? faChevronUp : faChevronDown} />
-                {isHovered &&
-                    <div className="absolute top-[100%] bg-white text-black border border-black rounded-sm">
-                        {itemGroup.children
-                            .filter(itemName => itemName !== reportItemName)
-                            .map((itemName, index) => (
-                                <div
-                                    key={index}
-                                    className="p-1 bg-white hover:bg-blue-300"
-                                    onClick={e => handleClick(e, itemName)}
-                                >
-                                    <span style={{ whiteSpace: "nowrap" }}>
-                                        {itemName}
-                                    </span>
-                                </div>
-                            ))}
-                    </div>
-                }
-            </div>
+        <div
+            ref={ref}
+            className={(isActive ? "text-white bg-[#1f76c6]" : "text-black bg-transparent")
+                + " relative flex items-center py-1 px-2 rounded-sm cursor-pointer hover:bg-[#1f76c6] hover:text-white"}
+            style={{ whiteSpace: "nowrap" }}
+        >
+            <FontAwesomeIcon icon={itemGroup.icon} className="mr-[4px]" />
+            <span className="mr-[4px]">
+                {isActive && activeView?.itemName ? activeView.itemName : itemGroup.name}
+            </span>
+            <FontAwesomeIcon icon={isHovered ? faChevronUp : faChevronDown} />
+            {isHovered &&
+                <div
+                    className="absolute top-[100%] bg-white text-black border border-black rounded-sm"
+                    style={{ zIndex: 20 }}
+                >
+                    {itemGroup.children
+                        .filter(itemName => itemName !== reportItemName)
+                        .map((itemName, index) => (
+                            <div
+                                key={index}
+                                className="p-1 bg-white hover:bg-blue-300"
+                                onClick={e => handleClick(e, itemName)}
+                            >
+                                <span style={{ whiteSpace: "nowrap" }}>
+                                    {itemName}
+                                </span>
+                            </div>
+                        ))}
+                </div>
+            }
         </div>
     )
 }

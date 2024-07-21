@@ -4,7 +4,7 @@ export default function TabContainer({ children }: {
     children: React.ReactNode;
 }) {
     return (
-        <div className="flex items-end h-full mr-[8px]">
+        <div className="flex items-end h-full">
             {children}
         </div>
     )

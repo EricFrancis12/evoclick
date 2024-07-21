@@ -1,13 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { faFolder, faGlobeEurope, faLaptop, faMobile, faWifi } from "@fortawesome/free-solid-svg-icons";
-import { EItemName } from "@/lib/types";
 import UpperCPWrapper from "./UpperCPWrapper";
 import UpperCPRow from "./UpperCPRow";
 import UpperCPItem from "./UpperCPItem";
 import UpperCPItemGroup, { TUpperCPItemGroup } from "./UpperCPItemGroup";
+import { TView } from "@/lib/store";
+import { EItemName } from "@/lib/types";
 
-export default function UpperControlPanel({ onClick = () => { }, reportItemName }: {
+export default function UpperControlPanel({ view, onClick = () => { }, reportItemName }: {
+    view: TView;
     onClick?: (itemName: EItemName) => void;
     reportItemName?: EItemName;
 }) {
@@ -16,9 +19,10 @@ export default function UpperControlPanel({ onClick = () => { }, reportItemName 
             <UpperCPRow>
                 {upperCPItems
                     .filter(itemName => itemName !== reportItemName)
-                    .map((itemName, _index) => (
+                    .map((itemName, index) => (
                         <UpperCPItem
-                            key={_index}
+                            key={index}
+                            view={view}
                             itemName={itemName}
                             onClick={onClick}
                         />

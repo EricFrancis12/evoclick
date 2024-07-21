@@ -26,6 +26,7 @@ export default function Report({ view, reportItemName }: {
     return rows
         ? <>
             <UpperControlPanel
+                view={view}
                 onClick={itemName => updateViewItemNameById(id, itemName)}
                 reportItemName={reportItemName}
             />

@@ -54,15 +54,14 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
         <ReportViewProvider primaryData={primaryData} clicks={clicks}>
             <DialogueViewProvider>
                 <div className="flex flex-col h-screen w-full">
-                    <div className="flex h-[40px] w-[100vw] bg-[#2f918e]">
+                    <div className="flex gap-2 h-[40px] w-[100vw] bg-[#2f918e]">
                         <div className="flex justify-center items-center h-full">
-                            <Link href="/">
+                            <Link href="/" className="hidden md:inline px-6">
                                 <Image
                                     src="/assets/images/logo-no-bg.png"
                                     alt="Logo"
                                     height={35}
                                     width={35}
-                                    className="mx-6"
                                 />
                             </Link>
                         </div>
