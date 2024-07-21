@@ -4,15 +4,15 @@ import React, { useState, useContext } from "react";
 import { PopoverLayer } from "@/components/popover";
 import ActionMenu from "./ActionMenu";
 import { TActionMenu } from "./ActionMenu/types";
-import { TAffiliateNetwork, TCampaign, TClick, TSavedFlow, TLandingPage, TOffer, TTrafficSource } from "@/lib/types";
+import { TAffiliateNetwork, TCampaign, TClick, TSavedFlow, TLandingPage, TOffer, TTrafficSource, EItemName } from "@/lib/types";
 
 export type TPrimaryData = {
-    affiliateNetworks: TAffiliateNetwork[];
-    campaigns: TCampaign[];
-    flows: TSavedFlow[];
-    landingPages: TLandingPage[];
-    offers: TOffer[];
-    trafficSources: TTrafficSource[];
+    [EItemName.AFFILIATE_NETWORK]: TAffiliateNetwork[];
+    [EItemName.CAMPAIGN]: TCampaign[];
+    [EItemName.FLOW]: TSavedFlow[];
+    [EItemName.LANDING_PAGE]: TLandingPage[];
+    [EItemName.OFFER]: TOffer[];
+    [EItemName.TRAFFIC_SOURCE]: TTrafficSource[];
 };
 
 export type TReportViewContext = {

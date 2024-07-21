@@ -15,7 +15,7 @@ import HeadlessDataTable from "./HeadlessDataTable";
 import PosNegIndicator from "./PosNegIndicator";
 import { makeActionMenu } from "../LowerControlPanel";
 import { TView } from "@/lib/store";
-import { DEPTH_MARGIN, TColumn, TRow } from ".";
+import { DEPTH_MARGIN, safeIndexCols, TColumn, TRow } from ".";
 import { EItemName, TClick } from "@/lib/types";
 import { useReportView } from "../ReportViewContext";
 import { getPrimaryItemById, itemNameIsPrimary } from "@/lib/utils";
@@ -118,7 +118,7 @@ export default function Row({ row, columns, onSelected, view, depth }: {
                     }
                 </CheckboxWrapper>
                 {cells.map((value, index) => {
-                    const { width, format } = columns[index];
+                    const { width, format } = safeIndexCols(columns, index);
                     return (
                         <Cell
                             key={index}

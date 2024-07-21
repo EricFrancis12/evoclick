@@ -7,8 +7,8 @@ const url = makeCampaignUrl("http:", "localhost", "3001", campaignSeedData.publi
 const duration = 30_000; // ms
 
 (async function () {
-    if (argv.length < 2) {
-        console.error("Please provide the number of requests per minute as an argument");
+    if (!argv?.[2]) {
+        console.error("Please provide the number of clicks as an argument");
         return;
     }
 

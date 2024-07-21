@@ -34,9 +34,8 @@ export function randomIntInRange(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function randItemFromArray<T>(arr: T[]): T {
-    if (arr.length === 0) throw new Error("Cannot select random item from an array of length 0");
-    return arr[randomIntInRange(0, arr.length - 1)];
+export function randItemFromArray<T>(arr: T[]): T | null {
+    return arr[randomIntInRange(0, arr.length - 1)] ?? null;
 }
 
 // Determines whether an element contains overflowing nodes or not
@@ -56,7 +55,7 @@ export function decodeTimeframe(str: string): [Date, Date] | null {
     const nums = splitOnComma.map(a => Number(a));
     if (nums.includes(NaN)) return null;
 
-    return [new Date(nums[0]), new Date(nums[1])];
+    return nums.map(num => new Date(num)) as [Date, Date];
 }
 
 export function getPrimaryItemById(
@@ -64,26 +63,7 @@ export function getPrimaryItemById(
     primaryItemName: TPrimaryItemName,
     id: number
 ): TPrimaryData[keyof TPrimaryData][number] | null {
-    const key: keyof TPrimaryData = primaryItemNameToKeyOfPrimaryData(primaryItemName);
-    const items = primaryData[key];
-    return items.find(item => item.id === id) ?? null;
-}
-
-function primaryItemNameToKeyOfPrimaryData(primaryItemName: TPrimaryItemName): keyof TPrimaryData {
-    switch (primaryItemName) {
-        case EItemName.AFFILIATE_NETWORK:
-            return "affiliateNetworks";
-        case EItemName.CAMPAIGN:
-            return "campaigns";
-        case EItemName.FLOW:
-            return "flows";
-        case EItemName.LANDING_PAGE:
-            return "landingPages";
-        case EItemName.OFFER:
-            return "offers";
-        case EItemName.TRAFFIC_SOURCE:
-            return "trafficSources";
-    }
+    return primaryData[primaryItemName].find(item => item.id === id) ?? null;
 }
 
 export type itemNameIsPrimaryResult = {

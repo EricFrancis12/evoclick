@@ -5,7 +5,7 @@ import CheckboxWrapper from "./CheckboxWrapper";
 import PosNegIndicator from "./PosNegIndicator";
 import RowWrapper from "./RowWrapper";
 import { makeCells } from "./Row";
-import { BASE_Z_INDEX, DEPTH_MARGIN, TColumn, TRow } from ".";
+import { BASE_Z_INDEX, DEPTH_MARGIN, safeIndexCols, TColumn, TRow } from ".";
 
 const border = "solid grey 2px";
 
@@ -33,7 +33,7 @@ export default function TotalRow({ rows, columns, depth }: {
             <PosNegIndicator value={profit} />
             <CheckboxWrapper />
             {cells.map((value, index) => {
-                const { width, format } = columns[index];
+                const { width, format } = safeIndexCols(columns, index);
                 return (
                     <Cell
                         key={index}
@@ -55,7 +55,7 @@ function makeCellsTotal(rows: TRow[], columns: TColumn[]): (string | number)[] {
     rows.forEach(row => {
         const cells = makeCells(row.clicks, row.name);
         cells.slice(1).forEach((cell, index) => {
-            if (typeof cell === "number") {
+            if (typeof cell === "number" && sums[index] !== undefined) {
                 sums[index] += cell;
             }
         });

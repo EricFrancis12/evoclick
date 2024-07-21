@@ -3,7 +3,7 @@
 import { useRows } from "@/hooks/useRows";
 import Rows from "./Rows";
 import TotalRow from "./TotalRow";
-import { reportChainColors } from "../ReportChain";
+import { getReportChainColor } from "../ReportChain/colors";
 import { TView } from "@/lib/store";
 import { EItemName, TClick } from "@/lib/types";
 import { BASE_Z_INDEX, DEPTH_MARGIN, ROW_HEIGHT, TColumn } from ".";
@@ -21,7 +21,7 @@ export default function HeadlessDataTable({ clicks, itemName, columns, view, dep
         ? <div
             className="py-4"
             style={{
-                backgroundColor: reportChainColors[newDepth]?.light,
+                backgroundColor: getReportChainColor(newDepth).light,
                 paddingLeft: `${DEPTH_MARGIN}px`
             }}
         >
@@ -54,7 +54,7 @@ function _Rows({ clicks, itemName, columns, view, depth }: {
                     top: `${ROW_HEIGHT * depth}px`,
                     height: `${ROW_HEIGHT}px`,
                     paddingLeft: `${DEPTH_MARGIN * 3}px`,
-                    backgroundColor: reportChainColors[depth].light,
+                    backgroundColor: getReportChainColor(depth).light,
                     zIndex: BASE_Z_INDEX - depth,
                 }}
             >

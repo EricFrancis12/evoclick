@@ -25,6 +25,8 @@ export default function FlowBuilder({ value, onChange }: {
 
         const newRuleRoutes = structuredClone(ruleRoutes);
         const [rule] = newRuleRoutes.splice(index, 1);
+        if (!rule) return;
+
         newRuleRoutes.splice(newIndex, 0, rule);
 
         onChange({ ...value, ruleRoutes: newRuleRoutes });

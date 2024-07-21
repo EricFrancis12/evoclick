@@ -12,16 +12,16 @@ export default function Path({ path, route, onChange, onDelete }: {
     onChange: (p: TPath) => void;
     onDelete: () => void;
 }) {
-    const { landingPages, offers } = useReportView().primaryData;
+    const { primaryData } = useReportView();
 
     const sections: TSection[] = [
         {
             itemName: EItemName.LANDING_PAGE,
-            options: landingPages,
+            options: primaryData[EItemName.LANDING_PAGE],
         },
         {
             itemName: EItemName.OFFER,
-            options: offers,
+            options: primaryData[EItemName.OFFER],
         },
     ];
 

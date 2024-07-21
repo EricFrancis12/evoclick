@@ -6,7 +6,7 @@ import RowWrapper from "./RowWrapper";
 import CheckboxWrapper from "./CheckboxWrapper";
 import PosNegIndicator from "./PosNegIndicator";
 import Cell from "./Cell";
-import { BASE_Z_INDEX, TColumn } from ".";
+import { BASE_Z_INDEX, safeIndexCols, TColumn } from ".";
 
 export default function TitleRow({ name, columns, setColumns }: {
     name: string;
@@ -17,7 +17,7 @@ export default function TitleRow({ name, columns, setColumns }: {
 
     const startDrag = useDragger((e, i) => {
         if (typeof i === "number") {
-            const width = columns[i].width + e.clientX - mouseDownClientX.current;
+            const width = safeIndexCols(columns, i).width + e.clientX - mouseDownClientX.current;
             setColumns(columns.map((col, index) => index === i ? { ...col, width } : col));
         }
     });

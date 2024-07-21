@@ -39,12 +39,12 @@ export default async function DashboardPage({ params, searchParams }: {
         const clicks = await clicksProm;
 
         const primaryData = {
-            affiliateNetworks: await affilaiteNetworksProm,
-            campaigns: await campaignsProm,
-            flows: await flowsProm,
-            landingPages: await landingPagesProm,
-            offers: await offersProm,
-            trafficSources: await trafficSourcesProm,
+            [EItemName.AFFILIATE_NETWORK]: await affilaiteNetworksProm,
+            [EItemName.CAMPAIGN]: await campaignsProm,
+            [EItemName.FLOW]: await flowsProm,
+            [EItemName.LANDING_PAGE]: await landingPagesProm,
+            [EItemName.OFFER]: await offersProm,
+            [EItemName.TRAFFIC_SOURCE]: await trafficSourcesProm,
         };
 
         return (

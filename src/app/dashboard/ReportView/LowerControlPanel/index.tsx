@@ -36,7 +36,7 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
     const newReport = useNewReport();
     // Finds the first row that is selected and creates a report for it
     function handleNewReport() {
-        if (selectedRows.length < 1) return;
+        if (!selectedRows[0]) return;
         newReport(view.itemName, selectedRows[0].id.toString(), view.timeframe);
     }
 
@@ -45,8 +45,7 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
     }
 
     function handleEditItem() {
-        if (selectedRows.length < 1) return;
-        if (typeof selectedRows[0].id !== "number") return;
+        if (typeof selectedRows[0]?.id !== "number") return;
         setActionMenu(makeActionMenu(primaryData, view.itemName, selectedRows[0].id));
     }
 
@@ -67,11 +66,11 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
         updateViewReportChainById(view.id, reportChain)
     }
 
-    function handleGetCampaignLinks(rowId: string | number) {
-        if (view.itemName !== EItemName.CAMPAIGN || typeof rowId !== "number") return;
+    function handleGetCampaignLinks() {
+        if (view.itemName !== EItemName.CAMPAIGN || typeof selectedRows[0]?.id !== "number") return;
         setActionMenu({
             type: "campaign links",
-            campaignId: rowId,
+            campaignId: selectedRows[0].id,
         });
     }
 
@@ -131,7 +130,7 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
                             <Button
                                 text="Get Campaign Links"
                                 icon={faLink}
-                                onClick={() => handleGetCampaignLinks(selectedRows[0].id)}
+                                onClick={() => handleGetCampaignLinks()}
                             />
                         }
                     </>

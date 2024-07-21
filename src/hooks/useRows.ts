@@ -5,6 +5,7 @@ import { itemNameToClickProp } from "@/lib/utils/maps";
 import { TPrimaryData, useReportView } from "@/app/dashboard/ReportView/ReportViewContext";
 import { TRow } from "@/app/dashboard/ReportView/DataTable";
 import { EItemName, TClick } from "@/lib/types";
+import { itemNameIsPrimary } from "@/lib/utils";
 
 export function useRows(clicks: TClick[], itemName: EItemName) {
     const { primaryData } = useReportView();
@@ -12,7 +13,7 @@ export function useRows(clicks: TClick[], itemName: EItemName) {
     const [rows, setRows] = useState<TRow[] | null>(null);
 
     useEffect(() => {
-        const newRows = makeRows(clicks, itemName, makeEnrichWith(itemName, primaryData));
+        const newRows = makeRows(clicks, itemName, makeEnrichmentItems(itemName, primaryData));
         setRows(newRows);
     }, [clicks.length, primaryData, itemName]);
 
@@ -20,19 +21,19 @@ export function useRows(clicks: TClick[], itemName: EItemName) {
     return value;
 }
 
-type TEnrichWith = {
+type TEnrichmentItem = {
     id: number;
     name: string;
 };
 
-function makeRows(clicks: TClick[], itemName: EItemName, enrichWith?: TEnrichWith[]): TRow[] {
+function makeRows(clicks: TClick[], itemName: EItemName, enrichmentItems?: TEnrichmentItem[]): TRow[] {
     const rows = clicks.reduce((rows: TRow[], click: TClick) => {
         const clickProp = itemNameToClickProp(itemName);
         const value = clickProp ? click[clickProp] : null;
         if (value && (typeof value === "number" || typeof value === "string")) {
-            const index = rows.findIndex(row => row.id === value);
-            if (index !== -1) {
-                rows[index].clicks.push(click);
+            const row = rows.find(row => row.id === value);
+            if (row) {
+                row.clicks.push(click);
             } else {
                 rows.push({
                     id: value,
@@ -45,9 +46,8 @@ function makeRows(clicks: TClick[], itemName: EItemName, enrichWith?: TEnrichWit
         return rows;
     }, []);
 
-    if (enrichWith) {
-        for (let i = 0; i < enrichWith.length; i++) {
-            const { id, name } = enrichWith[i];
+    if (enrichmentItems) {
+        for (const { id, name } of enrichmentItems) {
             if (rows.some(row => row.id === id)) continue;
             rows.push({
                 id,
@@ -61,25 +61,8 @@ function makeRows(clicks: TClick[], itemName: EItemName, enrichWith?: TEnrichWit
     return rows;
 }
 
-function makeEnrichWith(itemName: EItemName, primaryData: TPrimaryData): TEnrichWith[] | undefined {
-    return itemNameInPrimaryData(itemName, primaryData)?.map(({ id, name }) => ({ id, name: name || "" }));
-}
-
-function itemNameInPrimaryData(itemName: EItemName, primaryData: TPrimaryData) {
-    switch (itemName) {
-        case EItemName.AFFILIATE_NETWORK:
-            return primaryData.affiliateNetworks;
-        case EItemName.CAMPAIGN:
-            return primaryData.campaigns;
-        case EItemName.FLOW:
-            return primaryData.flows;
-        case EItemName.LANDING_PAGE:
-            return primaryData.landingPages;
-        case EItemName.OFFER:
-            return primaryData.offers;
-        case EItemName.TRAFFIC_SOURCE:
-            return primaryData.trafficSources;
-        default:
-            return undefined;
-    }
+function makeEnrichmentItems(itemName: EItemName, primaryData: TPrimaryData): TEnrichmentItem[] | undefined {
+    const { primaryItemName } = itemNameIsPrimary(itemName);
+    if (!primaryItemName) return undefined;
+    return primaryData[primaryItemName]?.map(({ id, name }) => ({ id, name: name || "" }));
 }

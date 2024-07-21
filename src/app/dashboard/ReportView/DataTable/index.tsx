@@ -12,16 +12,20 @@ export const ROW_HEIGHT = 30; // pixels
 export const DEPTH_MARGIN = 20; // pixels
 export const BASE_Z_INDEX = 50;
 
-export type TColumn = TDataTableColumn & {
-    width: number;
-}
-
 export type TRow = {
     id: number | string;
     name: string;
     clicks: TClick[];
     selected: boolean;
 };
+
+export type TColumn = TDataTableColumn & {
+    width: number;
+}
+
+export function safeIndexCols(columns: TColumn[], index: number): TColumn {
+    return columns[index] ?? { title: "", width: 0 };
+}
 
 export default function DataTable({ view, rows, setRows, depth = 0 }: {
     view: TView;

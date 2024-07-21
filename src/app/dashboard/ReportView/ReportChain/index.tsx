@@ -4,19 +4,13 @@ import { Fragment } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { Select, DummySelect } from "@/components/base";
+import { getReportChainColor } from "./colors";
 import { EItemName } from "@/lib/types";
 
 export type TReportChain = [TReportChainLink, TReportChainLink];
 export type TReportChainLink = null | {
     itemName?: EItemName;
 };
-
-// Maps the depth of the report chain (index) to a color
-export const reportChainColors: { light: string, dark: string }[] = [
-    { light: "#696969", dark: "#d3d3d3" }, // grey
-    { light: "#ffffe0", dark: "#ffd700" }, // yellow
-    { light: "#e6e6fa", dark: "#9370db" }, // purple
-];
 
 export default function ReportChain({ reportChain, onChange, omissions = [], itemName }: {
     reportChain: TReportChain;
@@ -43,7 +37,7 @@ export default function ReportChain({ reportChain, onChange, omissions = [], ite
                         className="rounded-lg"
                         style={{
                             border: "solid 1px",
-                            borderColor: reportChainColors[0]?.dark,
+                            borderColor: getReportChainColor(0).dark,
                         }}
                     >
                         {itemName}
@@ -65,7 +59,7 @@ export default function ReportChain({ reportChain, onChange, omissions = [], ite
                             className="rounded-lg"
                             style={{
                                 border: "solid 1px",
-                                borderColor: reportChainColors[index + 1]?.dark,
+                                borderColor: getReportChainColor(index + 1).dark,
                             }}
                         >
                             <option value="">None</option>
