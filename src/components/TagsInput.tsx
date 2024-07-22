@@ -4,6 +4,8 @@ import { useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 
+const X_BUTTON_SIZE = 16;
+
 export default function TagsInput({ tags, setTags, title, placeholder, suggestions }: {
     tags: string[];
     setTags: (newTags: string[]) => void;
@@ -53,9 +55,13 @@ export default function TagsInput({ tags, setTags, title, placeholder, suggestio
                                 </span>
                                 <span onClick={() => deleteTag(tag)}
                                     className="flex justify-center items-center rounded-full p-1 cursor-pointer hover:bg-gray-500"
-                                    style={{ height: "16px", width: "16px", border: "solid darkgrey 2px" }}
+                                    style={{
+                                        height: `${X_BUTTON_SIZE}px`,
+                                        width: `${X_BUTTON_SIZE}px`,
+                                        border: "solid darkgrey 2px"
+                                    }}
                                 >
-                                    <FontAwesomeIcon icon={faX} fontSize="8px" />
+                                    <FontAwesomeIcon icon={faX} fontSize={`${X_BUTTON_SIZE / 2}px`} />
                                 </span>
                             </div>
                         </span>
