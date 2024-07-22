@@ -12,7 +12,7 @@ export type TAffiliateNetworkSeedData = typeof affiliateNetworkSeedData;
 
 export const offerSeedData = {
     name: "My First Offer",
-    url: "http://localhost:3001/assets/sample-offer.html",
+    url: "http://localhost:3001/public/sample-offer.html",
     payout: 80,
     tags,
 };
@@ -20,7 +20,7 @@ export type TOfferSeedData = typeof offerSeedData;
 
 export const landingPageSeedData = {
     name: "My First Landing Page",
-    url: "http://localhost:3001/assets/sample-landing-page.html",
+    url: "http://localhost:3001/public/lp/sample-landing-page.html",
     tags,
 };
 export type TLandingPageSeedData = typeof landingPageSeedData;

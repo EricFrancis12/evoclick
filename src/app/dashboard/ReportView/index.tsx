@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import logo from "@/assets/images/logo-black-bg.png";
 import { DialogueViewProvider } from "./contexts/DialogueMenuContext";
 import { ReportViewProvider, TPrimaryData } from "./ReportViewContext";
 import useActiveView from "@/hooks/useActiveView";
@@ -58,7 +59,7 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
                         <div className="flex justify-center items-center h-full">
                             <Link href="/" className="hidden md:inline px-6">
                                 <Image
-                                    src="/assets/images/logo-no-bg.png"
+                                    src={logo}
                                     alt="Logo"
                                     height={35}
                                     width={35}

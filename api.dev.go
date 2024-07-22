@@ -6,7 +6,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/EricFrancis12/evoclick/api"
@@ -57,27 +56,11 @@ func (s *APIServer) Run() error {
 	router.HandleFunc("/postback", api.Postback)
 	router.HandleFunc("/t", api.T)
 
-	router.HandleFunc("/assets/{file}", HandleAssets)
+	router.PathPrefix("/public").Handler(http.StripPrefix("/public", http.FileServer(http.Dir("./public"))))
 
 	log.Println("Dev API running on port", s.listenAddr)
 
 	return http.ListenAndServe(s.listenAddr, router)
-}
-
-func HandleAssets(w http.ResponseWriter, r *http.Request) {
-	file := mux.Vars(r)["file"]
-	if file == "" {
-		http.Error(w, "please specify a file", http.StatusBadRequest)
-		return
-	}
-	filepath := "./assets/" + file
-	bytes, err := os.ReadFile(filepath)
-	if err != nil {
-		http.Error(w, "error reading file at: "+filepath, http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", contentType(file))
-	w.Write(bytes)
 }
 
 func TCPPortOpen(host string, port string) bool {
@@ -109,16 +92,4 @@ func fileExists(filepath string) bool {
 		return false
 	}
 	return err == nil
-}
-
-func contentType(f string) string {
-	spl := strings.Split(f, ".")
-	fext := spl[len(spl)-1]
-	if fext == "html" {
-		return "text/html"
-	}
-	if fext == "css" {
-		return "text/css"
-	}
-	return "text/plain"
 }

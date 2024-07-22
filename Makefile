@@ -1,4 +1,4 @@
-migrate dev:
+migrate:
 	npx prisma migrate dev
 
 seed:

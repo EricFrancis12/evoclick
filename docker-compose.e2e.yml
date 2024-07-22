@@ -16,7 +16,7 @@ services:
     environment:
       - "POSTGRES_URL=postgresql://postgres:mysecretpassword@postgres:5432/mydb?schema=public"
       - "REDIS_URL=redis://redis:6379"
-      - "CATCH_ALL_REDIRECT_URL=http://localhost:3001/assets/catch-all-url.html"
+      - "CATCH_ALL_REDIRECT_URL=http://localhost:3001/public/catch-all-url.html"
     ports:
       - "3001:3001"
     depends_on:
