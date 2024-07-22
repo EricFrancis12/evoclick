@@ -20,14 +20,7 @@ export default async function DashboardPage({ params, searchParams }: {
     const { reportItemName, reportItemId } = decodeParams(params);
 
     try {
-        const clicksProm = getAllClicks({
-            where: {
-                AND: [
-                    timeframeFilter(timeframe),
-                    reportItemFilter(reportItemName, reportItemId),
-                ],
-            },
-        });
+        const clicksProm = getAllClicks(prismaArgs(timeframe, reportItemName, reportItemId));
 
         const affilaiteNetworksProm = getAllAffiliateNetworks();
         const campaignsProm = getAllCampaigns();
@@ -58,7 +51,7 @@ export default async function DashboardPage({ params, searchParams }: {
         )
     } catch (err) {
         console.error(err);
-        return "Error fetching data from db :(";
+        return "Server error";
     }
 }
 
@@ -79,6 +72,17 @@ function decodeSearchParams(searchParams: {
     const { timeframe } = searchParams;
     return {
         timeframe: timeframe ? decodeTimeframe(timeframe) : null,
+    };
+}
+
+function prismaArgs(timeframe: [Date, Date], reportItemName: EItemName | null, reportItemId: string | null): Prisma.ClickFindManyArgs {
+    return {
+        where: {
+            AND: [
+                timeframeFilter(timeframe),
+                reportItemFilter(reportItemName, reportItemId),
+            ],
+        },
     };
 }
 

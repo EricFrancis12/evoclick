@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { faSpinner, faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 import Button from "./Button";
 
-export default function RefreshButton({ disabled = false }: {
+export default function RefreshButton({ disabled }: {
     disabled?: boolean;
 }) {
     const router = useRouter();

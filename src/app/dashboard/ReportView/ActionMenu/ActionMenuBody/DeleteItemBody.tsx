@@ -15,7 +15,7 @@ import {
     deleteLandingPageAction, deleteOfferAction, deleteTrafficSourceAction,
     revalidatePathAction
 } from "@/lib/actions";
-import { formatErr, getPrimaryItemById } from "@/lib/utils";
+import { getPrimaryItemById } from "@/lib/utils";
 import { TActionMenu, TDeleteItemsActionMenu } from "../types";
 import {
     EItemName, TAffiliateNetwork, TCampaign, TLandingPage,
@@ -27,7 +27,6 @@ type TDeletionStatus = "idle" | "pending" | "success" | "failed";
 type TDeletionItem = {
     data: TAffiliateNetwork | TCampaign | TSavedFlow | TLandingPage | TOffer | TTrafficSource;
     status: TDeletionStatus;
-    error: string;
 };
 
 export default function DeleteItemBody({ actionMenu, setActionMenu }: {
@@ -43,7 +42,7 @@ export default function DeleteItemBody({ actionMenu, setActionMenu }: {
         ids.reduce((delItems: TDeletionItem[], id) => {
             const data = getPrimaryItemById(primaryData, primaryItemName, id);
             return data
-                ? [...delItems, { data, status: "idle", error: "" }]
+                ? [...delItems, { data, status: "idle" }]
                 : delItems;
         }, [])
     );
@@ -65,7 +64,7 @@ export default function DeleteItemBody({ actionMenu, setActionMenu }: {
                 revalidatePathAction(window.location.href);
             } catch (err) {
                 errCount++;
-                setDeletionItems(prev => prev.map(delItem => delItem.data.id === id ? { ...delItem, status: "failed", error: formatErr(err) } : delItem));
+                setDeletionItems(prev => prev.map(delItem => delItem.data.id === id ? { ...delItem, status: "failed" } : delItem));
             }
         }
 

@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { faLink, faPencil, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faLink, faPencil, faPlus, faRandom, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { TPrimaryData, useReportView } from "../ReportViewContext";
 import useNewReport from "@/hooks/useNewReport";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import CalendarButton from "@/components/CalendarButton";
 import RefreshButton from "@/components/RefreshButton";
-import ReportButton from "@/components/ReportButton";
 import ReportChain, { TReportChain } from "../ReportChain";
 import LowerCPWrapper from "./LowerCPWrapper";
 import LowerCPRow from "./LowerCPRow";
@@ -91,9 +90,11 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
                 <RefreshButton />
                 {view.type === "main" &&
                     <>
-                        <ReportButton
-                            onClick={handleNewReport}
+                        <Button
+                            text="Report"
+                            icon={faRandom}
                             disabled={selectedRows.length < 1}
+                            onClick={handleNewReport}
                         />
                         {isPrimary(view.itemName).ok &&
                             <>

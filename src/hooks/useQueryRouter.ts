@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-export default function useViewRouter() {
+export default function useQueryRouter() {
     const router = useRouter();
 
     return {

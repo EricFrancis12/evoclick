@@ -1,36 +1,33 @@
 "use client";
 
-export function Input({ name = "", placeholder = "", value, onChange }: {
+const BASE_COMPONENT_CLASSNAME = "w-full px-2 py-1";
+const BASE_COMPONENT_STYLE = {
+    border: "solid 1px grey",
+    borderRadius: "6px"
+};
+
+export function Input({ name = "", placeholder, value, onChange }: {
     name: string;
     placeholder?: string;
     value: string | number | readonly string[] | undefined;
     onChange: React.ChangeEventHandler<HTMLInputElement>;
 }) {
     return (
-        <Wrapper>
+        <BaseComponentWrapper>
             <span>
                 {name}
             </span>
             <input
                 type="text"
                 placeholder={placeholder}
-                className="w-full px-2 py-1"
-                style={{
-                    border: "solid 1px grey",
-                    borderRadius: "6px"
-                }}
+                className={BASE_COMPONENT_CLASSNAME}
+                style={BASE_COMPONENT_STYLE}
                 value={value}
                 onChange={onChange}
             />
-        </Wrapper>
+        </BaseComponentWrapper>
     )
 }
-
-const selectClassName = "w-full px-2 py-1 ";
-const selectStyle = {
-    border: "solid 1px grey",
-    borderRadius: "6px"
-};
 
 export function Select({ name = "", value, onChange, children, disabled, className, style }: {
     name?: string;
@@ -42,20 +39,20 @@ export function Select({ name = "", value, onChange, children, disabled, classNa
     style?: React.CSSProperties;
 }) {
     return (
-        <Wrapper>
+        <BaseComponentWrapper>
             <span>
                 {name}
             </span>
             <select
                 disabled={disabled}
-                className={selectClassName + className}
-                style={{ ...selectStyle, ...style }}
+                className={BASE_COMPONENT_CLASSNAME + " " + className}
+                style={{ ...BASE_COMPONENT_STYLE, ...style }}
                 value={value}
                 onChange={onChange}
             >
                 {children}
             </select>
-        </Wrapper>
+        </BaseComponentWrapper>
     )
 }
 
@@ -66,14 +63,14 @@ export function DummySelect({ children, className, style }: {
 }) {
     return (
         <div>
-            <Wrapper>
+            <BaseComponentWrapper>
                 <div
-                    className={selectClassName + className}
-                    style={{ ...selectStyle, ...style }}
+                    className={BASE_COMPONENT_CLASSNAME + " " + className}
+                    style={{ ...BASE_COMPONENT_STYLE, ...style }}
                 >
                     {children}
                 </div>
-            </Wrapper>
+            </BaseComponentWrapper>
         </div>
     )
 }
@@ -86,7 +83,7 @@ export function SelectionButtons({ name = "", options, value, onClick, children 
     children?: React.ReactNode;
 }) {
     return (
-        <Wrapper>
+        <BaseComponentWrapper>
             <span>
                 {name}
             </span>
@@ -111,11 +108,11 @@ export function SelectionButtons({ name = "", options, value, onClick, children 
                 </div>
                 {children}
             </div>
-        </Wrapper>
+        </BaseComponentWrapper>
     )
 }
 
-export function Wrapper({ children, className, style }: {
+export function BaseComponentWrapper({ children, className, style }: {
     children: React.ReactNode;
     className?: string;
     style?: React.CSSProperties;

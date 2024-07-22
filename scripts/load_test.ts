@@ -6,8 +6,8 @@ import { Env } from "../src/lib/types";
 
 if (!process.env[Env.API_PORT]) throw new Error("Environment varaible API_PORT not set.");
 
-const url = makeCampaignUrl("http:", "localhost", process.env[Env.API_PORT], campaignSeedData.publicId);
-const duration = 30_000; // ms
+const URL = makeCampaignUrl("http:", "localhost", process.env[Env.API_PORT], campaignSeedData.publicId);
+const DURATION = 30_000; // ms
 
 (async function () {
     if (!argv?.[2]) {
@@ -21,17 +21,17 @@ const duration = 30_000; // ms
         return;
     }
 
-    console.log(`Running load test with ${numRequestsPerMinute} requests per minute to ${url}`);
+    console.log(`Running load test with ${numRequestsPerMinute} requests per minute to ${URL}`);
 
     let running = true;
     let count = 0;
 
-    setTimeout(() => running = false, duration);
+    setTimeout(() => running = false, DURATION);
 
     const interval = setInterval(() => console.log(`Running total: ${count} http requests sent`), 2000);
 
     while (running) {
-        const req = http.request(url);
+        const req = http.request(URL);
         req.on('error', err => console.error(`Problem with request: ${err.message}`));
         count++;
 
@@ -41,5 +41,5 @@ const duration = 30_000; // ms
 
     clearInterval(interval);
 
-    console.log(`Load test finished.\nSent ${count} http requests accross ${duration} ms`);
+    console.log(`Load test finished.\nSent ${count} http requests accross ${DURATION} ms`);
 })();

@@ -2,7 +2,7 @@ import { argv } from "process";
 import crypto from "crypto";
 import { Prisma } from "@prisma/client";
 import db from "../src/lib/db";
-import { randItemFromArray, randomIntInRange } from "../src/lib/utils";
+import { randomItemFromArray, randomIntInRange } from "../src/lib/utils";
 
 (async function () {
     if (!argv?.[2]) {
@@ -70,12 +70,12 @@ function smartMakeClickInput(arg: {
     offerIds: number[];
     trafficSourceIds: number[];
 }): Prisma.ClickCreateManyInput {
-    const affiliateNetworkId = randItemFromArray(arg.affiliateNetworkIds);
-    const campaignId = randItemFromArray(arg.campaignIds);
-    const savedFlowId = randItemFromArray(arg.savedFlowIds);
-    const landingPageId = randItemFromArray(arg.landingPageIds);
-    const offerId = randItemFromArray(arg.offerIds);
-    const trafficSourceId = randItemFromArray(arg.trafficSourceIds);
+    const affiliateNetworkId = randomItemFromArray(arg.affiliateNetworkIds);
+    const campaignId = randomItemFromArray(arg.campaignIds);
+    const savedFlowId = randomItemFromArray(arg.savedFlowIds);
+    const landingPageId = randomItemFromArray(arg.landingPageIds);
+    const offerId = randomItemFromArray(arg.offerIds);
+    const trafficSourceId = randomItemFromArray(arg.trafficSourceIds);
 
     if (affiliateNetworkId !== null
         && campaignId !== null

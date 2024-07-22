@@ -29,13 +29,17 @@ export function formatErr(err: unknown): string {
     return "Unknown error";
 }
 
+export function numberWithCommas(n: number): string {
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 export function randomIntInRange(min: number, max: number): number {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function randItemFromArray<T>(arr: T[]): T | null {
+export function randomItemFromArray<T>(arr: T[]): T | null {
     return arr[randomIntInRange(0, arr.length - 1)] ?? null;
 }
 

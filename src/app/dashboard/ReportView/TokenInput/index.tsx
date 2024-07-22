@@ -2,6 +2,7 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import TokenInputSection from "./TokenInputSection";
 import { Input } from "@/components/base";
 import { TNamedToken, TToken } from "@/lib/types";
 
@@ -20,23 +21,23 @@ export default function TokenInput({ token, onChange, onDelete, title = "" }: {
             <div className="flex justify-start items-center h-full w-full">
                 <span>{title}</span>
             </div>
-            <div className="flex justify-center items-center h-full w-full">
+            <TokenInputSection>
                 <Input
                     name=""
                     placeholder="query parameter"
                     value={token.queryParam}
                     onChange={e => onChange({ ...token, queryParam: e.target.value })}
                 />
-            </div>
-            <div className="flex justify-center items-center h-full w-full">
+            </TokenInputSection>
+            <TokenInputSection>
                 <Input
                     name=""
                     placeholder="{value}"
                     value={token.value}
                     onChange={e => onChange({ ...token, value: e.target.value })}
                 />
-            </div>
-            <div className="flex justify-center items-center h-full w-full">
+            </TokenInputSection>
+            <TokenInputSection>
                 {isNamedToken &&
                     <Input
                         name=""
@@ -46,7 +47,7 @@ export default function TokenInput({ token, onChange, onDelete, title = "" }: {
 
                     />
                 }
-            </div>
+            </TokenInputSection>
             <div className="flex justify-center items-center h-full w-[50px]">
                 {isNamedToken &&
                     <span

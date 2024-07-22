@@ -1,19 +1,22 @@
 "use client";
 
-export function PopoverLayer({ children, layer = 1, dark = true }: {
+export const POPOVER_BASE_Z_INDEX = 100;
+
+function backdropZIndex(zIndez: number): number {
+    return zIndez - 1;
+}
+
+export function PopoverLayer({ children, layer = 1, backdrop = true }: {
     children: React.ReactNode;
     layer?: number;
-    dark?: boolean;
+    backdrop?: boolean;
 }) {
-    const zIndex = layer * 100;
+    const zIndex = layer * POPOVER_BASE_Z_INDEX;
 
     return (
         <>
-            {dark &&
-                <div
-                    className="absolute top-0 left-0 h-screen w-screen bg-black opacity-50"
-                    style={{ zIndex: zIndex - 1 }}
-                />
+            {backdrop &&
+                <Backdrop style={{ zIndex: backdropZIndex(zIndex) }} />
             }
             <div
                 className="absolute top-0 left-0 flex justify-center items-center h-screen w-screen bg-transparent"
@@ -22,6 +25,14 @@ export function PopoverLayer({ children, layer = 1, dark = true }: {
                 {children}
             </div>
         </>
+    )
+}
+
+export function Backdrop({ style }: {
+    style: React.CSSProperties;
+}) {
+    return (
+        <div className="absolute top-0 left-0 h-screen w-screen bg-black opacity-50" style={style} />
     )
 }
 

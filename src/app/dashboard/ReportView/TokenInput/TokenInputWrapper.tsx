@@ -1,5 +1,7 @@
 "use client";
 
+import TokenInputSection from "./TokenInputSection";
+
 const tokenColumns = ["", "Query param", "Token", "Name", ""];
 
 export default function TokenInputWrapper({ children, onCreateNew }: {
@@ -10,9 +12,9 @@ export default function TokenInputWrapper({ children, onCreateNew }: {
         <div className="flex flex-col justify-start items-start w-full">
             <div className="flex justify-between items-center p-1 w-full">
                 {tokenColumns.map((col, index) => (
-                    <div key={index} className="flex justify-center items-center h-full w-full">
+                    <TokenInputSection key={index}>
                         <span>{col}</span>
-                    </div>
+                    </TokenInputSection>
                 ))}
             </div>
             {children}

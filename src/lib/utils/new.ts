@@ -1,5 +1,12 @@
-import { TActionMenu, TAffiliateNetworkActionMenu, TCampaignActionMenu, TLandingPageActionMenu, TOfferActionMenu, TSavedFlowActionMenu, TTrafficSourceActionMenu } from "@/app/dashboard/ReportView/ActionMenu/types";
-import { EItemName, ELogicalRelation, ERuleName, TAffiliateNetwork, TCampaign, TLandingPage, TNamedToken, TOffer, TPath, TRoute, TRule, TSavedFlow, TToken, TTrafficSource } from "../types";
+import {
+    TActionMenu, TAffiliateNetworkActionMenu, TCampaignActionMenu, TLandingPageActionMenu,
+    TOfferActionMenu, TSavedFlowActionMenu, TTrafficSourceActionMenu
+} from "@/app/dashboard/ReportView/ActionMenu/types";
+import {
+    EItemName, ELogicalRelation, ERuleName, TAffiliateNetwork, TCampaign, TLandingPage,
+    TNamedToken, TOffer, TPath, TRoute, TRule, TSavedFlow, TToken, TTrafficSource
+} from "../types";
+import { isPrimary } from ".";
 
 export function newRoute(): TRoute {
     return {
@@ -43,15 +50,11 @@ export function newNamedToken(): TNamedToken {
 }
 
 export function newPrimaryItemActionMenu(itemName: EItemName): TActionMenu {
-    if (itemName === EItemName.AFFILIATE_NETWORK
-        || itemName === EItemName.FLOW
-        || itemName === EItemName.LANDING_PAGE
-        || itemName === EItemName.OFFER
-        || itemName === EItemName.TRAFFIC_SOURCE
-    ) {
+    const { primaryItemName } = isPrimary(itemName);
+    if (primaryItemName) {
         return {
-            type: itemName,
-            itemName,
+            type: primaryItemName,
+            itemName: primaryItemName,
         } as TActionMenu;
     }
     return {
@@ -82,11 +85,11 @@ export function newCampaignActionMenu(campaign: TCampaign): TCampaignActionMenu 
 }
 
 export function newSavedFlowActionMenu(savedFlow: TSavedFlow): TSavedFlowActionMenu {
-    const { id, name, mainRoute, ruleRoutes, tags } = savedFlow;
+    const { name, mainRoute, ruleRoutes, tags } = savedFlow;
     return {
+        ...savedFlow,
         type: EItemName.FLOW,
         itemName: EItemName.FLOW,
-        id,
         name: name ?? undefined,
         mainRoute: mainRoute ?? undefined,
         ruleRoutes: ruleRoutes ?? undefined,

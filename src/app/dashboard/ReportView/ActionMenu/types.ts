@@ -1,4 +1,4 @@
-import { EItemName, TAffiliateNetwork, TCampaign, TLandingPage, TNamedToken, TOffer, TPrimaryItemName, TRoute, TSavedFlow, TToken, TTrafficSource } from "@/lib/types";
+import { EItemName, TNamedToken, TPrimaryItemName, TRoute, TToken } from "@/lib/types";
 import { $Enums } from "@prisma/client";
 
 export type TActionMenu =

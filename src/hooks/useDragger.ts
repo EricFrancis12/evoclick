@@ -3,7 +3,7 @@
 export default function useDragger(onMouseMove: (e: MouseEvent, u?: unknown) => void) {
     let boundHandleMouseMove: (e: MouseEvent) => void;
 
-    function handleMouseDown(e?: React.MouseEvent<Element, MouseEvent>, u?: unknown) {
+    function handleMouseDown(_?: React.MouseEvent<Element, MouseEvent>, u?: unknown) {
         document.body.style.cursor = "e-resize";
         document.body.style.userSelect = "none";
 

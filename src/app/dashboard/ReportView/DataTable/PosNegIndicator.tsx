@@ -8,11 +8,15 @@ export default function PosNegIndicator({ value, disabled }: {
 }) {
     return (
         <div
-            className={"flex justify-center items-center h-full "
-                + (disabled ? "" : (value > 0 ? "bg-green-200" : value < 0 ? "bg-red-200" : "bg-slate-100"))}
+            className={disabled ? "" : valueFromSign(value, "bg-green-200", "bg-red-200", "bg-slate-100")
+                + " flex justify-center items-center h-full"}
             style={{ width: `${DEPTH_MARGIN}px` }}
         >
-            <span>{disabled ? "" : (value > 0 ? "+" : value < 0 ? "-" : "·")}</span>
+            <span>{disabled ? "" : valueFromSign(value, "+", "-", "·")}</span>
         </div>
     )
+}
+
+function valueFromSign(n: number, valueIfPos: string, valueIfNeg: string, valueIfZero: string): string {
+    return n > 0 ? valueIfPos : n < 0 ? valueIfNeg : valueIfZero;
 }

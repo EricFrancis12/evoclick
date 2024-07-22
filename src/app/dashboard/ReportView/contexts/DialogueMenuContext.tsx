@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { traverseParentsForRef } from "@/lib/utils/client";
 
-const zIndex = 4000;
+const Z_INDEX = 4000;
 
 export type TDialogueMenu = {
     top: number;
@@ -91,7 +91,7 @@ export function DialogueViewProvider({ children }: {
                         left,
                         height: 0,
                         width: 0,
-                        zIndex,
+                        zIndex: Z_INDEX,
                     }}
                 >
                     <div className="relative">

@@ -20,6 +20,8 @@ export const userInputRules: ERuleName[] = [
     ERuleName.USER_AGENT,
 ];
 
+const includeExclude: [str: string, str: string] = ["Include", "Exclude"];
+
 export default function UserInputRuleLayout({ rule, onChange }: {
     rule: TRule;
     onChange: (ru: TRule) => void;
@@ -27,7 +29,7 @@ export default function UserInputRuleLayout({ rule, onChange }: {
     return (
         <RuleLayoutWrapper title={rule.ruleName}>
             <BooleanCheckboxesToggle
-                items={["Include", "Exclude"]}
+                values={includeExclude}
                 value={rule.includes}
                 onChange={includes => onChange({ ...rule, includes })}
             />

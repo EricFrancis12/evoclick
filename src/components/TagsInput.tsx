@@ -4,21 +4,21 @@ import { useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 
-export default function TagsInput({ tags, setTags, title, placeholder, tagSuggestions }: {
+export default function TagsInput({ tags, setTags, title, placeholder, suggestions }: {
     tags: string[];
     setTags: (newTags: string[]) => void;
     title?: string;
     placeholder?: string;
-    tagSuggestions?: string[];
+    suggestions?: string[];
 }) {
     const tagInputElement = useRef<HTMLInputElement>(null);
 
-    const [tagSuggestionsVisible, setTagSuggestionsVisible] = useState<boolean>(false);
-    const [inputSearchQuery, setInputSearchQuery] = useState<string>("");
+    const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
     function handleMouseDown(tag: string) {
         addNewTag(tag);
-        setInputSearchQuery("");
+        setSearchQuery("");
     }
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -27,7 +27,7 @@ export default function TagsInput({ tags, setTags, title, placeholder, tagSugges
 
         addNewTag(tagInputElement.current.value);
         tagInputElement.current.value = "";
-        setInputSearchQuery("");
+        setSearchQuery("");
     }
 
     function addNewTag(tag: string) {
@@ -41,7 +41,7 @@ export default function TagsInput({ tags, setTags, title, placeholder, tagSugges
     }
 
     return (
-        <div className="flex flex-col justify-start items-start w-full">
+        <div className="flex flex-col w-full">
             {title && <span>{title}</span>}
             <div className="w-full p-1 bg-white" style={{ border: "solid 1px grey", borderRadius: "6px" }}>
                 <span>
@@ -62,23 +62,24 @@ export default function TagsInput({ tags, setTags, title, placeholder, tagSugges
                     ))}
                     <span className="relative inline-block w-full">
                         <form className="w-full" onSubmit={handleSubmit}>
-                            <input ref={tagInputElement} placeholder={placeholder}
+                            <input
+                                ref={tagInputElement}
+                                placeholder={placeholder}
                                 className="w-full m-1 p-1 bg-transparent"
                                 style={{
                                     border: "none",
                                     outline: "none"
                                 }}
-                                onChange={e => setInputSearchQuery(e.target?.value ?? "")}
-                                onFocus={() => setTagSuggestionsVisible(true)}
-                                onBlur={() => setTagSuggestionsVisible(false)}
+                                onChange={e => setSearchQuery(e.target?.value ?? "")}
+                                onFocus={() => setShowSuggestions(true)}
+                                onBlur={() => setShowSuggestions(false)}
                             />
                         </form>
-                        {tagSuggestionsVisible &&
+                        {showSuggestions &&
                             <div className="absolute">
-                                {tagSuggestions && tagSuggestions
-                                    .filter(tag => (
-                                        (!inputSearchQuery || tag.includes(inputSearchQuery)) && !tags.includes(tag)
-                                    )).map((tag, index) => (
+                                {suggestions
+                                    ?.filter(suggestion => filterSuggestions(suggestion, searchQuery, tags))
+                                    .map((tag, index) => (
                                         <div key={index} onMouseDown={e => handleMouseDown(tag)}>
                                             {tag}
                                         </div>
@@ -91,4 +92,10 @@ export default function TagsInput({ tags, setTags, title, placeholder, tagSugges
             </div>
         </div>
     )
+}
+
+function filterSuggestions(suggestion: string, searchQuery: string, tags: string[]): boolean {
+    const satisfiesSearchQuery = suggestion.includes(searchQuery) || !searchQuery;
+    const notInTags = !tags.includes(suggestion);
+    return satisfiesSearchQuery && notInTags;
 }

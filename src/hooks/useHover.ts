@@ -14,7 +14,6 @@ export default function useHover(ref: React.RefObject<HTMLElement>): [boolean, D
             node.addEventListener("mouseenter", handleMouseEnter);
             node.addEventListener("mouseleave", handleMouseLeave);
 
-            // Cleanup the event listeners on unmount
             return () => {
                 node.removeEventListener("mouseenter", handleMouseEnter);
                 node.removeEventListener("mouseleave", handleMouseLeave);

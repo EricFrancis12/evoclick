@@ -7,7 +7,10 @@ import { TRow } from "@/app/dashboard/ReportView/DataTable";
 import { EItemName, TClick, TPrimaryItemName } from "@/lib/types";
 import { getPrimaryItemById, isPrimary } from "@/lib/utils";
 
-export function useRows(clicks: TClick[], itemName: EItemName) {
+export function useRows(
+    clicks: TClick[],
+    itemName: EItemName
+): [TRow[] | null, React.Dispatch<React.SetStateAction<TRow[] | null>>] {
     const { primaryData } = useReportView();
 
     const [rows, setRows] = useState<TRow[] | null>(null);
@@ -17,8 +20,7 @@ export function useRows(clicks: TClick[], itemName: EItemName) {
         setRows(newRows);
     }, [clicks.length, primaryData, itemName]);
 
-    const value: [TRow[] | null, React.Dispatch<React.SetStateAction<TRow[] | null>>] = [rows, setRows];
-    return value;
+    return [rows, setRows];
 }
 
 type TEnrichmentItem = {
