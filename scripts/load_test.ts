@@ -11,7 +11,7 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
 if (!process.env[Env.API_PORT]) throw new Error(`Environment varaible ${Env.API_PORT} not set.`);
 
-const URL = makeCampaignUrl("http:", "localhost", process.env[Env.API_PORT], campaignSeedData.publicId);
+const URL = makeCampaignUrl("http:", "localhost", process.env[Env.API_PORT], campaignSeedData.publicId, []);
 const DURATION = 30_000; // ms
 
 (async function () {

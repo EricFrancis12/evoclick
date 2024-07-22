@@ -1,5 +1,5 @@
 import { TPrimaryData } from "@/app/dashboard/ReportView/ReportViewContext";
-import { EItemName, TPrimaryItemName } from "../types";
+import { EItemName, TPrimaryItemName, TToken } from "../types";
 
 export * from "./maps"
 export * from "./new";
@@ -94,8 +94,15 @@ export function isPrimary(itemName: EItemName): isPrimaryResult {
     };
 }
 
-export function makeCampaignUrl(protocol: string, hostname: string, port: string, campaignPublicId: string): string {
-    return `${protocol}//${hostname}${port ? ":" + port : ""}/t?g=${campaignPublicId}`;
+export function makeCampaignUrl(
+    protocol: string,
+    hostname: string,
+    port: string,
+    campaignPublicId: string,
+    tokens: TToken[]
+): string {
+    const queryStr = `g=${campaignPublicId}${tokens.length > 0 ? "&" + flattenTokens(tokens) : ""}`;
+    return `${protocol}//${hostname}${port ? ":" + port : ""}/t?${queryStr}`;
 }
 
 export function makeClickUrl(protocol: string, hostname: string, port: string) {
@@ -104,4 +111,8 @@ export function makeClickUrl(protocol: string, hostname: string, port: string) {
 
 export function iPInfoEndpoint(ipAddr: string, ipInfoToken: string): string {
     return "https://ipinfo.io/" + ipAddr + "?token=" + ipInfoToken;
+}
+
+function flattenTokens(tokens: TToken[]): string {
+    return tokens.map(({ queryParam, value }) => `${queryParam}=${value}`).join("&");
 }

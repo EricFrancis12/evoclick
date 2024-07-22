@@ -7,10 +7,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faExternalLink } from "@fortawesome/free-solid-svg-icons";
 import { getOneCampaignAction } from "@/lib/actions";
 import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
-import { makeCampaignUrl, makeClickUrl } from "@/lib/utils";
+import { getPrimaryItemById, makeCampaignUrl, makeClickUrl } from "@/lib/utils";
 import { copyToClipboard } from "@/lib/utils/client";
 import { TActionMenu, TCampaignLinksActionMenu } from "../types";
-import { TCampaign } from "@/lib/types";
+import { EItemName, Env, TCampaign, TToken, TTrafficSource } from "@/lib/types";
+import { useReportView } from "../../ReportViewContext";
 
 export default function CampaignLinksBody({ actionMenu }: {
     actionMenu: TCampaignLinksActionMenu;
@@ -42,10 +43,15 @@ function CampaignLinksRows({ campaign }: {
     campaign: TCampaign;
 }) {
     const { protocol, hostname, port } = window.location;
+
+    const { primaryData } = useReportView();
+    const trafficSource = getPrimaryItemById(primaryData, EItemName.TRAFFIC_SOURCE, campaign.trafficSourceId);
+    const tokens = trafficSource?.primaryItemName === EItemName.TRAFFIC_SOURCE ? makeTokens(trafficSource) : [];
+
     const rows = [
         {
             name: "Campaign URL",
-            link: makeCampaignUrl(protocol, hostname, port, campaign?.publicId),
+            link: makeCampaignUrl(protocol, hostname, port, campaign.publicId, tokens),
         },
         {
             name: "Click URL",
@@ -62,11 +68,16 @@ function CampaignLinksRows({ campaign }: {
             />
             <div className="flex justify-between items-center gap-4 w-full">
                 <span>{name}: </span>
-                <Link href={link} className="text-end hover:underline">
+                <Link href={link} target="_blank" className="text-end hover:underline">
                     {link}
                     <FontAwesomeIcon icon={faExternalLink} className="ml-2" />
                 </Link>
             </div>
         </div>
     ))
+}
+
+function makeTokens(trafficSource: TTrafficSource): TToken[] {
+    const { externalIdToken, costToken, customTokens } = trafficSource;
+    return [externalIdToken, costToken, ...customTokens].map(({ queryParam, value }) => ({ queryParam, value }));
 }
