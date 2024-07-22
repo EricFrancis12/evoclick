@@ -3,7 +3,8 @@
 // uses ts-node under the hood,
 // and it's not able to recognize that syntax in the current tsconfig.
 import prisma from "../src/lib/db";
-import seedData, { main } from "./seedData";
+import main from "./main";
+import seedData from "./seedData";
 
 main(seedData)
     .catch(err => {

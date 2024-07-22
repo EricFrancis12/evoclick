@@ -15,12 +15,10 @@ import (
 	"github.com/mileusna/useragent"
 )
 
-var tStorer = pkg.NewStorer()
-
 func T(w http.ResponseWriter, r *http.Request) {
-	timestamp, ctx := tStorer.InitVisit(r)
-	defer tStorer.Client.Disconnect()
-	defer tStorer.Cache.Close()
+	timestamp, ctx, storer := pkg.InitVisit(r)
+	defer storer.Client.Disconnect()
+	defer storer.Cache.Close()
 
 	g := getGValue(r)
 	if g == "" {
@@ -31,7 +29,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	campaign, err := tStorer.GetCampaignByPublicId(ctx, g)
+	campaign, err := storer.GetCampaignByPublicId(ctx, g)
 	if err != nil {
 		// If campaign not found, redirect the visitor to the catch-all url
 		fmt.Println("error fetching Campaign by public ID: " + err.Error())
@@ -50,10 +48,10 @@ func T(w http.ResponseWriter, r *http.Request) {
 	go fetchIpInfoData(r, os.Getenv(pkg.EnvIpInfoToken), ipidch)
 
 	tsch := make(chan pkg.TrafficSource)
-	go fetchtrafficSource(ctx, tStorer, campaign.TrafficSourceID, tsch)
+	go fetchtrafficSource(ctx, storer, campaign.TrafficSourceID, tsch)
 
 	if campaign.FlowType == db.FlowTypeSaved {
-		savedFlow, err = tStorer.GetSavedFlowById(ctx, *campaign.SavedFlowID)
+		savedFlow, err = storer.GetSavedFlowById(ctx, *campaign.SavedFlowID)
 		if err != nil {
 			// If flow not found, redirect the visitor to the catch-all url
 			fmt.Println("error fetching Flow: " + err.Error())
@@ -70,10 +68,10 @@ func T(w http.ResponseWriter, r *http.Request) {
 		ipInfoData = <-ipidch
 	}
 
-	dest, _ := campaign.DetermineViewDestination(r, ctx, *tStorer, savedFlow, userAgent, ipInfoData)
+	dest, _ := campaign.DetermineViewDestination(r, ctx, *storer, savedFlow, userAgent, ipInfoData)
 
 	anch := make(chan pkg.AffiliateNetwork)
-	go fetchAffiliateNetwork(ctx, tStorer, dest, anch)
+	go fetchAffiliateNetwork(ctx, storer, dest, anch)
 
 	publicClickId := pkg.NewPublicClickID()
 	// If we are sending the visitor to a landing page,
@@ -93,7 +91,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 	affiliateNetwork := <-anch
 
 	// Save click to db
-	_, err = tStorer.CreateNewClick(ctx, pkg.ClickCreationReq{
+	_, err = storer.CreateNewClick(ctx, pkg.ClickCreationReq{
 		PublicId:           publicClickId,
 		ExternalId:         getExternalId(*r.URL, trafficSource),
 		Cost:               getCost(*r.URL, trafficSource),

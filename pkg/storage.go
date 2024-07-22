@@ -1,11 +1,8 @@
 package pkg
 
 import (
-	"context"
 	"fmt"
-	"net/http"
 	"os"
-	"time"
 
 	"github.com/EricFrancis12/evoclick/prisma/db"
 	"github.com/redis/go-redis/v9"
@@ -18,11 +15,6 @@ type Storer struct {
 
 func NewStorer() *Storer {
 	return &Storer{}
-}
-
-func (s *Storer) InitVisit(r *http.Request) (time.Time, context.Context) {
-	s.Renew()
-	return time.Now(), r.Context()
 }
 
 func (s *Storer) Renew() {

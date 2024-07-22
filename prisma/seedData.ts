@@ -1,9 +1,5 @@
-import dotenv from "dotenv";
 import { $Enums } from "@prisma/client";
-import prisma from "../src/lib/db";
-import { ELogicalRelation, TNamedToken, TRoute, TToken, Env } from "../src/lib/types";
-
-dotenv.config();
+import { ELogicalRelation, TNamedToken, TRoute, TToken } from "../src/lib/types";
 
 const tags = ["placeholder", "example"];
 
@@ -16,7 +12,7 @@ export type TAffiliateNetworkSeedData = typeof affiliateNetworkSeedData;
 
 export const offerSeedData = {
     name: "My First Offer",
-    url: `http://localhost:${process.env[Env.API_PORT]}/assets/sample-offer.html`,
+    url: "http://localhost:3001/assets/sample-offer.html",
     payout: 80,
     tags,
 };
@@ -24,7 +20,7 @@ export type TOfferSeedData = typeof offerSeedData;
 
 export const landingPageSeedData = {
     name: "My First Landing Page",
-    url: `http://localhost:${process.env[Env.API_PORT]}/assets/sample-landing-page.html`,
+    url: "http://localhost:3001/assets/sample-landing-page.html",
     tags,
 };
 export type TLandingPageSeedData = typeof landingPageSeedData;
@@ -64,7 +60,7 @@ export const trafficSourceSeedData = {
         },
     ],
     name: "My First Traffic Source",
-    postbackUrl: `http://localhost:${process.env[Env.API_PORT]}/postback/test`,
+    postbackUrl: "http://localhost:3001/postback/test",
     tags,
 };
 export type TTrafficSourceSeedData = typeof trafficSourceSeedData;
@@ -89,74 +85,3 @@ const seedData = {
 };
 export type TSeedData = typeof seedData;
 export default seedData;
-
-export async function main(seedData: TSeedData) {
-    const {
-        affiliateNetworkSeedData, campaignSeedData, savedFlowSeedData,
-        landingPageSeedData, offerSeedData, trafficSourceSeedData,
-    } = seedData;
-
-    const affiliateNetwork = await prisma.affiliateNetwork.create({
-        data: affiliateNetworkSeedData,
-    });
-
-    const offer = await prisma.offer.create({
-        data: {
-            ...offerSeedData,
-            affiliateNetworkId: affiliateNetwork.id,
-        },
-    });
-
-    const landingPage = await prisma.landingPage.create({
-        data: landingPageSeedData,
-    });
-
-    const flow = await prisma.savedFlow.create({
-        data: {
-            ...savedFlowSeedData,
-            mainRoute: JSON.stringify({
-                ...savedFlowSeedData.mainRoute,
-                paths: [
-                    {
-                        directLinkingEnabled: false,
-                        isActive: true,
-                        landingPageIds: [landingPage.id],
-                        offerIds: [offer.id],
-                        weight: 100,
-                    },
-                ],
-            }),
-            ruleRoutes: JSON.stringify(savedFlowSeedData.ruleRoutes),
-        },
-    });
-
-    const trafficSource = await prisma.trafficSource.create({
-        data: {
-            ...trafficSourceSeedData,
-            externalIdToken: JSON.stringify(trafficSourceSeedData.externalIdToken),
-            costToken: JSON.stringify(trafficSourceSeedData.costToken),
-            customTokens: JSON.stringify(trafficSourceSeedData.customTokens),
-        },
-    });
-
-    const campaign = await prisma.campaign.create({
-        data: {
-            ...campaignSeedData,
-            flowType: $Enums.FlowType.SAVED,
-            savedFlowId: flow.id,
-            trafficSourceId: trafficSource.id,
-            flowMainRoute: "",
-            flowRuleRoutes: "",
-            flowUrl: "",
-        },
-    });
-
-    return {
-        affiliateNetwork,
-        campaign,
-        flow,
-        landingPage,
-        offer,
-        trafficSource,
-    };
-}
