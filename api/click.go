@@ -13,8 +13,6 @@ var clickStorer = pkg.NewStorer()
 
 func Click(w http.ResponseWriter, r *http.Request) {
 	timestamp, ctx := clickStorer.InitVisit(r)
-	defer clickStorer.Client.Disconnect()
-	defer clickStorer.Cache.Close()
 
 	clickPublicId := getCookieValue(r, pkg.CookieNameClickPublicID)
 	if clickPublicId == "" {

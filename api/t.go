@@ -19,8 +19,6 @@ var tStorer = pkg.NewStorer()
 
 func T(w http.ResponseWriter, r *http.Request) {
 	timestamp, ctx := tStorer.InitVisit(r)
-	defer tStorer.Client.Disconnect()
-	defer tStorer.Cache.Close()
 
 	g := getGValue(r)
 	if g == "" {

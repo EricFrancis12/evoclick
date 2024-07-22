@@ -17,8 +17,6 @@ type PostbackResp struct{}
 
 func Postback(w http.ResponseWriter, r *http.Request) {
 	timestamp, ctx := postbackStorer.InitVisit(r)
-	defer postbackStorer.Client.Disconnect()
-	defer postbackStorer.Cache.Close()
 
 	if clickPublicId := r.URL.Query().Get("pid"); clickPublicId != "" {
 		// Get click from db
