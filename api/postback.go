@@ -11,27 +11,29 @@ import (
 	"github.com/EricFrancis12/evoclick/pkg"
 )
 
+var postbackStorer = pkg.NewStorer()
+
 type PostbackResp struct{}
 
 func Postback(w http.ResponseWriter, r *http.Request) {
-	timestamp, ctx, storer := pkg.InitVisit()
-	defer storer.Client.Disconnect()
-	defer storer.Cache.Close()
+	timestamp, ctx := postbackStorer.InitVisit(r)
+	defer postbackStorer.Client.Disconnect()
+	defer postbackStorer.Cache.Close()
 
 	if clickPublicId := r.URL.Query().Get("pid"); clickPublicId != "" {
 		// Get click from db
-		click, err := storer.GetClickByPublicId(ctx, clickPublicId)
+		click, err := postbackStorer.GetClickByPublicId(ctx, clickPublicId)
 		if err != nil {
 			fmt.Println("error fetching click by Public ID: " + err.Error())
 		} else {
 			// Update click in db
 			revenue := getRevenue(*r.URL)
 			convertedClick := convertClick(click, timestamp, revenue)
-			if _, err := storer.UpsertClickById(ctx, click.ID, convertedClick); err != nil {
+			if _, err := postbackStorer.UpsertClickById(ctx, click.ID, convertedClick); err != nil {
 				fmt.Println("error updating click in db: " + err.Error())
 			}
 
-			trafficSource, err := storer.GetTrafficSourceById(ctx, click.TrafficSourceID)
+			trafficSource, err := postbackStorer.GetTrafficSourceById(ctx, click.TrafficSourceID)
 			if err != nil {
 				fmt.Println("error fetching traffic source: " + err.Error())
 			}

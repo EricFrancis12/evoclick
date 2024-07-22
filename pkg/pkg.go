@@ -1,21 +1,13 @@
 package pkg
 
 import (
-	"context"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/mileusna/useragent"
 )
 
 const defaultCatchAllRedirectUrl = "https://bing.com"
-
-func InitVisit() (time.Time, context.Context, *Storer) {
-	storer := NewStorer()
-	storer.Renew()
-	return time.Now(), context.Background(), storer
-}
 
 func RedirectVisitor(w http.ResponseWriter, r *http.Request, url string) {
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)

@@ -9,10 +9,12 @@ import (
 	"github.com/EricFrancis12/evoclick/prisma/db"
 )
 
+var clickStorer = pkg.NewStorer()
+
 func Click(w http.ResponseWriter, r *http.Request) {
-	timestamp, ctx, storer := pkg.InitVisit()
-	defer storer.Client.Disconnect()
-	defer storer.Cache.Close()
+	timestamp, ctx := clickStorer.InitVisit(r)
+	defer clickStorer.Client.Disconnect()
+	defer clickStorer.Cache.Close()
 
 	clickPublicId := getCookieValue(r, pkg.CookieNameClickPublicID)
 	if clickPublicId == "" {
@@ -21,14 +23,14 @@ func Click(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	click, err := storer.GetClickByPublicId(ctx, clickPublicId)
+	click, err := clickStorer.GetClickByPublicId(ctx, clickPublicId)
 	if err != nil {
 		fmt.Println("error fetching click by Public ID: " + err.Error())
 		pkg.RedirectToCatchAllUrl(w, r)
 		return
 	}
 
-	campaign, err := storer.GetCampaignById(ctx, click.CampaignID)
+	campaign, err := clickStorer.GetCampaignById(ctx, click.CampaignID)
 	if err != nil {
 		fmt.Println("error fetching campaign by ID: " + err.Error())
 		pkg.RedirectToCatchAllUrl(w, r)
@@ -37,7 +39,7 @@ func Click(w http.ResponseWriter, r *http.Request) {
 
 	var route pkg.Route
 	if campaign.FlowType == db.FlowTypeSaved && campaign.SavedFlowID != nil && *campaign.SavedFlowID != 0 {
-		savedFlow, err := storer.GetSavedFlowById(ctx, *campaign.SavedFlowID)
+		savedFlow, err := clickStorer.GetSavedFlowById(ctx, *campaign.SavedFlowID)
 		if err != nil {
 			fmt.Println("error fetching flow by ID: " + err.Error())
 			pkg.RedirectToCatchAllUrl(w, r)
@@ -66,7 +68,7 @@ func Click(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	offer, err := storer.GetOfferById(ctx, oID)
+	offer, err := clickStorer.GetOfferById(ctx, oID)
 	if err != nil {
 		fmt.Println("error fetching offer by ID: " + err.Error())
 		pkg.RedirectToCatchAllUrl(w, r)
@@ -79,7 +81,7 @@ func Click(w http.ResponseWriter, r *http.Request) {
 	updatedClick := updateClick(click, timestamp, offer.URL)
 
 	// Save updated click to db
-	if _, err := storer.UpsertClickById(ctx, click.ID, updatedClick); err != nil {
+	if _, err := clickStorer.UpsertClickById(ctx, click.ID, updatedClick); err != nil {
 		fmt.Println("error updating click in db: " + err.Error())
 	}
 }
