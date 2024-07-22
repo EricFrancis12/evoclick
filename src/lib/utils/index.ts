@@ -101,3 +101,7 @@ export function makeCampaignUrl(protocol: string, hostname: string, port: string
 export function makeClickUrl(protocol: string, hostname: string, port: string) {
     return `${protocol}//${hostname}${port ? ":" + port : ""}/click`;
 }
+
+export function iPInfoEndpoint(ipAddr: string, ipInfoToken: string): string {
+    return "https://ipinfo.io/" + ipAddr + "?token=" + ipInfoToken;
+}

@@ -97,7 +97,7 @@ export type TPath = {
 
 export type IPInfoData = {
     ip: string;
-    hostname: string;
+    hostname?: string;
     city: string;
     region: string;
     country: string;
@@ -190,4 +190,5 @@ export enum Env {
     NEXT_PHASE = "NEXT_PHASE",
     JWT_SECRET = "JWT_SECRET",
     JWT_EXPIRY = "JWT_EXPIRY",
+    IP_INFO_TOKEN = "IP_INFO_TOKEN",
 };

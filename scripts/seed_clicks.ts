@@ -1,8 +1,13 @@
+import dotenv from "dotenv";
 import { argv } from "process";
 import crypto from "crypto";
+import path from "path";
 import { Prisma } from "@prisma/client";
 import db from "../src/lib/db";
 import { randomItemFromArray, randomIntInRange } from "../src/lib/utils";
+
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
 (async function () {
     if (!argv?.[2]) {

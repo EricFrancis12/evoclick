@@ -1,10 +1,15 @@
+import dotenv from "dotenv";
 import { argv } from "process";
 import http from "http";
+import path from "path";
 import { campaignSeedData } from "../prisma/seedData";
 import { makeCampaignUrl } from "../src/lib/utils";
 import { Env } from "../src/lib/types";
 
-if (!process.env[Env.API_PORT]) throw new Error("Environment varaible API_PORT not set.");
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
+
+if (!process.env[Env.API_PORT]) throw new Error(`Environment varaible ${Env.API_PORT} not set.`);
 
 const URL = makeCampaignUrl("http:", "localhost", process.env[Env.API_PORT], campaignSeedData.publicId);
 const DURATION = 30_000; // ms
@@ -32,7 +37,7 @@ const DURATION = 30_000; // ms
 
     while (running) {
         const req = http.request(URL);
-        req.on('error', err => console.error(`Problem with request: ${err.message}`));
+        req.on("error", err => console.error(`Problem with request: ${err.message}`));
         count++;
 
         await new Promise(resolve => setTimeout(resolve, 60_000 / numRequestsPerMinute));

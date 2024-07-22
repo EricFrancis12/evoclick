@@ -4,7 +4,7 @@ import { ECookieName, Env } from "../../src/lib/types";
 
 dotenv.config();
 
-if (!process.env[Env.API_PORT]) throw new Error("Environment varaible API_PORT not set.");
+if (!process.env[Env.API_PORT]) throw new Error(`Environment varaible ${Env.API_PORT} not set.`);
 
 describe("Testing campaign redirects", () => {
     it("redirects to the correct URLs", () => {
