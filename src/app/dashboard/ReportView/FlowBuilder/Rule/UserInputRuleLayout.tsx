@@ -29,7 +29,7 @@ export default function UserInputRuleLayout({ rule, onChange }: {
     return (
         <RuleLayoutWrapper title={rule.ruleName}>
             <BooleanCheckboxesToggle
-                values={includeExclude}
+                textValues={includeExclude}
                 value={rule.includes}
                 onChange={includes => onChange({ ...rule, includes })}
             />
