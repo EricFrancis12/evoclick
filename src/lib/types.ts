@@ -1,5 +1,17 @@
 import { AffiliateNetwork, Campaign, Click, SavedFlow, LandingPage, Offer, TrafficSource, User } from "@prisma/client";
 
+export enum Env {
+    API_PORT = "API_PORT",
+    ROOT_USERNAME = "ROOT_USERNAME",
+    ROOT_PASSWORD = "ROOT_PASSWORD",
+    REDIS_URL = "REDIS_URL",
+    NODE_ENV = "NODE_ENV",
+    NEXT_PHASE = "NEXT_PHASE",
+    JWT_SECRET = "JWT_SECRET",
+    JWT_EXPIRY = "JWT_EXPIRY",
+    IP_INFO_TOKEN = "IP_INFO_TOKEN",
+};
+
 type omissions = "id" | "createdAt" | "updatedAt";
 type primaryItemName = "primaryItemName";
 
@@ -181,15 +193,3 @@ export enum ECookieName {
     CAMPAIGN_PUBLIC_ID = "campaignPublicID",
     CLICK_PUBLIC_ID = "clickPublicID",
 }
-
-export enum Env {
-    API_PORT = "API_PORT",
-    ROOT_USERNAME = "ROOT_USERNAME",
-    ROOT_PASSWORD = "ROOT_PASSWORD",
-    REDIS_URL = "REDIS_URL",
-    NODE_ENV = "NODE_ENV",
-    NEXT_PHASE = "NEXT_PHASE",
-    JWT_SECRET = "JWT_SECRET",
-    JWT_EXPIRY = "JWT_EXPIRY",
-    IP_INFO_TOKEN = "IP_INFO_TOKEN",
-};

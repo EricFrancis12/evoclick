@@ -139,6 +139,28 @@ type IPInfoData struct {
 	Timezone string `json:"-"`        // example: "Europe/Copenhagen"
 }
 
+type QueryParam string
+
+const (
+	QueryParamG QueryParam = "g"
+)
+
+type CookieName string
+
+const (
+	CookieNameCampaignPublicID CookieName = "campaignPublicID"
+	CookieNameClickPublicID    CookieName = "clickPublicID"
+)
+
+type DeviceType string
+
+const (
+	DeviceTypeDesktop DeviceType = "desktop"
+	DeviceTypeTablet  DeviceType = "tablet"
+	DeviceTypeMobile  DeviceType = "mobile"
+	DeviceTypeUnknown DeviceType = "unknown"
+)
+
 type LogicalRelation string
 
 const (
@@ -165,22 +187,6 @@ const (
 	RuleNameBrowserVersion   RuleName = "Browser Version"
 )
 
-type DeviceType string
-
-const (
-	DeviceTypeDesktop DeviceType = "desktop"
-	DeviceTypeTablet  DeviceType = "tablet"
-	DeviceTypeMobile  DeviceType = "mobile"
-	DeviceTypeUnknown DeviceType = "unknown"
-)
-
-type CookieName string
-
-const (
-	CookieNameCampaignPublicID CookieName = "campaignPublicID"
-	CookieNameClickPublicID    CookieName = "clickPublicID"
-)
-
 type Destination struct {
 	Type DestType
 	URL  string
@@ -196,8 +202,39 @@ const (
 	DestTypeCatchAll    DestType = "catchAll"
 )
 
-type QueryParam string
+type PostbackURLMatcher = string
 
 const (
-	QueryParamG QueryParam = "g"
+	PostbackURLMatcherID                 PostbackURLMatcher = "{ID}"
+	PostbackURLMatcherPublicID           PostbackURLMatcher = "{publicID}"
+	PostbackURLMatcherExternalID         PostbackURLMatcher = "{externalID}"
+	PostbackURLMatcherCost               PostbackURLMatcher = "{cost}"
+	PostbackURLMatcherRevenue            PostbackURLMatcher = "{revenue}"
+	PostbackURLMatcherViewTime           PostbackURLMatcher = "{viewTime}"
+	PostbackURLMatcherClickTime          PostbackURLMatcher = "{clickTime}"
+	PostbackURLMatcherConvTime           PostbackURLMatcher = "{convTime}"
+	PostbackURLMatcherViewOutputUrl      PostbackURLMatcher = "{viewOutputUrl}"
+	PostbackURLMatcherClickOutputUrl     PostbackURLMatcher = "{clickOutputUrl}"
+	PostbackURLMatcherIP                 PostbackURLMatcher = "{ip}"
+	PostbackURLMatcherIsp                PostbackURLMatcher = "{isp}"
+	PostbackURLMatcherUserAgent          PostbackURLMatcher = "{userAgent}"
+	PostbackURLMatcherLanguage           PostbackURLMatcher = "{language}"
+	PostbackURLMatcherCountry            PostbackURLMatcher = "{country}"
+	PostbackURLMatcherRegion             PostbackURLMatcher = "{region}"
+	PostbackURLMatcherCity               PostbackURLMatcher = "{city}"
+	PostbackURLMatcherDeviceType         PostbackURLMatcher = "{deviceType}"
+	PostbackURLMatcherDevice             PostbackURLMatcher = "{device}"
+	PostbackURLMatcherScreenResolution   PostbackURLMatcher = "{screenResolution}"
+	PostbackURLMatcherOs                 PostbackURLMatcher = "{os}"
+	PostbackURLMatcherOsVersion          PostbackURLMatcher = "{osVersion}"
+	PostbackURLMatcherBrowserName        PostbackURLMatcher = "{browserName}"
+	PostbackURLMatcherBrowserVersion     PostbackURLMatcher = "{browserVersion}"
+	PostbackURLMatcherCreatedAt          PostbackURLMatcher = "{createdAt}"
+	PostbackURLMatcherUpdatedAt          PostbackURLMatcher = "{updatedAt}"
+	PostbackURLMatcherAffiliateNetworkID PostbackURLMatcher = "{affiliateNetworkId}"
+	PostbackURLMatcherCampaignID         PostbackURLMatcher = "{campaignId}"
+	PostbackURLMatcherFlowID             PostbackURLMatcher = "{flowId}"
+	PostbackURLMatcherLandingPageID      PostbackURLMatcher = "{landingPageId}"
+	PostbackURLMatcherOfferID            PostbackURLMatcher = "{offerId}"
+	PostbackURLMatcherTrafficSourceID    PostbackURLMatcher = "{trafficSourceId}"
 )

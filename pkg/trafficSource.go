@@ -50,10 +50,10 @@ func (ts TrafficSource) FillPostbackURL(click Click) string {
 		return ""
 	}
 
-	clickPropsMap := newClickPropsMap(click)
+	postbackMatcherMap := newPostbackMatcherMap(click)
 
 	result := ts.PostbackURL
-	for matcher, clickProp := range clickPropsMap {
+	for matcher, clickProp := range postbackMatcherMap {
 		if strings.Contains(result, matcher) {
 			result = strings.ReplaceAll(result, matcher, clickProp)
 		}
