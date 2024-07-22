@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import useActiveView from "@/hooks/useActiveView";
 import useHover from "@/hooks/useHover";
+import { BASE_Z_INDEX } from "../DataTable";
 import { EItemName } from "@/lib/types";
 
 export type TUpperCPItemGroup = {
@@ -24,6 +25,8 @@ export default function UpperCPItemGroup({ itemGroup, onClick = () => { }, repor
 
     const activeView = useActiveView()
     const isActive = useGroupIsActive(itemGroup);
+
+    const zIndexAboveDataTable = BASE_Z_INDEX + 1; // Ensures dropdowns appear over top of the data table
 
     function handleClick(e: React.MouseEvent<HTMLDivElement>, itemName: EItemName) {
         e.stopPropagation();
@@ -46,7 +49,7 @@ export default function UpperCPItemGroup({ itemGroup, onClick = () => { }, repor
             {isHovered &&
                 <div
                     className="absolute top-[100%] bg-white text-black border border-black rounded-sm"
-                    style={{ zIndex: 20 }}
+                    style={{ zIndex: zIndexAboveDataTable }}
                 >
                     {itemGroup.children
                         .filter(itemName => itemName !== reportItemName)
