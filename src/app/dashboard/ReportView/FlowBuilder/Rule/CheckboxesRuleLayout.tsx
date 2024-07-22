@@ -17,13 +17,13 @@ export default function CheckboxesRuleLayout({ rule, onChange }: {
     return (
         <RuleLayoutWrapper title={rule.ruleName}>
             <BooleanCheckboxesToggle
-                items={["Include", "Exclude"]}
+                textValues={["Include", "Exclude"]}
                 value={rule.includes}
                 onChange={includes => onChange({ ...rule, includes })}
             />
             <CheckboxesInput
                 className="mx-4"
-                items={checkboxItems(rule.ruleName)}
+                options={checkboxItems(rule.ruleName)}
                 value={rule.data}
                 onChange={data => onChange({ ...rule, data })}
             />
