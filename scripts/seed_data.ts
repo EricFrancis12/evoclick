@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { main } from "../prisma/seedData";
+import main from "../prisma/main";
 import seedData from "../prisma/seedData";
 
 (async function () {
