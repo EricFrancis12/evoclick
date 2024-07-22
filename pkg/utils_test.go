@@ -33,65 +33,51 @@ func TestMatchValAgainstRegexSlice(t *testing.T) {
 	assert.Nil(t, _err)
 	assert.False(t, isMatch)
 }
-
 func TestParseJSON(t *testing.T) {
-	t.Run("Parse JSON into map", func(t *testing.T) {
-		jsonStr := `{"name": "John", "age": 30}`
-		expected := map[string]interface{}{"name": "John", "age": float64(30)}
+	type Person struct {
+		Name string `json:"name"`
+		Age  int    `json:"age"`
+	}
 
-		result, err := ParseJSON[map[string]interface{}](jsonStr)
-		assert.NoError(t, err)
-		assert.Equal(t, expected, result)
-	})
+	jsonStr := `{"name": "John", "age": 30}`
+	expectedMap := map[string]interface{}{"name": "John", "age": float64(30)}
 
-	t.Run("Parse JSON into struct", func(t *testing.T) {
-		type Person struct {
-			Name string `json:"name"`
-			Age  int    `json:"age"`
-		}
+	resultMap, err := ParseJSON[map[string]interface{}](jsonStr)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedMap, resultMap)
 
-		jsonStr := `{"name": "John", "age": 30}`
-		expected := Person{Name: "John", Age: 30}
+	expectedStruct := Person{Name: "John", Age: 30}
 
-		result, err := ParseJSON[Person](jsonStr)
-		assert.NoError(t, err)
-		assert.Equal(t, expected, result)
-	})
+	resultStruct, err := ParseJSON[Person](jsonStr)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedStruct, resultStruct)
 
-	t.Run("Parse invalid JSON", func(t *testing.T) {
-		jsonStr := `{"name": "John", "age": 30`
+	invalidJsonStr := `{"name": "John", "age": 30`
 
-		var expected map[string]interface{}
+	var expectedInvalidMap map[string]interface{}
 
-		result, err := ParseJSON[map[string]interface{}](jsonStr)
-		assert.Error(t, err)
-		assert.Equal(t, expected, result)
-	})
+	resultInvalidMap, err := ParseJSON[map[string]interface{}](invalidJsonStr)
+	assert.Error(t, err)
+	assert.Equal(t, expectedInvalidMap, resultInvalidMap)
 
-	t.Run("Parse JSON into slice", func(t *testing.T) {
-		jsonStr := `["apple", "banana", "cherry"]`
-		expected := []string{"apple", "banana", "cherry"}
+	jsonStrSlice := `["apple", "banana", "cherry"]`
+	expectedSlice := []string{"apple", "banana", "cherry"}
 
-		result, err := ParseJSON[[]string](jsonStr)
-		assert.NoError(t, err)
-		assert.Equal(t, expected, result)
-	})
+	resultSlice, err := ParseJSON[[]string](jsonStrSlice)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedSlice, resultSlice)
 
-	t.Run("Parse JSON into int", func(t *testing.T) {
-		jsonStr := `123`
-		expected := 123
+	jsonStrInt := `123`
+	expectedInt := 123
 
-		result, err := ParseJSON[int](jsonStr)
-		assert.NoError(t, err)
-		assert.Equal(t, expected, result)
-	})
+	resultInt, err := ParseJSON[int](jsonStrInt)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedInt, resultInt)
 
-	t.Run("Parse empty JSON string", func(t *testing.T) {
-		jsonStr := ``
-		var expected map[string]interface{}
+	emptyJsonStr := ``
+	var expectedEmptyMap map[string]interface{}
 
-		result, err := ParseJSON[map[string]interface{}](jsonStr)
-		assert.Error(t, err)
-		assert.Equal(t, expected, result)
-	})
+	resultEmptyMap, err := ParseJSON[map[string]interface{}](emptyJsonStr)
+	assert.Error(t, err)
+	assert.Equal(t, expectedEmptyMap, resultEmptyMap)
 }

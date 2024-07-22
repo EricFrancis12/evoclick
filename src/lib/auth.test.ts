@@ -6,15 +6,15 @@ describe("Testing auth", () => {
     const ADMIN = "ADMIN";
 
     beforeEach(() => {
-        jest.resetModules() // Most important - it clears the cache
-        process.env = { ...OLD_ENV }; // Make a copy
+        jest.resetModules(); // Most important - it clears the cache
+        process.env = { ...OLD_ENV };
     });
 
     afterAll(() => {
         process.env = OLD_ENV; // Restore old environment
     });
 
-    test("Testing Root User properties", () => {
+    test("generateRootUser() should create a valid Root User", () => {
         process.env[Env.ROOT_USERNAME] = undefined;
         expect(generateRootUser()).toEqual(null);
 
@@ -27,7 +27,7 @@ describe("Testing auth", () => {
         expect(generateRootUser()?.hashedPassword).toEqual("");
     });
 
-    test("Testing isRootUser()", () => {
+    test("isRootUser() should validate if a user is a Root User", () => {
         process.env[Env.ROOT_USERNAME] = ADMIN;
 
         const rootUser = generateRootUser();

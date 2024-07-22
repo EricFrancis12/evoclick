@@ -8,8 +8,8 @@ import {
     TPath, TRoute, TRule, ERuleName, ELogicalRelation, EItemName
 } from "./types";
 
-describe("Testing Schemas", () => {
-    test("Campaign Schema aligns with type", () => {
+describe("Testing schemas", () => {
+    test("Campaign Schema should align with type", () => {
         expect(campaignSchema.safeParse({}).success).toEqual(false);
 
         const boilerplateCampaign: TCampaign = {
@@ -75,19 +75,19 @@ describe("Testing Schemas", () => {
         rules: [boilerplateRule2],
     };
 
-    test("Route Schema aligns with type", () => {
+    test("Route Schema should align with type", () => {
         expect(routeSchema.safeParse({}).success).toEqual(false);
         expect(routeSchema.safeParse(boilerplateRoute1).success).toEqual(true);
         expect(routeSchema.safeParse(boilerplateRoute2).success).toEqual(true);
     });
 
-    test("Rule Schema aligns with type", () => {
+    test("Rule Schema should align with type", () => {
         expect(ruleSchema.safeParse({}).success).toEqual(false);
         expect(ruleSchema.safeParse(boilerplateRule1).success).toEqual(true);
         expect(ruleSchema.safeParse(boilerplateRule2).success).toEqual(true);
     });
 
-    test("Flow Schema aligns with type", () => {
+    test("Flow Schema should align with type", () => {
         expect(savedFlowSchema.safeParse({}).success).toEqual(false);
 
         const boilerplateSavedFlow: TSavedFlow = {
@@ -113,12 +113,12 @@ describe("Testing Schemas", () => {
         updatedAt: new Date(),
     };
 
-    test("Affiliate Network Schema aligns with type", () => {
+    test("Affiliate Network Schema should align with type", () => {
         expect(affiliateNetworkSchema.safeParse({}).success).toEqual(false);
         expect(affiliateNetworkSchema.safeParse(boilerplateAffiliateNetwork).success).toEqual(true);
     });
 
-    test("Landing Page Schema aligns with type", () => {
+    test("Landing Page Schema should align with type", () => {
         expect(landingPageSchema.safeParse({}).success).toEqual(false);
 
         const boilerplateLandingPage: TLandingPage = {
@@ -133,7 +133,7 @@ describe("Testing Schemas", () => {
         expect(landingPageSchema.safeParse(boilerplateLandingPage).success).toEqual(true);
     });
 
-    test("Offer Schema aligns with type", () => {
+    test("Offer Schema should align with type", () => {
         expect(offersSchema.safeParse({}).success).toEqual(false);
 
         const boilerplateOffer: TOffer = {

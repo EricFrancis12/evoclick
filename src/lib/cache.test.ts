@@ -1,7 +1,7 @@
 import { makeRedisKeyFunc } from "../lib/cache";
 
-describe("Testing Cache", () => {
-    test("Generating RedisKeyFuncs", () => {
+describe("Testing cache", () => {
+    test(`The functions created by makeRedisKeyFunc() should return -> [prefix] + ":" + [input]`, () => {
         const prefix = "prefix";
         const num = 1;
         const str = "str";
