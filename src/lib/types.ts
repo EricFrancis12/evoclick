@@ -1,6 +1,7 @@
 import { AffiliateNetwork, Campaign, Click, SavedFlow, LandingPage, Offer, TrafficSource, User } from "@prisma/client";
 
 type omissions = "id" | "createdAt" | "updatedAt";
+type primaryItemName = "primaryItemName";
 
 // Extending User model
 export type TUser = User;
@@ -11,8 +12,8 @@ export type TUser_updateRequest = Omit<Partial<TUser>, omissions>;
 export type TAffiliateNetwork = AffiliateNetwork & {
     primaryItemName: EItemName.AFFILIATE_NETWORK;
 };
-export type TAffiliateNetwork_createRequest = Omit<TAffiliateNetwork, omissions>;
-export type TAffiliateNetwork_updateRequest = Omit<Partial<TAffiliateNetwork>, omissions>;
+export type TAffiliateNetwork_createRequest = Omit<TAffiliateNetwork, omissions | primaryItemName>;
+export type TAffiliateNetwork_updateRequest = Omit<Partial<TAffiliateNetwork>, omissions | primaryItemName>;
 
 // Extending Campaign model
 export type TCampaign = Omit<Campaign, "flowMainRoute" | "flowRuleRoutes"> & {
@@ -20,8 +21,8 @@ export type TCampaign = Omit<Campaign, "flowMainRoute" | "flowRuleRoutes"> & {
     flowMainRoute: TRoute | null;
     flowRuleRoutes: TRoute[] | null;
 };
-export type TCampaign_createRequest = Omit<TCampaign, omissions | "publicId">;
-export type TCampaign_updateRequest = Omit<Partial<TCampaign>, omissions>;
+export type TCampaign_createRequest = Omit<TCampaign, omissions | primaryItemName | "publicId">;
+export type TCampaign_updateRequest = Omit<Partial<TCampaign>, omissions | primaryItemName>;
 
 // Extending Flow model
 export type TSavedFlow = Omit<SavedFlow, "mainRoute" | "ruleRoutes"> & {
@@ -29,22 +30,22 @@ export type TSavedFlow = Omit<SavedFlow, "mainRoute" | "ruleRoutes"> & {
     mainRoute: TRoute;
     ruleRoutes: TRoute[];
 };
-export type TSavedFlow_createRequest = Omit<TSavedFlow, omissions>;
-export type TSavedFlow_updateRequest = Omit<Partial<TSavedFlow>, omissions>;
+export type TSavedFlow_createRequest = Omit<TSavedFlow, omissions | primaryItemName>;
+export type TSavedFlow_updateRequest = Omit<Partial<TSavedFlow>, omissions | primaryItemName>;
 
 // Extending Landing Page model
 export type TLandingPage = LandingPage & {
     primaryItemName: EItemName.LANDING_PAGE;
 };
-export type TLandingPage_createRequest = Omit<TLandingPage, omissions>;
-export type TLandingPage_updateRequest = Omit<Partial<TLandingPage>, omissions>;
+export type TLandingPage_createRequest = Omit<TLandingPage, omissions | primaryItemName>;
+export type TLandingPage_updateRequest = Omit<Partial<TLandingPage>, omissions | primaryItemName>;
 
 // Extending Offer model
 export type TOffer = Offer & {
     primaryItemName: EItemName.OFFER;
 };
-export type TOffer_createRequest = Omit<TOffer, omissions>;
-export type TOffer_updateRequest = Omit<Partial<TOffer>, omissions>;
+export type TOffer_createRequest = Omit<TOffer, omissions | primaryItemName>;
+export type TOffer_updateRequest = Omit<Partial<TOffer>, omissions | primaryItemName>;
 
 // Extending Traffic Source model
 export type TTrafficSource = Omit<TrafficSource, "externalIdToken" | "costToken" | "customTokens"> & {
@@ -53,8 +54,8 @@ export type TTrafficSource = Omit<TrafficSource, "externalIdToken" | "costToken"
     costToken: TToken;
     customTokens: TNamedToken[];
 };
-export type TTrafficSource_createRequest = Omit<TTrafficSource, omissions>;
-export type TTrafficSource_updateRequest = Omit<Partial<TTrafficSource>, omissions>;
+export type TTrafficSource_createRequest = Omit<TTrafficSource, omissions | primaryItemName>;
+export type TTrafficSource_updateRequest = Omit<Partial<TTrafficSource>, omissions | primaryItemName>;
 
 export type TToken = {
     queryParam: string;

@@ -30,7 +30,6 @@ export default function OfferBody({ actionMenu, setActionMenu }: {
                 toast.success("Offer was updated successfully");
             } else if (affiliateNetworkId !== undefined) {
                 await createNewOfferAction({
-                    primaryItemName: EItemName.OFFER,
                     name: name ?? "",
                     url: url ?? "",
                     payout: payout ?? 0,

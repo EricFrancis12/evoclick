@@ -28,7 +28,6 @@ export default function SavedFlowBody({ actionMenu, setActionMenu }: {
                 toast.success("Saved Flow was updated successfully");
             } else {
                 await createNewFlowAction({
-                    primaryItemName: EItemName.FLOW,
                     name: name ?? "",
                     mainRoute: mainRoute ?? newRoute(),
                     ruleRoutes: ruleRoutes ?? [],

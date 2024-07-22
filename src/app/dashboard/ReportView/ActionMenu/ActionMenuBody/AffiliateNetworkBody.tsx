@@ -21,7 +21,6 @@ export default function AffiliateNetworkBody({ actionMenu, setActionMenu }: {
                 toast.success("Affiliate Network was updated successfully");
             } else {
                 await createNewAffiliateNetworkAction({
-                    primaryItemName: EItemName.AFFILIATE_NETWORK,
                     name: name ?? "",
                     defaultNewOfferString: defaultNewOfferString ?? "",
                     tags: tags ?? [],

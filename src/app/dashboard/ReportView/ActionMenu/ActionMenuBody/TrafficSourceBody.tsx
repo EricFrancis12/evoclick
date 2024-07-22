@@ -29,7 +29,6 @@ export default function TrafficSourceBody({ actionMenu, setActionMenu }: {
                 toast.success("Traffic Source was updated successfully");
             } else {
                 await createNewTrafficSourceAction({
-                    primaryItemName: EItemName.TRAFFIC_SOURCE,
                     name: name ?? "",
                     externalIdToken: externalIdToken ?? newToken(),
                     costToken: costToken ?? newToken(),

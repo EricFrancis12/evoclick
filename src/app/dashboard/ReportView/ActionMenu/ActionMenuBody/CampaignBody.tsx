@@ -66,7 +66,6 @@ export default function CampaignBody({ actionMenu, setActionMenu }: {
                 toast.success("Campaign was updated successfully");
             } else if (trafficSourceId !== undefined) {
                 await createNewCampaignAction({
-                    primaryItemName: EItemName.CAMPAIGN,
                     name: name ?? "",
                     landingPageRotationType: landingPageRotationType ?? $Enums.RotationType.RANDOM,
                     offerRotationType: offerRotationType ?? $Enums.RotationType.RANDOM,

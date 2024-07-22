@@ -21,7 +21,6 @@ export default function LandingPageBody({ actionMenu, setActionMenu }: {
                 toast.success("Landing Page was updated successfully");
             } else {
                 await createNewLandingPageAction({
-                    primaryItemName: EItemName.LANDING_PAGE,
                     name: name ?? "",
                     url: url ?? "",
                     tags: tags ?? [],
