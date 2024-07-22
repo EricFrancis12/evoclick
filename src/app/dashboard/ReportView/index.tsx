@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import logo from "@/assets/images/logo-black-bg.png";
+import logo from "@/assets/images/logo-no-bg.png";
 import { DialogueViewProvider } from "./contexts/DialogueMenuContext";
 import { ReportViewProvider, TPrimaryData } from "./ReportViewContext";
 import useActiveView from "@/hooks/useActiveView";
