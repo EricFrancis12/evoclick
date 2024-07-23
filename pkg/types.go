@@ -90,7 +90,6 @@ type Offer struct {
 
 type TrafficSource struct {
 	db.InnerTrafficSource
-	PostbackURL     string       `json:"postbackURL"`
 	ExternalIDToken Token        `json:"externalIDToken"`
 	CostToken       Token        `json:"costToken"`
 	CustomTokens    []NamedToken `json:"customTokens"`
@@ -142,7 +141,9 @@ type IPInfoData struct {
 type QueryParam string
 
 const (
-	QueryParamG QueryParam = "g"
+	QueryParamG      QueryParam = "g"
+	QueryParamPid    QueryParam = "pid"
+	QueryParamPayout QueryParam = "payout"
 )
 
 type CookieName string

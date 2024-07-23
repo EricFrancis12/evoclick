@@ -28,7 +28,7 @@ func main() {
 	if err := SafeLoadEnvs(".env.local", ".env"); err != nil {
 		log.Fatal("error loading .env files: " + err.Error())
 	}
-	if err := os.Setenv("NODE_ENV", "development"); err != nil {
+	if err := os.Setenv(pkg.EnvNodeEnv, "development"); err != nil {
 		log.Fatal("error setting ENV: " + err.Error())
 	}
 

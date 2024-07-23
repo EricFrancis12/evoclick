@@ -1,5 +1,5 @@
 import { TPrimaryData } from "@/app/dashboard/ReportView/ReportViewContext";
-import { EItemName, TPrimaryItemName, TToken } from "../types";
+import { EItemName, EQueryParam, TPrimaryItemName, TToken } from "../types";
 
 export * from "./maps"
 export * from "./new";
@@ -41,6 +41,12 @@ export function randomIntInRange(min: number, max: number): number {
 
 export function randomItemFromArray<T>(arr: T[]): T | null {
     return arr[randomIntInRange(0, arr.length - 1)] ?? null;
+}
+
+export function safeJoin(strings: string[], separator: string): string {
+    const nonEmptyStrings = strings.filter(str => str);
+    if (nonEmptyStrings.length === 0) return "";
+    return nonEmptyStrings.join(separator);
 }
 
 export function encodeTimeframe(timeframe: [Date, Date]): string {
@@ -101,18 +107,28 @@ export function makeCampaignUrl(
     campaignPublicId: string,
     tokens: TToken[]
 ): string {
-    const queryStr = `g=${campaignPublicId}${tokens.length > 0 ? "&" + flattenTokens(tokens) : ""}`;
-    return `${protocol}//${hostname}${port ? ":" + port : ""}/t?${queryStr}`;
+    const pidStr = campaignPublicId ? `${EQueryParam.G}=${campaignPublicId}` : "";
+    const tokensStr = tokens.length > 0 ? flattenTokens(tokens) : "";
+    const queryStr = safeJoin([pidStr, tokensStr], "&");
+    return `${origin(protocol, hostname, port)}/t${queryStr ? "?" + queryStr : ""}`;
 }
 
 export function makeClickUrl(protocol: string, hostname: string, port: string) {
-    return `${protocol}//${hostname}${port ? ":" + port : ""}/click`;
+    return `${origin(protocol, hostname, port)}/click`;
+}
+
+export function makePostbackUrl(protocol: string, hostname: string, port: string, clickPublicId: string): string {
+    return `${origin(protocol, hostname, port)}/postback?${EQueryParam.PID}=${clickPublicId}`;
 }
 
 export function iPInfoEndpoint(ipAddr: string, ipInfoToken: string): string {
     return "https://ipinfo.io/" + ipAddr + "?token=" + ipInfoToken;
 }
 
-function flattenTokens(tokens: TToken[]): string {
+export function flattenTokens(tokens: TToken[]): string {
     return tokens.map(({ queryParam, value }) => `${queryParam}=${value}`).join("&");
+}
+
+export function origin(protocol: string, hostname: string, port: string): string {
+    return `${protocol}//${hostname}${port ? ":" + port : ""}`;
 }

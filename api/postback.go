@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"time"
 
@@ -17,8 +18,9 @@ type PostbackResp struct{}
 
 func Postback(w http.ResponseWriter, r *http.Request) {
 	timestamp, ctx := postbackStorer.InitVisit(r)
+	pbrch := make(chan pkg.PostbackResult)
 
-	if clickPublicId := r.URL.Query().Get("pid"); clickPublicId != "" {
+	if clickPublicId := getPid(*r.URL); clickPublicId != "" {
 		// Get click from db
 		click, err := postbackStorer.GetClickByPublicId(ctx, clickPublicId)
 		if err != nil {
@@ -35,14 +37,22 @@ func Postback(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				fmt.Println("error fetching traffic source: " + err.Error())
 			}
-			if trafficSource.PostbackURL != "" {
-				go http.Get(trafficSource.FillPostbackURL(click))
-			}
+
+			go trafficSource.SendPostback(click, pbrch)
 		}
 	}
 
-	jsonEncoder := json.NewEncoder(w)
-	err := jsonEncoder.Encode(PostbackResp{})
+	if os.Getenv(pkg.EnvNodeEnv) == "development" {
+		postbackResult := <-pbrch
+		if postbackResult.Err != nil {
+			fmt.Println(postbackResult.Err.Error())
+			w.Header().Set("cypress-redirect-test-result", "fail")
+		} else {
+			w.Header().Set("cypress-redirect-test-result", "pass")
+		}
+	}
+
+	err := json.NewEncoder(w).Encode(PostbackResp{})
 	if err != nil {
 		fmt.Println("error encoding JSON: " + err.Error())
 	}
@@ -54,8 +64,12 @@ func convertClick(click pkg.Click, convTime time.Time, revenue int) pkg.Click {
 	return click
 }
 
+func getPid(url url.URL) string {
+	return url.Query().Get(string(pkg.QueryParamPid))
+}
+
 func getRevenue(url url.URL) int {
-	payoutStr := url.Query().Get("payout")
+	payoutStr := url.Query().Get(string(pkg.QueryParamPayout))
 	revenue, err := strconv.Atoi(payoutStr)
 	if err != nil || revenue < 0 {
 		return 0

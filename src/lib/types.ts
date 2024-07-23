@@ -10,6 +10,7 @@ export enum Env {
     JWT_SECRET = "JWT_SECRET",
     JWT_EXPIRY = "JWT_EXPIRY",
     IP_INFO_TOKEN = "IP_INFO_TOKEN",
+    CATCH_ALL_REDIRECT_URL = "CATCH_ALL_REDIRECT_URL",
 };
 
 type omissions = "id" | "createdAt" | "updatedAt";
@@ -192,4 +193,10 @@ export enum ECookieName {
     JWT = "jwt",
     CAMPAIGN_PUBLIC_ID = "campaignPublicID",
     CLICK_PUBLIC_ID = "clickPublicID",
+}
+
+export enum EQueryParam {
+    G = "g",
+    PID = "pid",
+    PAYOUT = "payout",
 }

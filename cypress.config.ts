@@ -1,6 +1,6 @@
-import { defineConfig } from "cypress";
-import path from "path";
 import dotenv from "dotenv";
+import path from "path";
+import { defineConfig } from "cypress";
 
 const env = dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 const envLocal = dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });

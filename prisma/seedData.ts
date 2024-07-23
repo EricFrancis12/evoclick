@@ -60,7 +60,7 @@ export const trafficSourceSeedData = {
         },
     ],
     name: "My First Traffic Source",
-    postbackUrl: "http://localhost:3001/postback/test",
+    postbackUrl: "http://localhost:3001/public/sample-postback-url.html",
     tags,
 };
 export type TTrafficSourceSeedData = typeof trafficSourceSeedData;
