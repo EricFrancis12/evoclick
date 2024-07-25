@@ -7,6 +7,8 @@ import { TRow } from "@/app/dashboard/ReportView/DataTable";
 import { EItemName, TClick, TPrimaryItemName } from "@/lib/types";
 import { getPrimaryItemById, isPrimary } from "@/lib/utils";
 
+const INCLUDE_UNKNOWN_ROWS = false;
+
 export function useRows(
     clicks: TClick[],
     itemName: EItemName
@@ -43,9 +45,12 @@ function makeRows(
 
         if (typeof value === "number" || typeof value === "string") {
             if (!rows.has(value)) {
+                const rowName = newRowName(primaryData, primaryItemName, value);
+                if (!rowName && !INCLUDE_UNKNOWN_ROWS) continue;
+
                 rows.set(value, {
                     id: value,
-                    name: newRowName(primaryData, primaryItemName, value),
+                    name: rowName,
                     clicks: [],
                     selected: false,
                 });
@@ -78,7 +83,7 @@ function newRowName(primaryData: TPrimaryData, primaryItemName: TPrimaryItemName
 
     if (value && typeof value === "string") return value;
 
-    return "unknown";
+    return "";
 }
 
 

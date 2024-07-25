@@ -53,8 +53,8 @@ func (s *Storer) CreateNewClick(ctx context.Context, creationReq ClickCreationRe
 		db.Click.OsVersion.Set(creationReq.OsVersion),
 		db.Click.BrowserName.Set(creationReq.BrowserName),
 		db.Click.BrowserVersion.Set(creationReq.BrowserVersion),
-		db.Click.Campaign.Link(db.Campaign.ID.Equals(creationReq.CampaignID)),
-		db.Click.TrafficSource.Link(db.TrafficSource.ID.Equals(creationReq.TrafficSourceID)),
+		db.Click.CampaignID.Set(creationReq.CampaignID),
+		db.Click.TrafficSourceID.Set(creationReq.TrafficSourceID),
 		// Optional parameters:
 		optParams...,
 	).Exec(ctx)
@@ -90,8 +90,8 @@ func (s *Storer) UpsertClickById(ctx context.Context, id int, click Click) (Clic
 		db.Click.OsVersion.Set(click.OsVersion),
 		db.Click.BrowserName.Set(click.BrowserName),
 		db.Click.BrowserVersion.Set(click.BrowserVersion),
-		db.Click.Campaign.Link(db.Campaign.ID.Equals(click.CampaignID)),
-		db.Click.TrafficSource.Link(db.TrafficSource.ID.Equals(click.TrafficSourceID)),
+		db.Click.CampaignID.Set(click.CampaignID),
+		db.Click.TrafficSourceID.Set(click.TrafficSourceID),
 	).Update(
 		upsertParams...,
 	).Exec(ctx)
@@ -119,10 +119,10 @@ func makeOptParams(cp ClickCreationReq) []db.ClickSetParam {
 	optParams = appendIfTrue(optParams, db.Click.Country.Set(cp.Country), cp.Country != "")
 	optParams = appendIfTrue(optParams, db.Click.Region.Set(cp.Region), cp.Region != "")
 	optParams = appendIfTrue(optParams, db.Click.City.Set(cp.City), cp.City != "")
-	optParams = appendIfTrue(optParams, db.Click.AffiliateNetwork.Link(db.AffiliateNetwork.ID.Equals(cp.AffiliateNetworkID)), cp.AffiliateNetworkID != 0)
-	optParams = appendIfTrue(optParams, db.Click.LandingPage.Link(db.LandingPage.ID.Equals(cp.LandingPageID)), cp.LandingPageID != 0)
-	optParams = appendIfTrue(optParams, db.Click.Offer.Link(db.Offer.ID.Equals(cp.OfferID)), cp.OfferID != 0)
-	optParams = appendIfTrue(optParams, db.Click.SavedFlow.Link(db.SavedFlow.ID.Equals(cp.SavedFlowID)), cp.SavedFlowID != 0)
+	optParams = appendIfTrue(optParams, db.Click.AffiliateNetworkID.Set(cp.AffiliateNetworkID), cp.AffiliateNetworkID != 0)
+	optParams = appendIfTrue(optParams, db.Click.LandingPageID.Set(cp.LandingPageID), cp.LandingPageID != 0)
+	optParams = appendIfTrue(optParams, db.Click.OfferID.Set(cp.OfferID), cp.OfferID != 0)
+	optParams = appendIfTrue(optParams, db.Click.SavedFlowID.Set(cp.SavedFlowID), cp.SavedFlowID != 0)
 	return optParams
 }
 
@@ -154,8 +154,8 @@ func makeUpsertParams(click Click) []db.ClickSetParam {
 		db.Click.OsVersion.Set(click.OsVersion),
 		db.Click.BrowserName.Set(click.BrowserName),
 		db.Click.BrowserVersion.Set(click.BrowserVersion),
-		db.Click.Campaign.Link(db.Campaign.ID.Equals(click.CampaignID)),
-		db.Click.TrafficSource.Link(db.TrafficSource.ID.Equals(click.TrafficSourceID)),
+		db.Click.CampaignID.Set(click.CampaignID),
+		db.Click.TrafficSourceID.Set(click.TrafficSourceID),
 	}
 
 	// Optional parameters:

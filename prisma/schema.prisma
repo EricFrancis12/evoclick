@@ -26,8 +26,8 @@ model User {
 }
 
 model Click {
-  id                 Int               @id @default(autoincrement())
-  publicId           String            @unique
+  id                 Int       @id @default(autoincrement())
+  publicId           String    @unique
   externalId         String
   cost               Int
   revenue            Int
@@ -51,19 +51,13 @@ model Click {
   osVersion          String
   browserName        String
   browserVersion     String
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @updatedAt
-  affiliateNetwork   AffiliateNetwork? @relation(fields: [affiliateNetworkId], references: [id])
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
   affiliateNetworkId Int?
-  campaign           Campaign          @relation(fields: [campaignId], references: [id])
   campaignId         Int
-  savedFlow          SavedFlow?        @relation(fields: [savedFlowId], references: [id])
   savedFlowId        Int?
-  landingPage        LandingPage?      @relation(fields: [landingPageId], references: [id])
   landingPageId      Int?
-  offer              Offer?            @relation(fields: [offerId], references: [id])
   offerId            Int?
-  trafficSource      TrafficSource     @relation(fields: [trafficSourceId], references: [id])
   trafficSourceId    Int
 }
 
@@ -75,7 +69,6 @@ model AffiliateNetwork {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
   Offer                 Offer[]
-  Click                 Click[]
 }
 
 model Campaign {
@@ -90,7 +83,6 @@ model Campaign {
   updatedAt               DateTime      @updatedAt
   trafficSource           TrafficSource @relation(fields: [trafficSourceId], references: [id])
   trafficSourceId         Int
-  Click                   Click[]
 
   // flowType determines what flow properties the campaign uses
   flowType FlowType
@@ -122,7 +114,6 @@ model SavedFlow {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   Campaign   Campaign[]
-  Click      Click[]
 }
 
 model LandingPage {
@@ -132,7 +123,6 @@ model LandingPage {
   tags      String[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Click     Click[]
 }
 
 enum RotationType {
@@ -150,7 +140,6 @@ model Offer {
   updatedAt          DateTime         @updatedAt
   affiliateNetwork   AffiliateNetwork @relation(fields: [affiliateNetworkId], references: [id])
   affiliateNetworkId Int
-  Click              Click[]
 }
 
 model TrafficSource {
@@ -164,7 +153,6 @@ model TrafficSource {
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
   Campaign        Campaign[]
-  Click           Click[]
 }
 
 enum GeoName {
