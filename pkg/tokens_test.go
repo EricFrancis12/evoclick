@@ -40,7 +40,7 @@ func TestReplaceTokensInURL(t *testing.T) {
 		assert.Equal(t, ReplaceTokensInURL(initialURL, destOpts.TokenMatcherMap()), finalURL)
 	})
 
-	t.Run("Test with empty string query params", func(t *testing.T) {
+	t.Run("Test with empty query params", func(t *testing.T) {
 		var (
 			initialURL = initialURL + "&empty=&novalue="
 			finalURL   = finalURL + "&empty=&novalue="

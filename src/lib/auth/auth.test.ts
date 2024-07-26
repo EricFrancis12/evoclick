@@ -1,5 +1,5 @@
-import { generateRootUser, isRootUser } from "./auth";
-import { Env } from "./types";
+import generateRootUser, { isRootUser } from "./generateRootUser";
+import { Env } from "../types";
 
 describe("Testing auth", () => {
     const OLD_ENV = process.env;
@@ -16,6 +16,7 @@ describe("Testing auth", () => {
 
     test("generateRootUser() should create a valid Root User", () => {
         process.env[Env.ROOT_USERNAME] = undefined;
+
         expect(generateRootUser()).toEqual(null);
 
         process.env[Env.ROOT_USERNAME] = "";

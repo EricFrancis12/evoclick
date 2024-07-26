@@ -3,7 +3,8 @@ import { redirect } from "next/navigation"
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@/lib/constants";
 import { getUserById } from "@/data";
-import { TUser, ECookieName, Env } from "@/lib/types";
+import generateRootUser, { isRootUser } from "./generateRootUser";
+import { TUser, ECookieName } from "@/lib/types";
 
 export async function useProtectedRoute(redirectUrl = "/login"): Promise<TUser> {
     const user = await getUserFromJWT();
@@ -39,30 +40,10 @@ export async function getUserFromJWT(): Promise<TUser | null> {
     return null;
 }
 
-export function generateRootUser(): TUser | null {
-    if (!process.env[Env.ROOT_USERNAME]) {
-        console.log("Unable to genreate Root User because ROOT_USERNAME is not set");
-        return null;
-    }
-
-    const date = new Date();
-    return {
-        id: -1,
-        name: process.env[Env.ROOT_USERNAME],
-        hashedPassword: "",
-        createdAt: date,
-        updatedAt: date,
-    };
-}
-
 export async function useRootUserRoute(redirectUrl = "/login"): Promise<TUser> {
     const user = await getUserFromJWT();
     if (!user || !isRootUser(user)) {
         redirect(redirectUrl);
     }
     return user;
-}
-
-export function isRootUser(user: TUser): boolean {
-    return user.name === process.env[Env.ROOT_USERNAME] && user.id === -1;
 }
