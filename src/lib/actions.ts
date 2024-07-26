@@ -79,7 +79,7 @@ type CRUDOperations<CreationRequest, UpdateRequest, Result> = {
     delete: (id: number) => Promise<Result>;
 };
 
-function createCUDActions<CreationRequest, UpdateRequest, Result>(
+function createCRUDActions<CreationRequest, UpdateRequest, Result>(
     operations: CRUDOperations<CreationRequest, UpdateRequest, Result>
 ) {
     return {
@@ -119,7 +119,7 @@ const affiliateNetworkOperations: CRUDOperations<TAffiliateNetwork_createRequest
     delete: data.deleteAffiliateNetworkById,
 };
 
-const affiliateNetworkActions = createCUDActions(affiliateNetworkOperations);
+const affiliateNetworkActions = createCRUDActions(affiliateNetworkOperations);
 export const getAllAffiliateNetworksAction = affiliateNetworkActions.readAllAction;
 export const getOneAffiliateNetworkAction = affiliateNetworkActions.readOneAction;
 export const createNewAffiliateNetworkAction = affiliateNetworkActions.createAction;
@@ -134,7 +134,7 @@ const campaignOperations: CRUDOperations<TCampaign_createRequest, TCampaign_upda
     delete: data.deleteCampaignById,
 };
 
-const campaignActions = createCUDActions(campaignOperations);
+const campaignActions = createCRUDActions(campaignOperations);
 export const getAllCampaignsAction = campaignActions.readAllAction;
 export const getOneCampaignAction = campaignActions.readOneAction;
 export const createNewCampaignAction = campaignActions.createAction;
@@ -149,7 +149,7 @@ const flowOperations: CRUDOperations<TSavedFlow_createRequest, TSavedFlow_update
     delete: data.deleteFlowById,
 };
 
-const flowActions = createCUDActions(flowOperations);
+const flowActions = createCRUDActions(flowOperations);
 export const getAllFlowsAction = flowActions.readAllAction;
 export const getOneFlowAction = flowActions.readOneAction;
 export const createNewFlowAction = flowActions.createAction;
@@ -164,7 +164,7 @@ const landingPageOperations: CRUDOperations<TLandingPage_createRequest, TLanding
     delete: data.deleteLandingPageById,
 };
 
-const landingPageActions = createCUDActions(landingPageOperations);
+const landingPageActions = createCRUDActions(landingPageOperations);
 export const getAllLandingPagesAction = landingPageActions.readAllAction;
 export const getOneLandingPageAction = landingPageActions.readOneAction;
 export const createNewLandingPageAction = landingPageActions.createAction;
@@ -179,7 +179,7 @@ const offerOperations: CRUDOperations<TOffer_createRequest, TOffer_updateRequest
     delete: data.deleteOfferById,
 };
 
-const offerActions = createCUDActions(offerOperations);
+const offerActions = createCRUDActions(offerOperations);
 export const getAllOffersAction = offerActions.readAllAction;
 export const getOneOfferAction = offerActions.readOneAction;
 export const createNewOfferAction = offerActions.createAction;
@@ -188,13 +188,13 @@ export const deleteOfferAction = offerActions.deleteAction;
 
 const trafficSourceOperations: CRUDOperations<TTrafficSource_createRequest, TTrafficSource_updateRequest, TTrafficSource> = {
     readAll: data.getAllTrafficSources,
-    readOne: data.geTTrafficSourceById,
+    readOne: data.getTrafficSourceById,
     create: data.createNewTrafficSource,
     update: data.updateTrafficSourceById,
     delete: data.deleteTrafficSourceById,
 };
 
-const trafficSourceActions = createCUDActions(trafficSourceOperations);
+const trafficSourceActions = createCRUDActions(trafficSourceOperations);
 export const getAllTrafficSourcesAction = trafficSourceActions.readAllAction;
 export const getOneTrafficSourceAction = trafficSourceActions.readOneAction;
 export const createNewTrafficSourceAction = trafficSourceActions.createAction;

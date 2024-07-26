@@ -7,7 +7,6 @@ import { Input } from "@/components/base";
 import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import ActionMenuFooter from "../ActionMenuFooter";
 import { TActionMenu, TAffiliateNetworkActionMenu } from "../types";
-import { EItemName } from "@/lib/types";
 
 export default function AffiliateNetworkBody({ actionMenu, setActionMenu }: {
     actionMenu: TAffiliateNetworkActionMenu;

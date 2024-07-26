@@ -28,9 +28,9 @@ export default function ActionMenuBody({ actionMenu, setActionMenu }: {
             return <OfferBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
         case EItemName.TRAFFIC_SOURCE:
             return <TrafficSourceBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
-        case "campaign links":
+        case "Campaign Links":
             return <CampaignLinksBody actionMenu={actionMenu} setActionMenu={setActionMenu} />
-        case "delete item":
+        case "Delete Items":
             return <DeleteItemBody actionMenu={actionMenu} setActionMenu={setActionMenu} />
         default:
             return "";

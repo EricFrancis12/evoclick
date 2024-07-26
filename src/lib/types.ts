@@ -15,6 +15,7 @@ export enum Env {
 
 type omissions = "id" | "createdAt" | "updatedAt";
 type primaryItemName = "primaryItemName";
+type publicId = "publicId";
 
 // Extending User model
 export type TUser = User;
@@ -34,7 +35,7 @@ export type TCampaign = Omit<Campaign, "flowMainRoute" | "flowRuleRoutes"> & {
     flowMainRoute: TRoute | null;
     flowRuleRoutes: TRoute[] | null;
 };
-export type TCampaign_createRequest = Omit<TCampaign, omissions | primaryItemName | "publicId">;
+export type TCampaign_createRequest = Omit<TCampaign, omissions | primaryItemName | publicId>;
 export type TCampaign_updateRequest = Omit<Partial<TCampaign>, omissions | primaryItemName>;
 
 // Extending Flow model
@@ -70,17 +71,39 @@ export type TTrafficSource = Omit<TrafficSource, "externalIdToken" | "costToken"
 export type TTrafficSource_createRequest = Omit<TTrafficSource, omissions | primaryItemName>;
 export type TTrafficSource_updateRequest = Omit<Partial<TTrafficSource>, omissions | primaryItemName>;
 
+// Extending Click model
+export type TClick = Omit<Click, "tokens"> & {
+    tokens: TToken[];
+};
+export type TClick_createRequest = Omit<TClick, omissions | primaryItemName | publicId>;
+export type TClick_updateRequest = Omit<Partial<TClick>, omissions | primaryItemName>;
+
+export type TPrimaryItem = TAffiliateNetwork | TCampaign | TSavedFlow | TLandingPage | TOffer | TTrafficSource;
+
+export type CreationRequest =
+    TAffiliateNetwork_createRequest
+    | TCampaign_createRequest
+    | TSavedFlow_createRequest
+    | TLandingPage_createRequest
+    | TOffer_createRequest
+    | TTrafficSource_createRequest
+    | TClick_createRequest;
+
+export type UpdateRequest =
+    TTrafficSource_updateRequest
+    | TCampaign_updateRequest
+    | TSavedFlow_createRequest
+    | TLandingPage_createRequest
+    | TOffer_createRequest
+    | TTrafficSource_createRequest
+    | TClick_updateRequest;
+
 export type TToken = {
     queryParam: string;
     value: string;
 };
 export type TNamedToken = TToken & {
     name: string;
-};
-
-// Extending Click model
-export type TClick = Omit<Click, "tokens"> & {
-    tokens: TToken[];
 };
 
 export type TRoute = {

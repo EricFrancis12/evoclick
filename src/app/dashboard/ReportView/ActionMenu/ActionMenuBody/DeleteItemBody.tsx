@@ -17,15 +17,12 @@ import {
 } from "@/lib/actions";
 import { getPrimaryItemById } from "@/lib/utils";
 import { TActionMenu, TDeleteItemsActionMenu } from "../types";
-import {
-    EItemName, TAffiliateNetwork, TCampaign, TLandingPage,
-    TOffer, TPrimaryItemName, TSavedFlow, TTrafficSource
-} from "@/lib/types";
+import { EItemName, TPrimaryItemName, TPrimaryItem } from "@/lib/types";
 
 type TDeletionStatus = "idle" | "pending" | "success" | "failed";
 
 type TDeletionItem = {
-    data: TAffiliateNetwork | TCampaign | TSavedFlow | TLandingPage | TOffer | TTrafficSource;
+    data: TPrimaryItem;
     status: TDeletionStatus;
 };
 

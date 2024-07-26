@@ -63,7 +63,7 @@ export default function Row({ row, columns, onSelected, view, depth }: {
             icon: faTrash,
             onClick: () => {
                 if (!primaryItemName || typeof row.id !== "number") return;
-                setActionMenu({ type: "delete item", primaryItemName, ids: [row.id] });
+                setActionMenu({ type: "Delete Items", primaryItemName, ids: [row.id] });
             },
         },
         {
@@ -89,7 +89,7 @@ export default function Row({ row, columns, onSelected, view, depth }: {
             icon: faLink,
             onClick: () => {
                 if (view.itemName !== EItemName.CAMPAIGN || typeof row.id !== "number") return;
-                setActionMenu({ type: "campaign links", campaignId: row.id })
+                setActionMenu({ type: "Campaign Links", campaignId: row.id })
             },
         },
     ];

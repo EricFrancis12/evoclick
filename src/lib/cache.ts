@@ -1,7 +1,10 @@
 import { createClient, RedisClientType } from "redis";
 import { Env } from "./types";
 
-export const makeRedisKeyFunc = (prefix: string) => (id: number | string) => `${prefix}:${id}`;
+export type RedisKeyFunc = (id: number | string) => string;
+export type MakeRedisKeyFunc = (prefix: string) => RedisKeyFunc;
+
+export const makeRedisKeyFunc: MakeRedisKeyFunc = (prefix: string) => (id: number | string) => `${prefix}:${id}`;
 
 // Using the Redis cache is an optional feature
 let cache: RedisClientType | undefined;

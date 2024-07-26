@@ -80,12 +80,12 @@ export type TTrafficSourceActionMenu = {
 };
 
 export type TCampaignLinksActionMenu = {
-    type: "campaign links";
+    type: "Campaign Links";
     campaignId: number;
 };
 
 export type TDeleteItemsActionMenu = {
-    type: "delete item",
+    type: "Delete Items",
     primaryItemName: TPrimaryItemName;
     ids: number[];
 };

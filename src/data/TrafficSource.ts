@@ -1,112 +1,38 @@
-import { TrafficSource } from "@prisma/client";
-import cache, { makeRedisKeyFunc } from "../lib/cache";
+import { Prisma, TrafficSource } from "@prisma/client";
 import db from "../lib/db";
-import { parseToken, parseNamedTokens } from ".";
+import { parseToken, parseNamedTokens, makeStorerFuncs } from ".";
 import { trafficSourceSchema } from "../lib/schemas";
-import { REDIS_EXPIRY } from "../lib/constants";
-import { safeParseJson } from "../lib/utils";
 import { EItemName, TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest } from "../lib/types";
 
-const makeKey = makeRedisKeyFunc("trafficSource");
+const {
+    getAllFunc: getAllTrafficSources,
+    getByIdFunc: getTrafficSourceById,
+    createNewFunc,
+    updateByIdFunc,
+    deleteByIdFunc: deleteTrafficSourceById,
+} = makeStorerFuncs<TrafficSource, TTrafficSource, Prisma.TrafficSourceUncheckedCreateInput, Prisma.TrafficSourceUpdateInput>(
+    EItemName.TRAFFIC_SOURCE,
+    db.trafficSource,
+    makeClientTrafficSource,
+    trafficSourceSchema
+);
 
-export async function getAllTrafficSources(): Promise<TTrafficSource[]> {
-    const models: TrafficSource[] = await db.trafficSource.findMany();
-    const proms: Promise<TTrafficSource>[] = models.map(makeClientTrafficSource);
-    return Promise.all(proms);
-}
+const createNewTrafficSource = async (createReq: TTrafficSource_createRequest) => createNewFunc(
+    toTrafficSourceCreateInput(createReq)
+);
 
-export async function geTTrafficSourceById(id: number): Promise<TTrafficSource | null> {
-    // Check redis cache for this traffic source
-    const key = makeKey(id);
-    const cachedResult = await cache?.get(key);
+const updateTrafficSourceById = async (id: number, updateReq: TTrafficSource_updateRequest) => updateByIdFunc(
+    id,
+    toTrafficSourceUpdateInput(updateReq)
+);
 
-    // If found in the cache, parse and return it
-    if (cachedResult != null) {
-        const { data, success } = await trafficSourceSchema.spa(safeParseJson(cachedResult));
-        if (success) return data;
-    }
-
-    // If not in cache, query db for it
-    const trafficSourceProm = db.trafficSource.findUnique({
-        where: { id },
-    });
-
-    // If we fetch from the db successfully, create a new key for this traffic source in the cache
-    trafficSourceProm.then(async (trafficSource) => {
-        if (trafficSource && cache) {
-            cache.set(key, JSON.stringify(await makeClientTrafficSource(trafficSource)), {
-                EX: REDIS_EXPIRY,
-            });
-        }
-    });
-
-    return trafficSourceProm.then(ts => ts ? makeClientTrafficSource(ts) : null);
-}
-
-export async function createNewTrafficSource(creationRequest: TTrafficSource_createRequest): Promise<TTrafficSource> {
-    const trafficSourceProm = db.trafficSource.create({
-        data: {
-            ...creationRequest,
-            // Changing defaultTokens and customTokens into strings because
-            // they are saved as strings in the db
-            externalIdToken: JSON.stringify(creationRequest.externalIdToken),
-            costToken: JSON.stringify(creationRequest.costToken),
-            customTokens: JSON.stringify(creationRequest.customTokens),
-        }
-    });
-
-    // If the creation was successful, create a new key for this new traffic source in the cache
-    trafficSourceProm.then(async (trafficSource) => {
-        if (trafficSource && cache) {
-            const key = makeKey(trafficSource.id);
-            cache.set(key, JSON.stringify(await makeClientTrafficSource(trafficSource)), {
-                EX: REDIS_EXPIRY,
-            });
-        }
-    });
-
-    return trafficSourceProm.then(makeClientTrafficSource);
-}
-
-export async function updateTrafficSourceById(id: number, data: TTrafficSource_updateRequest): Promise<TTrafficSource> {
-    const trafficSourceProm = db.trafficSource.update({
-        where: { id },
-        data: {
-            ...data,
-            // Changing defaultTokens and customTokens into strings (if defined) because
-            // they are saved as strings in the db
-            externalIdToken: data.externalIdToken ? JSON.stringify(data.externalIdToken) : undefined,
-            costToken: data.costToken ? JSON.stringify(data.costToken) : undefined,
-            customTokens: data.customTokens ? JSON.stringify(data.customTokens) : undefined,
-        }
-    });
-
-    // If the update was successful, update the corresponding key for this traffic source in the cache
-    trafficSourceProm.then(async (trafficSource) => {
-        if (trafficSource && cache) {
-            const key = makeKey(trafficSource.id);
-            cache.set(key, JSON.stringify(await makeClientTrafficSource(trafficSource)), {
-                EX: REDIS_EXPIRY,
-            });
-        }
-    });
-
-    return trafficSourceProm.then(makeClientTrafficSource);
-}
-
-export async function deleteTrafficSourceById(id: number): Promise<TTrafficSource> {
-    // Delete the corresponding key for this traffic source in the cache
-    if (cache) {
-        const key = makeKey(id);
-        cache.del(key);
-    }
-
-    const trafficSourceProm = db.trafficSource.delete({
-        where: { id },
-    });
-
-    return trafficSourceProm.then(makeClientTrafficSource);
-}
+export {
+    getAllTrafficSources,
+    getTrafficSourceById,
+    createNewTrafficSource,
+    updateTrafficSourceById,
+    deleteTrafficSourceById,
+};
 
 async function makeClientTrafficSource(dbModel: TrafficSource): Promise<TTrafficSource> {
     const externalIdTokenProm = parseToken(dbModel.externalIdToken);
@@ -118,5 +44,25 @@ async function makeClientTrafficSource(dbModel: TrafficSource): Promise<TTraffic
         externalIdToken: await externalIdTokenProm,
         costToken: await costTokenProm,
         customTokens: await customTokensProm,
+    };
+}
+
+function toTrafficSourceCreateInput(createReq: TTrafficSource_createRequest): Prisma.TrafficSourceUncheckedCreateInput {
+    const { externalIdToken, costToken, customTokens } = createReq;
+    return {
+        ...createReq,
+        externalIdToken: JSON.stringify(externalIdToken),
+        costToken: JSON.stringify(costToken),
+        customTokens: JSON.stringify(customTokens),
+    };
+}
+
+function toTrafficSourceUpdateInput(updateReq: TTrafficSource_updateRequest): Prisma.TrafficSourceUpdateInput {
+    const { externalIdToken, costToken, customTokens } = updateReq;
+    return {
+        ...updateReq,
+        externalIdToken: externalIdToken ? JSON.stringify(externalIdToken) : undefined,
+        costToken: costToken ? JSON.stringify(costToken) : undefined,
+        customTokens: customTokens ? JSON.stringify(customTokens) : undefined,
     };
 }

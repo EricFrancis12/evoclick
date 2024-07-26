@@ -1,121 +1,43 @@
 import crypto from "crypto";
-import { Campaign } from "@prisma/client";
+import { Prisma, Campaign } from "@prisma/client";
 import cache, { makeRedisKeyFunc } from "../lib/cache";
 import db from "../lib/db";
-import { parseRoute, parseRoutes } from ".";
+import { makeStorerFuncs, parseRoute, parseRoutes } from ".";
 import { campaignSchema } from "../lib/schemas";
 import { safeParseJson, newRoute } from "../lib/utils";
 import { REDIS_EXPIRY } from "../lib/constants";
 import { EItemName, ELogicalRelation, TCampaign, TCampaign_createRequest, TCampaign_updateRequest, TRoute } from "../lib/types";
 
-const makeKey = makeRedisKeyFunc("campaign");
+const {
+    getAllFunc: getAllCampaigns,
+    getByIdFunc: getCampaignById,
+    createNewFunc,
+    updateByIdFunc,
+    deleteByIdFunc: deleteCampaignById,
+} = makeStorerFuncs<Campaign, TCampaign, Prisma.CampaignUncheckedCreateInput, Prisma.CampaignUpdateInput>(
+    EItemName.TRAFFIC_SOURCE,
+    db.campaign,
+    makeClientCampaign,
+    campaignSchema
+);
 
-export async function getAllCampaigns(): Promise<TCampaign[]> {
-    const models: Campaign[] = await db.campaign.findMany();
-    const proms: Promise<TCampaign>[] = models.map(makeClientCampaign);
-    return Promise.all(proms);
-}
+const createNewCampaign = async (createReq: TCampaign_createRequest) => createNewFunc(
+    toCampaignCreateInput(createReq)
+);
 
-export async function getCampaignById(id: number): Promise<TCampaign | null> {
-    // Check redis cache for this campaign
-    const key = makeKey(id);
-    const cachedResult = await cache?.get(key);
+const updateCampaignById = async (id: number, updateReq: TCampaign_updateRequest) => updateByIdFunc(
+    id,
+    toCampaignUpdateInput(updateReq)
+);
 
-    // If found in the cache, parse and return it
-    if (cachedResult != null) {
-        const { data, success } = await campaignSchema.spa(safeParseJson(cachedResult));
-        if (success) return data;
-    }
+export {
+    getAllCampaigns,
+    getCampaignById,
+    createNewCampaign,
+    updateCampaignById,
+    deleteCampaignById,
+};
 
-    // If not in cache, query db for it
-    const campaignProm = db.campaign.findUnique({
-        where: { id },
-    });
-
-    // If we fetch from the db successfully, create a new key for this campaign in the cache
-    campaignProm.then(async (campaign) => {
-        if (campaign && cache) {
-            cache.set(key, JSON.stringify(await makeClientCampaign(campaign)), {
-                EX: REDIS_EXPIRY,
-            });
-        }
-    });
-
-    return campaignProm.then(campaign => campaign ? makeClientCampaign(campaign) : null);
-}
-
-export async function createNewCampaign(creationRequest: TCampaign_createRequest): Promise<TCampaign> {
-    const mainRoute = creationRequest.flowMainRoute ?? {
-        isActive: true,
-        logicalRelation: ELogicalRelation.AND,
-        paths: [],
-        rules: [],
-    };
-    const ruleRoutes = creationRequest.flowRuleRoutes ?? [];
-    const campaignProm = db.campaign.create({
-        data: {
-            ...creationRequest,
-            publicId: crypto.randomUUID() as string,
-            // Changing flowMainRoute and flowRuleRoutes into strings because
-            // they are saved as strings in the db
-            flowMainRoute: JSON.stringify(mainRoute),
-            flowRuleRoutes: JSON.stringify(ruleRoutes),
-        }
-    });
-
-    // If the creation was successful, create a new key for this new campaign in the cache
-    campaignProm.then(async (campaign) => {
-        if (campaign && cache) {
-            const key = makeKey(campaign.id);
-            cache.set(key, JSON.stringify(await makeClientCampaign(campaign)), {
-                EX: REDIS_EXPIRY,
-            });
-        }
-    });
-
-    return campaignProm.then(makeClientCampaign);
-}
-
-export async function updateCampaignById(id: number, data: TCampaign_updateRequest): Promise<TCampaign> {
-    const mainRoute = data.flowMainRoute ?? newRoute();
-    const ruleRoutes = data.flowRuleRoutes ?? [];
-    const campaignProm = db.campaign.update({
-        where: { id },
-        data: {
-            ...data,
-            // Changing flowMainRoute and flowRuleRoutes into strings because
-            // they are saved as strings in the db
-            flowMainRoute: JSON.stringify(mainRoute),
-            flowRuleRoutes: JSON.stringify(ruleRoutes),
-        }
-    });
-
-    // If the update was successful, update the corresponding key for this campaign in the cache
-    campaignProm.then(async (campaign) => {
-        if (campaign && cache) {
-            const key = makeKey(campaign.id);
-            cache.set(key, JSON.stringify(await makeClientCampaign(campaign)), {
-                EX: REDIS_EXPIRY,
-            });
-        }
-    });
-
-    return campaignProm.then(makeClientCampaign);
-}
-
-export async function deleteCampaignById(id: number): Promise<TCampaign> {
-    // Delete the corresponding key for this campaign in the cache
-    if (cache) {
-        const key = makeKey(id);
-        cache.del(key);
-    }
-
-    const campaignProm = db.campaign.delete({
-        where: { id },
-    });
-
-    return campaignProm.then(makeClientCampaign);
-}
 
 async function makeClientCampaign(dbModel: Campaign): Promise<TCampaign> {
     const flowMainRouteProm = dbModel.flowMainRoute ? parseRoute(dbModel.flowMainRoute) : newRoute();
@@ -125,5 +47,25 @@ async function makeClientCampaign(dbModel: Campaign): Promise<TCampaign> {
         primaryItemName: EItemName.CAMPAIGN,
         flowMainRoute: await flowMainRouteProm,
         flowRuleRoutes: await flowRuleRoutesProm,
+    };
+}
+
+function toCampaignCreateInput(createReq: TCampaign_createRequest): Prisma.CampaignUncheckedCreateInput {
+    const flowMainRoute = createReq.flowMainRoute ?? newRoute();
+    const flowRuleRoutes = createReq.flowRuleRoutes ?? [];
+    return {
+        ...createReq,
+        publicId: crypto.randomUUID() as string,
+        flowMainRoute: JSON.stringify(flowMainRoute),
+        flowRuleRoutes: JSON.stringify(flowRuleRoutes),
+    };
+}
+
+function toCampaignUpdateInput(updateReq: TCampaign_updateRequest): Prisma.CampaignUpdateInput {
+    const { flowMainRoute, flowRuleRoutes } = updateReq;
+    return {
+        ...updateReq,
+        flowMainRoute: flowMainRoute ? JSON.stringify(flowMainRoute) : undefined,
+        flowRuleRoutes: flowRuleRoutes ? JSON.stringify(flowRuleRoutes) : undefined,
     };
 }

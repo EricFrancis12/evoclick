@@ -1,114 +1,38 @@
-import { SavedFlow } from "@prisma/client";
-import cache, { makeRedisKeyFunc } from "../lib/cache";
+import { Prisma, SavedFlow } from "@prisma/client";
 import db from "../lib/db";
-import { parseRoute, parseRoutes } from ".";
+import { makeStorerFuncs, parseRoute, parseRoutes } from ".";
 import { savedFlowSchema } from "../lib/schemas";
-import { REDIS_EXPIRY } from "@/lib/constants";
-import { safeParseJson, newRoute } from "../lib/utils";
 import { EItemName, TSavedFlow, TSavedFlow_createRequest, TSavedFlow_updateRequest } from "../lib/types";
 
-const makeKey = makeRedisKeyFunc("flow");
+const {
+    getAllFunc: getAllFlows,
+    getByIdFunc: getFlowById,
+    createNewFunc,
+    updateByIdFunc,
+    deleteByIdFunc: deleteFlowById,
+} = makeStorerFuncs<SavedFlow, TSavedFlow, Prisma.SavedFlowUncheckedCreateInput, Prisma.SavedFlowUpdateInput>(
+    EItemName.FLOW,
+    db.savedFlow,
+    makeClientFlow,
+    savedFlowSchema
+);
 
-export async function getAllFlows(): Promise<TSavedFlow[]> {
-    const models: SavedFlow[] = await db.savedFlow.findMany();
-    const proms: Promise<TSavedFlow>[] = models.map(makeClientFlow);
-    return Promise.all(proms);
-}
+const createNewFlow = async (createReq: TSavedFlow_createRequest) => createNewFunc(
+    toSavedFlowCreateInput(createReq)
+);
 
-export async function getFlowById(id: number): Promise<TSavedFlow | null> {
-    // Check redis cache for this flow
-    const key = makeKey(id);
-    const cachedResult = await cache?.get(key);
+const updateFlowById = async (id: number, updateReq: TSavedFlow_updateRequest) => updateByIdFunc(
+    id,
+    toSavedFlowUpdateInput(updateReq)
+);
 
-    // If found in the cache, parse and return it
-    if (cachedResult != null) {
-        const { data, success } = await savedFlowSchema.spa(safeParseJson(cachedResult));
-        if (success) return data;
-    }
-
-    // If not in cache, query db for it
-    const flowProm = db.savedFlow.findUnique({
-        where: { id },
-    });
-
-    // If we fetch from the db successfully, create a new key for this flow in the cache
-    flowProm.then(async (flow) => {
-        if (flow && cache) {
-            cache.set(key, JSON.stringify(await makeClientFlow(flow)), {
-                EX: REDIS_EXPIRY,
-            });
-        }
-    });
-
-    return flowProm.then(flow => flow ? makeClientFlow(flow) : null);
-}
-
-export async function createNewFlow(creationRequest: TSavedFlow_createRequest): Promise<TSavedFlow> {
-    const mainRoute = creationRequest.mainRoute ?? newRoute();
-    const ruleRoutes = creationRequest.ruleRoutes ?? [];
-    const flowProm = db.savedFlow.create({
-        data: {
-            ...creationRequest,
-            // Changing mainRoute and ruleRoutes into strings because
-            // they are saved as strings in the db
-            mainRoute: JSON.stringify(mainRoute),
-            ruleRoutes: JSON.stringify(ruleRoutes),
-        }
-    });
-
-    // If the creation was successful, create a new key for this new flow in the cache
-    flowProm.then(async (flow) => {
-        if (flow && cache) {
-            const key = makeKey(flow.id);
-            cache.set(key, JSON.stringify(await makeClientFlow(flow)), {
-                EX: REDIS_EXPIRY,
-            });
-        }
-    });
-
-    return flowProm.then(makeClientFlow);
-}
-
-export async function updateFlowById(id: number, data: TSavedFlow_updateRequest): Promise<TSavedFlow> {
-    const mainRoute = data.mainRoute ?? newRoute();
-    const ruleRoutes = data.ruleRoutes ?? [];
-    const flowProm = db.savedFlow.update({
-        where: { id },
-        data: {
-            ...data,
-            // Changing mainRoute and ruleRoutes into strings because
-            // they are saved as strings in the db
-            mainRoute: JSON.stringify(mainRoute),
-            ruleRoutes: JSON.stringify(ruleRoutes),
-        }
-    });
-
-    // If the update was successful, update the corresponding key for this flow in the cache
-    flowProm.then(async (flow) => {
-        if (flow && cache) {
-            const key = makeKey(flow.id);
-            cache.set(key, JSON.stringify(await makeClientFlow(flow)), {
-                EX: REDIS_EXPIRY,
-            });
-        }
-    });
-
-    return flowProm.then(makeClientFlow);
-}
-
-export async function deleteFlowById(id: number): Promise<TSavedFlow> {
-    // Delete the corresponding key for this flow in the cache
-    if (cache) {
-        const key = makeKey(id);
-        cache.del(key);
-    }
-
-    const flowProm = db.savedFlow.delete({
-        where: { id },
-    });
-
-    return flowProm.then(makeClientFlow);
-}
+export {
+    getAllFlows,
+    getFlowById,
+    createNewFlow,
+    updateFlowById,
+    deleteFlowById,
+};
 
 async function makeClientFlow(dbModel: SavedFlow): Promise<TSavedFlow> {
     const { mainRoute, ruleRoutes } = dbModel;
@@ -119,5 +43,23 @@ async function makeClientFlow(dbModel: SavedFlow): Promise<TSavedFlow> {
         primaryItemName: EItemName.FLOW,
         mainRoute: await mainRouteProm,
         ruleRoutes: await ruleRoutesProm,
+    };
+}
+
+function toSavedFlowCreateInput(createReq: TSavedFlow_createRequest): Prisma.SavedFlowUncheckedCreateInput {
+    const { mainRoute, ruleRoutes } = createReq;
+    return {
+        ...createReq,
+        mainRoute: JSON.stringify(mainRoute),
+        ruleRoutes: JSON.stringify(ruleRoutes),
+    };
+}
+
+function toSavedFlowUpdateInput(updateReq: TSavedFlow_updateRequest): Prisma.SavedFlowUpdateInput {
+    const { mainRoute, ruleRoutes } = updateReq;
+    return {
+        ...updateReq,
+        mainRoute: mainRoute ? JSON.stringify(mainRoute) : undefined,
+        ruleRoutes: ruleRoutes ? JSON.stringify(ruleRoutes) : undefined,
     };
 }

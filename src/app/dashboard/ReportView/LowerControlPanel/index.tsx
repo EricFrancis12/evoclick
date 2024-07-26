@@ -56,7 +56,7 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
         const { ok, primaryItemName } = isPrimary(view.itemName);
         if (!ok) return;
         setActionMenu({
-            type: "delete item",
+            type: "Delete Items",
             primaryItemName,
             ids: selectedRows.reduce((ids: number[], { id }) => {
                 return typeof id === "number" ? [...ids, id] : ids;
@@ -72,7 +72,7 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
     function handleGetCampaignLinks() {
         if (view.itemName !== EItemName.CAMPAIGN || typeof selectedRows[0]?.id !== "number") return;
         setActionMenu({
-            type: "campaign links",
+            type: "Campaign Links",
             campaignId: selectedRows[0].id,
         });
     }

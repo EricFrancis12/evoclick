@@ -1,97 +1,31 @@
-import { LandingPage } from "@prisma/client";
-import cache, { makeRedisKeyFunc } from "../lib/cache";
+import { Prisma, LandingPage } from "@prisma/client";
 import db from "../lib/db";
 import { landingPageSchema } from "../lib/schemas";
-import { REDIS_EXPIRY } from "@/lib/constants";
-import { safeParseJson } from "../lib/utils";
-import { EItemName, TLandingPage, TLandingPage_createRequest, TLandingPage_updateRequest } from "../lib/types";
+import { EItemName, TLandingPage } from "../lib/types";
+import { makeStorerFuncs } from ".";
 
-const makeKey = makeRedisKeyFunc("landingPage");
+const {
+    getAllFunc: getAllLandingPages,
+    getByIdFunc: getLandingPageById,
+    createNewFunc: createNewLandingPage,
+    updateByIdFunc: updateLandingPageById,
+    deleteByIdFunc: deleteLandingPageById,
+} = makeStorerFuncs<LandingPage, TLandingPage, Prisma.LandingPageUncheckedCreateInput, Prisma.LandingPageUpdateInput>(
+    EItemName.LANDING_PAGE,
+    db.landingPage,
+    makeClientLandingPage,
+    landingPageSchema
+);
 
-export async function getAllLandingPages(): Promise<TLandingPage[]> {
-    return db.landingPage.findMany().then(models => models.map(makeClientLandingPage));
-}
+export {
+    getAllLandingPages,
+    getLandingPageById,
+    createNewLandingPage,
+    updateLandingPageById,
+    deleteLandingPageById,
+};
 
-export async function getLandingPageById(id: number): Promise<TLandingPage | null> {
-    // Check redis cache for this landing page
-    const key = makeKey(id);
-    const cachedResult = await cache?.get(key);
-
-    // If found in the cache, parse and return it
-    if (cachedResult != null) {
-        const { data, success } = await landingPageSchema.spa(safeParseJson(cachedResult));
-        if (success) return data;
-    }
-
-    // If not in cache, query db for it
-    const landingPageProm = db.landingPage.findUnique({
-        where: { id },
-    });
-
-    // If we fetch from the db successfully, create a new key for this landing page in the cache
-    landingPageProm.then(landingPage => {
-        if (landingPage && cache) {
-            cache.set(key, JSON.stringify(landingPage), {
-                EX: REDIS_EXPIRY,
-            });
-        }
-    });
-
-    return landingPageProm.then(lp => lp ? makeClientLandingPage(lp) : null);
-}
-
-export async function createNewLandingPage(creationRequest: TLandingPage_createRequest): Promise<TLandingPage> {
-    const landingPageProm = db.landingPage.create({
-        data: { ...creationRequest },
-    });
-
-    // If the creation was successful, create a new key for this new landing page in the cache
-    landingPageProm.then(landingPage => {
-        if (landingPage && cache) {
-            const key = makeKey(landingPage.id);
-            cache.set(key, JSON.stringify(landingPage), {
-                EX: REDIS_EXPIRY,
-            });
-        }
-    });
-
-    return landingPageProm.then(makeClientLandingPage);
-}
-
-export async function updateLandingPageById(id: number, data: TLandingPage_updateRequest): Promise<TLandingPage> {
-    const landingPageProm = db.landingPage.update({
-        where: { id },
-        data,
-    });
-
-    // If the update was successful, update the corresponding key for this landing page in the cache
-    landingPageProm.then(landingPage => {
-        if (landingPage && cache) {
-            const key = makeKey(landingPage.id);
-            cache.set(key, JSON.stringify(landingPage), {
-                EX: REDIS_EXPIRY,
-            });
-        }
-    });
-
-    return landingPageProm.then(makeClientLandingPage);
-}
-
-export async function deleteLandingPageById(id: number): Promise<TLandingPage> {
-    // Delete the corresponding key for this landing page in the cache
-    if (cache) {
-        const key = makeKey(id);
-        cache.del(key);
-    }
-
-    const landingPageProm = db.landingPage.delete({
-        where: { id },
-    });
-
-    return landingPageProm.then(makeClientLandingPage);
-}
-
-function makeClientLandingPage(dbModel: LandingPage): TLandingPage {
+async function makeClientLandingPage(dbModel: LandingPage): Promise<TLandingPage> {
     return {
         ...dbModel,
         primaryItemName: EItemName.LANDING_PAGE,

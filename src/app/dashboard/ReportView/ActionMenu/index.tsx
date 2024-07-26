@@ -9,7 +9,7 @@ export default function ActionMenu({ actionMenu, setActionMenu }: {
     setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 }) {
     return (
-        <div className="flex flex-col items-center w-[85vw] sm:min-w-[400px] bg-white">
+        <div className="flex flex-col items-center w-[85vw] sm:min-w-[400px] bg-white rounded-md">
             <ActionMenuHeader
                 title={actionMenu.type}
                 onClose={() => setActionMenu(null)}
