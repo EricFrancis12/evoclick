@@ -5,7 +5,7 @@ import { cookies } from "next/headers"
 import { Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { generateRootUser } from "./auth";
+import generateRootUser from "./auth/generateRootUser";
 import { JWT_EXPIRY, JWT_SECRET } from "./constants";
 import * as data from "../data";
 import {
