@@ -8,7 +8,10 @@ export default function Cell({ value, width, className = "" }: {
     return (
         <div
             className={"flex items-center h-full px-1 border overflow-hidden " + className}
-            style={{ width: `${width}px` }}
+            style={{
+                width: `${width}px`,
+                whiteSpace: "nowrap",
+            }}
         >
             {value}
         </div>
