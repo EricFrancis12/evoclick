@@ -42,6 +42,10 @@ func (s *Storer) GetLandingPageById(ctx context.Context, id int) (LandingPage, e
 	return lp, nil
 }
 
+func (lp *LandingPage) FillURL(urltmm URLTokenMatcherMap) string {
+	return ReplaceTokensInURL(lp.URL, urltmm)
+}
+
 func formatLandingPage(model *db.LandingPageModel) LandingPage {
 	return LandingPage{
 		InnerLandingPage: model.InnerLandingPage,

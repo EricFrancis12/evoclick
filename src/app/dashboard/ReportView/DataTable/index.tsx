@@ -66,9 +66,13 @@ export default function DataTable({ view, rows, setRows, depth = 0 }: {
 }
 
 function makeInitialColumns(columnsMap: TColumnsMap): TColumn[] {
-    return Array.from(columnsMap).map(([title, value], index) => ({
-        title,
-        format: value.dtc.format,
-        width: index === 0 ? 300 : 100,
-    }))
+    return Array.from(columnsMap).map(([title, value], index) => {
+        const { calcValue, format } = value.dtc;
+        return {
+            title,
+            calcValue,
+            format,
+            width: index === 0 ? 300 : 100,
+        };
+    })
 }

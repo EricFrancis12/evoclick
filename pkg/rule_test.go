@@ -16,25 +16,25 @@ func TestViewDoesTrigger(t *testing.T) {
 		RuleName: RuleNameBrowserName,
 		Data:     browsers,
 		Includes: true,
-	}.ViewDoesTrigger(&http.Request{}, useragent.UserAgent{}, IPInfoData{}))
+	}.ViewDoesTrigger(http.Request{}, useragent.UserAgent{}, IPInfoData{}))
 
 	assert.True(t, Rule{
 		RuleName: RuleNameBrowserName,
 		Data:     browsers,
 		Includes: false,
-	}.ViewDoesTrigger(&http.Request{}, useragent.UserAgent{}, IPInfoData{}))
+	}.ViewDoesTrigger(http.Request{}, useragent.UserAgent{}, IPInfoData{}))
 
 	assert.True(t, Rule{
 		RuleName: RuleNameBrowserName,
 		Data:     browsers,
 		Includes: true,
-	}.ViewDoesTrigger(&http.Request{}, useragent.UserAgent{Name: browsers[0]}, IPInfoData{}))
+	}.ViewDoesTrigger(http.Request{}, useragent.UserAgent{Name: browsers[0]}, IPInfoData{}))
 
 	assert.False(t, Rule{
 		RuleName: RuleNameBrowserName,
 		Data:     browsers,
 		Includes: false,
-	}.ViewDoesTrigger(&http.Request{}, useragent.UserAgent{Name: browsers[0]}, IPInfoData{}))
+	}.ViewDoesTrigger(http.Request{}, useragent.UserAgent{Name: browsers[0]}, IPInfoData{}))
 }
 
 func TestClickDoesTrigger(t *testing.T) {

@@ -68,7 +68,14 @@ func T(w http.ResponseWriter, r *http.Request) {
 		ipInfoData = <-ipidch
 	}
 
-	dest, _ := campaign.DetermineViewDestination(r, ctx, *tStorer, savedFlow, userAgent, ipInfoData)
+	dest, _ := campaign.DetermineViewDestination(pkg.DestinationOpts{
+		R:          *r,
+		Ctx:        ctx,
+		Storer:     *tStorer,
+		SavedFlow:  savedFlow,
+		UserAgent:  userAgent,
+		IpInfoData: ipInfoData,
+	})
 
 	anch := make(chan pkg.AffiliateNetwork)
 	go fetchAffiliateNetwork(ctx, tStorer, dest, anch)
@@ -104,13 +111,13 @@ func T(w http.ResponseWriter, r *http.Request) {
 		IP:                 r.RemoteAddr,
 		Isp:                ipInfoData.Org,
 		UserAgent:          r.UserAgent(),
-		Language:           pkg.GetLanguage(r),
+		Language:           pkg.GetLanguage(*r),
 		Country:            ipInfoData.Country,
 		Region:             ipInfoData.Region,
 		City:               ipInfoData.City,
 		DeviceType:         getDeviceType(userAgent),
 		Device:             userAgent.Device,
-		ScreenResolution:   pkg.GetScreenRes(r),
+		ScreenResolution:   pkg.GetScreenRes(*r),
 		Os:                 userAgent.OS,
 		OsVersion:          userAgent.OSVersion,
 		BrowserName:        userAgent.Name,

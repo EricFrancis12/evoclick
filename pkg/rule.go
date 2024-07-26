@@ -9,7 +9,7 @@ import (
 type RulesMap map[RuleName]string
 
 // Determines if the view triggers this rule
-func (rule Rule) ViewDoesTrigger(r *http.Request, ua useragent.UserAgent, ipInfoData IPInfoData) bool {
+func (rule Rule) ViewDoesTrigger(r http.Request, ua useragent.UserAgent, ipInfoData IPInfoData) bool {
 	rulesMap := newRulesMapFromView(r, ua, ipInfoData)
 	return rulesMap.checkForMatch(rule)
 }
@@ -30,7 +30,7 @@ func (rm RulesMap) checkForMatch(rule Rule) bool {
 }
 
 // Helper function to create RulesMap from request, user agent, and ipInfoData
-func newRulesMapFromView(r *http.Request, ua useragent.UserAgent, ipInfoData IPInfoData) RulesMap {
+func newRulesMapFromView(r http.Request, ua useragent.UserAgent, ipInfoData IPInfoData) RulesMap {
 	return RulesMap{
 		RuleNameBrowserName:      ua.Name,
 		RuleNameBrowserVersion:   ua.Version,

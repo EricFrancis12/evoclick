@@ -43,10 +43,10 @@ func GetDeviceType(ua useragent.UserAgent) DeviceType {
 	return DeviceTypeUnknown
 }
 
-func GetLanguage(r *http.Request) string {
+func GetLanguage(r http.Request) string {
 	return r.Header.Get("Accept-Language")
 }
 
-func GetScreenRes(r *http.Request) string {
+func GetScreenRes(r http.Request) string {
 	return r.Header.Get("Viewport-Width")
 }

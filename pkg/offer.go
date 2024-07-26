@@ -42,6 +42,10 @@ func (s *Storer) GetOfferById(ctx context.Context, id int) (Offer, error) {
 	return o, nil
 }
 
+func (o *Offer) FillURL(urltmm URLTokenMatcherMap) string {
+	return ReplaceTokensInURL(o.URL, urltmm)
+}
+
 func formatOffer(model *db.OfferModel) Offer {
 	return Offer{
 		InnerOffer: model.InnerOffer,

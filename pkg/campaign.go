@@ -77,7 +77,7 @@ func (s *Storer) GetCampaignByPublicId(ctx context.Context, publicId string) (Ca
 	return c, nil
 }
 
-func (c *Campaign) SelectViewRoute(r *http.Request, userAgent useragent.UserAgent, ipInfoData IPInfoData) Route {
+func (c *Campaign) SelectViewRoute(r http.Request, userAgent useragent.UserAgent, ipInfoData IPInfoData) Route {
 	return selectViewRoute(c.FlowMainRoute, c.FlowRuleRoutes, r, userAgent, ipInfoData)
 }
 
@@ -98,18 +98,46 @@ func (c *Campaign) SelectOfferID(ids []int) (int, error) {
 	return selectIDUsingRotType(ids, c.OfferRotationType)
 }
 
-func (c *Campaign) DetermineViewDestination(r *http.Request, ctx context.Context, storer Storer, savedFlow SavedFlow, userAgent useragent.UserAgent, ipInfoData IPInfoData) (Destination, error) {
-	if c.FlowType == db.FlowTypeURL && c.FlowURL != nil && *c.FlowURL != "" {
+type DestinationOpts struct {
+	R          http.Request
+	Ctx        context.Context
+	Storer     Storer
+	SavedFlow  SavedFlow
+	UserAgent  useragent.UserAgent
+	IpInfoData IPInfoData
+}
+
+func (do *DestinationOpts) TokenMatcherMap() URLTokenMatcherMap {
+	return URLTokenMatcherMap{
+		URLTokenMatcherIP:               do.R.RemoteAddr,
+		URLTokenMatcherIsp:              do.IpInfoData.Org,
+		URLTokenMatcherUserAgent:        do.R.UserAgent(),
+		URLTokenMatcherLanguage:         GetLanguage(do.R),
+		URLTokenMatcherCountry:          do.IpInfoData.Country,
+		URLTokenMatcherRegion:           do.IpInfoData.Region,
+		URLTokenMatcherCity:             do.IpInfoData.City,
+		URLTokenMatcherDeviceType:       string(GetDeviceType(do.UserAgent)),
+		URLTokenMatcherDevice:           do.UserAgent.Device,
+		URLTokenMatcherScreenResolution: GetScreenRes(do.R),
+		URLTokenMatcherOs:               do.UserAgent.OS,
+		URLTokenMatcherOsVersion:        do.UserAgent.OSVersion,
+		URLTokenMatcherBrowserName:      do.UserAgent.Name,
+		URLTokenMatcherBrowserVersion:   do.UserAgent.Version,
+	}
+}
+
+func (c *Campaign) DetermineViewDestination(opts DestinationOpts) (Destination, error) {
+	if c.FlowType == db.FlowTypeURL {
 		return Destination{
 			Type: DestTypeURL,
-			URL:  *c.FlowURL,
+			URL:  c.FillFlowURL(opts.TokenMatcherMap()),
 		}, nil
 	} else if c.FlowType == db.FlowTypeBuiltIn || c.FlowType == db.FlowTypeSaved {
 		route := Route{}
 		if c.FlowType == db.FlowTypeBuiltIn {
-			route = c.SelectViewRoute(r, userAgent, ipInfoData)
+			route = c.SelectViewRoute(opts.R, opts.UserAgent, opts.IpInfoData)
 		} else {
-			route = savedFlow.SelectViewRoute(r, userAgent, ipInfoData)
+			route = opts.SavedFlow.SelectViewRoute(opts.R, opts.UserAgent, opts.IpInfoData)
 		}
 
 		path, err := route.WeightedSelectPath()
@@ -123,14 +151,14 @@ func (c *Campaign) DetermineViewDestination(r *http.Request, ctx context.Context
 				return catchAllDest(), err
 			}
 
-			lp, err := storer.GetLandingPageById(ctx, lpID)
+			lp, err := opts.Storer.GetLandingPageById(opts.Ctx, lpID)
 			if err != nil {
 				return catchAllDest(), err
 			}
 
 			return Destination{
 				Type: DestTypeLandingPage,
-				URL:  lp.URL,
+				URL:  lp.FillURL(opts.TokenMatcherMap()),
 				ID:   lp.ID,
 			}, nil
 		} else {
@@ -139,19 +167,26 @@ func (c *Campaign) DetermineViewDestination(r *http.Request, ctx context.Context
 				return catchAllDest(), err
 			}
 
-			o, err := storer.GetOfferById(ctx, oID)
+			o, err := opts.Storer.GetOfferById(opts.Ctx, oID)
 			if err != nil {
 				return catchAllDest(), err
 			}
 
 			return Destination{
 				Type: DestTypeOffer,
-				URL:  o.URL,
+				URL:  ReplaceTokensInURL(o.URL, opts.TokenMatcherMap()),
 				ID:   o.ID,
 			}, nil
 		}
 	}
 	return catchAllDest(), fmt.Errorf("missing or unknown flow type")
+}
+
+func (c *Campaign) FillFlowURL(urltmm URLTokenMatcherMap) string {
+	if c.FlowURL == nil || *c.FlowURL == "" {
+		return ""
+	}
+	return ReplaceTokensInURL(*c.FlowURL, urltmm)
 }
 
 func selectIDUsingRotType(ids []int, rotType db.RotationType) (int, error) {

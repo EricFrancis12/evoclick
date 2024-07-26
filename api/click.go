@@ -73,10 +73,11 @@ func Click(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pkg.RedirectVisitor(w, r, offer.URL)
+	destURL := offer.FillURL(click.TokenMatcherMap())
+	pkg.RedirectVisitor(w, r, destURL)
 
 	// Update clickTime and clickOutputUrl
-	updatedClick := updateClick(click, timestamp, offer.URL)
+	updatedClick := updateClick(click, timestamp, destURL)
 
 	// Save updated click to db
 	if _, err := clickStorer.UpsertClickById(ctx, click.ID, updatedClick); err != nil {

@@ -46,22 +46,11 @@ func (s *Storer) GetTrafficSourceById(ctx context.Context, id int) (TrafficSourc
 	return ts, nil
 }
 
-func (ts *TrafficSource) FillPostbackURL(click Click) string {
+func (ts *TrafficSource) FillPostbackURL(urltmm URLTokenMatcherMap) string {
 	if ts.InnerTrafficSource.PostbackURL == nil || *ts.InnerTrafficSource.PostbackURL == "" {
 		return ""
 	}
-
-	var (
-		url    = *ts.InnerTrafficSource.PostbackURL
-		pbmMap = newPostbackMatcherMap(click)
-	)
-
-	for matcher, clickProp := range pbmMap {
-		if strings.Contains(url, matcher) {
-			url = strings.ReplaceAll(url, matcher, clickProp)
-		}
-	}
-	return url
+	return ReplaceTokensInURL(*ts.InnerTrafficSource.PostbackURL, urltmm)
 }
 
 type PostbackResult struct {
@@ -70,7 +59,7 @@ type PostbackResult struct {
 }
 
 func (ts *TrafficSource) SendPostback(click Click, pbrch chan PostbackResult) {
-	url := ts.FillPostbackURL(click)
+	url := ts.FillPostbackURL(click.TokenMatcherMap())
 	if url == "" {
 		pbrch <- PostbackResult{
 			Resp: &http.Response{},
