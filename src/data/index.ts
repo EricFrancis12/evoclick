@@ -107,7 +107,7 @@ function makeGetByIdFunc<
 
         if (cache) {
             // Check redis cache
-            const cachedResult = await cache?.get(key);
+            const cachedResult = await cache.get(key);
 
             // If found in the cache, parse and return it
             if (cachedResult != null) {

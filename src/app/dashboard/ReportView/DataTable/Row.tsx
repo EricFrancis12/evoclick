@@ -20,6 +20,7 @@ import { EItemName, TClick } from "@/lib/types";
 import { useReportView } from "../ReportViewContext";
 import { getPrimaryItemById, isPrimary } from "@/lib/utils";
 import { copyToClipboard } from "@/lib/utils/client";
+import columnsMap, { EColumnTitle, makeCells, TColumnsMap } from "./columnsMap";
 
 export default function Row({ row, columns, onSelected, view, depth }: {
     row: TRow;
@@ -31,8 +32,8 @@ export default function Row({ row, columns, onSelected, view, depth }: {
     const { primaryData, setActionMenu } = useReportView();
 
     const [open, setOpen] = useState<boolean>(false);
-    const cells = makeCells(row.clicks, row.name);
-    const profit = typeof cells[6] === "number" ? cells[6] : 0;
+    const cells = makeCells(columnsMap, row.clicks, row.name);
+    const profit = safeGetProfit(columnsMap, cells)
 
     const { primaryItemName } = isPrimary(view.itemName);
 
@@ -148,93 +149,13 @@ function hasURLProp(itemName: EItemName): boolean {
     return false;
 }
 
-export function makeCells(clicks: TClick[], name: string): (string | number)[] {
-    const numVisits = calcVisits(clicks);
-    const numClicks = calcClicks(clicks);
-    const numConversions = calcConversions(clicks);
-    const revenue = calcTotalRevenue(clicks);
-    const cost = calcTotalCost(clicks);
-    const profit = calcProfit(revenue, cost);
-    const cpv = calcCostPerVisit(cost, numVisits);
-    const cpc = calcCostPerClick(cost, numClicks);
-    const cpcv = calcCostPerConversion(cost, numConversions);
-    const ctr = calcClickThroughRate(numClicks, numVisits);
-    const cvr = calcConversionRate(numConversions, numVisits);
-    const roi = calcROI(revenue, cost);
-    const epv = calcEarningsPerVisit(revenue, numVisits);
-    const epc = calcEarningsPerClick(revenue, numClicks);
-
-    return [
-        name,
-        numVisits,
-        numClicks,
-        numConversions,
-        revenue,
-        cost,
-        profit,
-        cpv,
-        cpc,
-        cpcv,
-        ctr,
-        cvr,
-        roi,
-        epv,
-        epc
-    ];
-}
-
-function calcVisits(clicks: TClick[]): number {
-    return clicks.length;
-}
-
-function calcClicks(clicks: TClick[]): number {
-    return clicks.filter(click => !!click.clickTime).length;
-}
-
-function calcConversions(clicks: TClick[]): number {
-    return clicks.filter(click => !!click.convTime).length;
-}
-
-function calcTotalRevenue(clicks: TClick[]): number {
-    return clicks.reduce((total, click) => total + click.revenue, 0);
-}
-
-function calcTotalCost(clicks: TClick[]): number {
-    return clicks.reduce((total, click) => total + click.cost, 0);
-}
-
-function calcProfit(revenue: number, cost: number): number {
-    return revenue - cost;
-}
-
-function calcCostPerVisit(cost: number, numVisits: number): number {
-    return numVisits ? cost / numVisits : 0;
-}
-
-function calcCostPerClick(cost: number, numClicks: number): number {
-    return numClicks ? cost / numClicks : 0;
-}
-
-function calcCostPerConversion(cost: number, numConversions: number): number {
-    return numConversions ? cost / numConversions : 0;
-}
-
-function calcClickThroughRate(numClicks: number, numVisits: number): number {
-    return numVisits ? numClicks / numVisits : 0;
-}
-
-function calcConversionRate(numConversions: number, numVisits: number): number {
-    return numVisits ? numConversions / numVisits : 0;
-}
-
-function calcROI(revenue: number, cost: number): number {
-    return cost ? (revenue - cost) / cost : 0;
-}
-
-function calcEarningsPerVisit(revenue: number, numVisits: number): number {
-    return numVisits ? revenue / numVisits : 0;
-}
-
-function calcEarningsPerClick(revenue: number, numClicks: number): number {
-    return numClicks ? revenue / numClicks : 0;
+export function safeGetProfit(columnsMap: TColumnsMap, cells: (string | number)[]): number {
+    // Retrieve the column index for 'Profit' from the columns map
+    const profitColumnIndex = columnsMap.get(EColumnTitle.Profit)?.index;
+    // Check if the index is valid and exists within the cells array
+    if (profitColumnIndex !== undefined && profitColumnIndex < cells.length) {
+        const profitValue = cells[profitColumnIndex];
+        return typeof profitValue === 'number' ? profitValue : 0;
+    }
+    return 0;
 }

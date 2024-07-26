@@ -4,8 +4,9 @@ import Cell from "./Cell";
 import CheckboxWrapper from "./CheckboxWrapper";
 import PosNegIndicator from "./PosNegIndicator";
 import RowWrapper from "./RowWrapper";
-import { makeCells } from "./Row";
+import { safeGetProfit } from "./Row";
 import { BASE_Z_INDEX, DEPTH_MARGIN, safeIndexCols, TColumn, TRow } from ".";
+import columnsMap, { makeCells } from "./columnsMap";
 
 const border = "solid grey 2px";
 
@@ -15,7 +16,7 @@ export default function TotalRow({ rows, columns, depth }: {
     depth: number;
 }) {
     const cells = makeCellsTotal(rows, columns);
-    const profit = typeof cells[6] === "number" ? cells[6] : 0;
+    const profit = safeGetProfit(columnsMap, cells);
 
     return (
         <RowWrapper
@@ -53,7 +54,7 @@ function makeCellsTotal(rows: TRow[], columns: TColumn[]): (string | number)[] {
     const sums: number[] = new Array(columns.length - 1).fill(0);
 
     rows.forEach(row => {
-        const cells = makeCells(row.clicks, row.name);
+        const cells = makeCells(columnsMap, row.clicks, row.name);
         cells.slice(1).forEach((cell, index) => {
             if (typeof cell === "number" && sums[index] !== undefined) {
                 sums[index] += cell;

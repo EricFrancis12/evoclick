@@ -4,7 +4,7 @@ import { useState } from "react";
 import Rows from "./Rows";
 import TitleRow from "./TitleRow";
 import TotalRow from "./TotalRow";
-import dataTableColumns, { TDataTableColumn } from "./dataTableColumns";
+import columnsMap, { TDataTableColumn, TColumnsMapValue, TColumnsMap } from "./columnsMap";
 import { TView } from "@/lib/store";
 import { TClick } from "@/lib/types";
 
@@ -23,8 +23,13 @@ export type TColumn = TDataTableColumn & {
     width: number;
 }
 
-export function safeIndexCols(columns: TColumn[], index: number): TColumn {
-    return columns[index] ?? { title: "", width: 0 };
+type SafeIndexColsResult = {
+    width: number;
+    format?: (value: number) => string;
+};
+
+export function safeIndexCols(columns: TColumn[], index: number): SafeIndexColsResult {
+    return columns[index] ?? { width: 0 };
 }
 
 export default function DataTable({ view, rows, setRows, depth = 0 }: {
@@ -33,10 +38,7 @@ export default function DataTable({ view, rows, setRows, depth = 0 }: {
     setRows: (newRows: TRow[]) => void;
     depth?: number;
 }) {
-    const [columns, setColumns] = useState<TColumn[]>(dataTableColumns.map((col, index) => ({
-        ...col,
-        width: index === 0 ? 300 : 100,
-    })));
+    const [columns, setColumns] = useState<TColumn[]>(makeInitialColumns(columnsMap));
 
     return (
         <div className="relative flex flex-col flex-1 max-w-[100vw] overflow-x-scroll">
@@ -61,4 +63,12 @@ export default function DataTable({ view, rows, setRows, depth = 0 }: {
             </div>
         </div>
     )
+}
+
+function makeInitialColumns(columnsMap: TColumnsMap): TColumn[] {
+    return Array.from(columnsMap).map(([title, value], index) => ({
+        title,
+        format: value.dtc.format,
+        width: index === 0 ? 300 : 100,
+    }))
 }
