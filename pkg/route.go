@@ -48,10 +48,10 @@ func (route Route) doesTrigger(condition func(rule Rule) bool) bool {
 
 	if route.LogicalRelation == LogicalRelationAnd {
 		// Check if at least one bool is false
-		return !sliceIncludes(bools, false)
+		return !SliceIncludes(bools, false)
 	} else if route.LogicalRelation == LogicalRelationOr {
 		// Check if at least one bool is true
-		return sliceIncludes(bools, true)
+		return SliceIncludes(bools, true)
 	}
 
 	return false

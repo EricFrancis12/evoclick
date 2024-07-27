@@ -1,24 +1,23 @@
-package main
+package api
 
 import (
 	"net/http"
 	"reflect"
 	"testing"
 
-	"github.com/EricFrancis12/evoclick/api"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestTHandler(t *testing.T) {
-	assert.True(t, isValidVercelHandler(api.T))
+	assert.True(t, isValidVercelHandler(T))
 }
 
 func TestClickHandler(t *testing.T) {
-	assert.True(t, isValidVercelHandler(api.Click))
+	assert.True(t, isValidVercelHandler(Click))
 }
 
 func TestPostbackHandler(t *testing.T) {
-	assert.True(t, isValidVercelHandler(api.Postback))
+	assert.True(t, isValidVercelHandler(Postback))
 }
 
 // Makes sure the handler will run as a Serverless Function when deployed to Vercel

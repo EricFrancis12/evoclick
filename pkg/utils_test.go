@@ -8,16 +8,16 @@ import (
 
 func TestSliceIncludes(t *testing.T) {
 	strSlice := []string{"a", "b", "c"}
-	assert.True(t, sliceIncludes(strSlice, "b"))
-	assert.False(t, sliceIncludes(strSlice, "d"))
+	assert.True(t, SliceIncludes(strSlice, "b"))
+	assert.False(t, SliceIncludes(strSlice, "d"))
 
 	intSlice := []int{1, 2, 3}
-	assert.True(t, sliceIncludes(intSlice, 2))
-	assert.False(t, sliceIncludes(intSlice, 4))
+	assert.True(t, SliceIncludes(intSlice, 2))
+	assert.False(t, SliceIncludes(intSlice, 4))
 
 	boolSlice := []bool{true, true}
-	assert.True(t, sliceIncludes(boolSlice, true))
-	assert.False(t, sliceIncludes(boolSlice, false))
+	assert.True(t, SliceIncludes(boolSlice, true))
+	assert.False(t, SliceIncludes(boolSlice, false))
 }
 
 func TestMatchValAgainstRegexSlice(t *testing.T) {

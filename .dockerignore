@@ -6,3 +6,9 @@ node_modules
 
 Dockerfile*
 .dockerignore
+
+# bin
+**/evoclick
+**/bin
+**/*.exe
+**/*.mti

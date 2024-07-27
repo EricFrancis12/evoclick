@@ -19,7 +19,7 @@ func ParseJSON[T any](jsonStr string) (T, error) {
 }
 
 // Checks if a given value is present in the slice.
-func sliceIncludes[T string | int | bool](slice []T, val T) bool {
+func SliceIncludes[T string | int | bool](slice []T, val T) bool {
 	for _, item := range slice {
 		if item == val {
 			return true

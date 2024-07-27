@@ -38,7 +38,7 @@ yarn-error.log*
 next-env.d.ts
 
 # bin
-bin
-evoclick
-*.exe
-*.mti
+**/evoclick
+**/bin
+**/*.exe
+**/*.mti

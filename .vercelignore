@@ -1,2 +1,2 @@
-api.dev.go
-*_test.go
+main.go
+**/*_test.go

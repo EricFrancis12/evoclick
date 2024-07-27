@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -28,8 +29,14 @@ func main() {
 	if err := SafeLoadEnvs(".env.local", ".env"); err != nil {
 		log.Fatal("error loading .env files: " + err.Error())
 	}
-	if err := os.Setenv(pkg.EnvNodeEnv, "development"); err != nil {
-		log.Fatal("error setting ENV: " + err.Error())
+
+	flag.Parse()
+	args := flag.Args()
+	if pkg.SliceIncludes(args, "dev") {
+		log.Println("Starting in dev mode")
+		if err := os.Setenv(pkg.EnvNodeEnv, "development"); err != nil {
+			log.Fatal("error setting ENV: " + err.Error())
+		}
 	}
 
 	port := os.Getenv(pkg.EnvApiPort)
@@ -38,15 +45,12 @@ func main() {
 	}
 
 	if TCPPortOpen("localhost", port) {
-		fmt.Println("TCP port " + port + " is already in use. Dev API exiting gracefully.")
+		fmt.Println("TCP port " + port + " is already in use. Exiting gracefully.")
 		os.Exit(0)
 	}
 
 	server := NewAPIServer(":" + port)
-	err := server.Run()
-	if err != nil {
-		log.Fatal("error starting Dev API: " + err.Error())
-	}
+	log.Fatal(server.Run())
 }
 
 func (s *APIServer) Run() error {
@@ -58,8 +62,7 @@ func (s *APIServer) Run() error {
 
 	router.PathPrefix("/public").Handler(http.StripPrefix("/public", http.FileServer(http.Dir("./public"))))
 
-	log.Println("Dev API running on port", s.listenAddr)
-
+	log.Println("EvoClick running on port", s.listenAddr)
 	return http.ListenAndServe(s.listenAddr, router)
 }
 

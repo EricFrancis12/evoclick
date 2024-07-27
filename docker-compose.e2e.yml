@@ -9,10 +9,11 @@ services:
       - postgres
       - redis
 
-  dev-api:
+  api:
     build:
       context: ./
-      dockerfile: ./Dockerfile.api.dev
+      dockerfile: ./Dockerfile.api
+    command: ./bin dev
     environment:
       - "POSTGRES_URL=postgresql://postgres:mysecretpassword@postgres:5432/mydb?schema=public"
       - "REDIS_URL=redis://redis:6379"

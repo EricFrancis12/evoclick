@@ -8,4 +8,4 @@ db push:
 	npx prisma db push
 
 dev api:
-	go run api.dev.go
+	go run main.go dev
