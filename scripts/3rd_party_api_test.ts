@@ -1,12 +1,10 @@
-import dotenv from "dotenv";
-import path from "path";
 import axios from "axios";
 import { IPInfoDataSchema } from "../src/lib/schemas";
 import { iPInfoEndpoint } from "../src/lib/utils";
+import { dotenvConfig } from "@/lib/utils/env";
 import { Env } from "../src/lib/types";
 
-dotenv.config({ path: path.resolve(process.cwd(), ".env") });
-dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
+dotenvConfig();
 
 const TEST_IP_ADDR = "104.47.216.167";
 

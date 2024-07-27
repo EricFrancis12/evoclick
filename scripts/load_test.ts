@@ -1,13 +1,11 @@
-import dotenv from "dotenv";
 import { argv } from "process";
 import http from "http";
-import path from "path";
 import { campaignSeedData } from "../prisma/seedData";
 import { makeCampaignUrl } from "../src/lib/utils";
+import { dotenvConfig } from "@/lib/utils/env";
 import { Env } from "../src/lib/types";
 
-dotenv.config({ path: path.resolve(process.cwd(), ".env") });
-dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
+dotenvConfig();
 
 if (!process.env[Env.API_PORT]) throw new Error(`Environment variable ${Env.API_PORT} not set.`);
 
