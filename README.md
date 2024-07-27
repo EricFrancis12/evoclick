@@ -47,5 +47,12 @@ NOTE: When deploying to Vercel, the route handlers in `/api` are automatically r
 Instructions coming soon.
 
 
+## Find a bug?
+If you found an issue or would like to submit an improvement to this project, please submit an issue using the issues tab above. If you would like to submit a PR with a fix, reference the issue you created!
+
+
+Thank you for using EvoClick! I hope it helps you optimize your marketing campaigns effectively.
+
+
 ## Inspiration
 Inspired by click trackers such as [Voluum](https://voluum.com), [Bemob](https://bemob.com), and [Binom](https://binom.org)
