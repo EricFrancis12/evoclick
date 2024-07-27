@@ -1,4 +1,28 @@
 services:
+  next-app:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - redis
+
+  api:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.api
+    environment:
+      - "POSTGRES_URL=postgresql://postgres:mysecretpassword@postgres:5432/mydb?schema=public"
+      - "REDIS_URL=redis://redis:6379"
+      - "CATCH_ALL_REDIRECT_URL=http://localhost:3001/public/catch-all-url.html"
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+      - redis
+
   postgres:
     image: postgres
     restart: always
