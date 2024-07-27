@@ -36,5 +36,16 @@ EvoClick is a self-hosted click tracking software designed for media buyers and 
 The UI will now be running at http://localhost:3000 by default. Check the `.env` file for your Root Username and Root Password.
 
 
+## Deployment
+
+### Option A: Vercel
+This application was designed for deployment on [Vercel](https://vercel.com). This is because Vercel offers a Postgres database and Redis instance on their free tier, which makes it extremely easy to get the application up and running using a single platform.
+
+NOTE: When deploying to Vercel, the route handlers in `/api` are automatically ran as Serverless Functions. More information here: https://vercel.com/docs/functions/runtimes/go
+
+### Option B: VPS
+Instructions coming soon.
+
+
 ## Inspiration
 Inspired by click trackers such as [Voluum](https://voluum.com), [Bemob](https://bemob.com), and [Binom](https://binom.org)
