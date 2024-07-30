@@ -54,7 +54,7 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
     return (
         <ReportViewProvider primaryData={primaryData} clicks={clicks}>
             <DialogueViewProvider>
-                <div className="flex flex-col h-screen w-full">
+                <main className="flex flex-col h-screen w-full">
                     <div className="flex gap-2 h-[40px] w-[100vw] bg-[#2f918e]">
                         <div className="flex justify-center items-center h-full">
                             <Link href="/" className="hidden md:inline px-6">
@@ -94,7 +94,7 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
                             : <ReportSkeleton reportItemName={reportItemName} />
                         }
                     </div>
-                </div>
+                </main>
             </DialogueViewProvider>
         </ReportViewProvider>
     )

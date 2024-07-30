@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import { useProtectedRoute } from "@/lib/auth";
 import {
     getAllAffiliateNetworks, getAllCampaigns, getAllClicks, getAllFlows,
@@ -6,8 +5,7 @@ import {
 } from "@/data";
 import ReportView from "./ReportView";
 import { defaultTimeframe } from "@/lib/constants";
-import { decodeTimeframe, isPrimary } from "@/lib/utils";
-import { clickPropsMap } from "@/lib/utils/maps";
+import { decodeParams, decodeSearchParams, prismaArgs } from "@/lib/utils/server";
 import { EItemName } from "@/lib/types";
 
 export default async function DashboardPage({ params, searchParams }: {
@@ -54,64 +52,3 @@ export default async function DashboardPage({ params, searchParams }: {
         return "Server error";
     }
 }
-
-function decodeParams(params: {
-    itemName?: string;
-    id?: string;
-}): { reportItemName: EItemName | null, reportItemId: string | null } {
-    const { itemName, id } = params;
-    return {
-        reportItemName: itemName ? decodeURIComponent(itemName) as EItemName || null : null,
-        reportItemId: id ? decodeURIComponent(id) || null : null,
-    };
-}
-
-function decodeSearchParams(searchParams: {
-    timeframe?: string;
-}): { timeframe: [Date, Date] | null } {
-    const { timeframe } = searchParams;
-    return {
-        timeframe: timeframe ? decodeTimeframe(timeframe) : null,
-    };
-}
-
-function prismaArgs(timeframe: [Date, Date], reportItemName: EItemName | null, reportItemId: string | null): Prisma.ClickFindManyArgs {
-    return {
-        where: {
-            AND: [
-                timeframeFilter(timeframe),
-                reportItemFilter(reportItemName, reportItemId),
-            ],
-        },
-    };
-}
-
-function timeframeFilter([start, end]: [Date, Date]): Prisma.ClickWhereInput {
-    return {
-        viewTime: {
-            gte: start,
-            lte: end,
-        },
-    };
-}
-
-function reportItemFilter(reportItemName: EItemName | null, reportItemId: string | null): Prisma.ClickWhereInput {
-    if (reportItemName === null || reportItemId === null) return {};
-
-    if (isPrimary(reportItemName).ok) {
-        const id = parseInt(reportItemId);
-        if (!id) return {};
-
-        return { [itemNameToKeyofPrismaInput(reportItemName)]: id };
-    }
-
-    return { [itemNameToKeyofPrismaInput(reportItemName)]: reportItemId };
-}
-
-function itemNameToKeyofPrismaInput(itemName: EItemName): keyof Prisma.ClickWhereInput {
-    return keyofPrismaInputsMap[itemName];
-}
-
-const keyofPrismaInputsMap: Record<EItemName, keyof Prisma.ClickWhereInput> = {
-    ...clickPropsMap,
-};
