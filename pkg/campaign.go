@@ -99,16 +99,18 @@ func (c *Campaign) SelectOfferID(ids []int) (int, error) {
 }
 
 type DestinationOpts struct {
-	R          http.Request
-	Ctx        context.Context
-	Storer     Storer
-	SavedFlow  SavedFlow
-	UserAgent  useragent.UserAgent
-	IpInfoData IPInfoData
+	R             http.Request
+	Ctx           context.Context
+	Storer        Storer
+	SavedFlow     SavedFlow
+	UserAgent     useragent.UserAgent
+	IpInfoData    IPInfoData
+	PublicClickId string
 }
 
 func (do *DestinationOpts) TokenMatcherMap() URLTokenMatcherMap {
 	return URLTokenMatcherMap{
+		URLTokenMatcherPublicID:         do.PublicClickId,
 		URLTokenMatcherIP:               do.R.RemoteAddr,
 		URLTokenMatcherIsp:              do.IpInfoData.Org,
 		URLTokenMatcherUserAgent:        do.R.UserAgent(),
@@ -123,6 +125,7 @@ func (do *DestinationOpts) TokenMatcherMap() URLTokenMatcherMap {
 		URLTokenMatcherOsVersion:        do.UserAgent.OSVersion,
 		URLTokenMatcherBrowserName:      do.UserAgent.Name,
 		URLTokenMatcherBrowserVersion:   do.UserAgent.Version,
+		URLTokenMatcherFlowID:           strconv.Itoa(do.SavedFlow.ID),
 	}
 }
 

@@ -4,9 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"net/url"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -68,19 +66,20 @@ func T(w http.ResponseWriter, r *http.Request) {
 		ipInfoData = <-ipidch
 	}
 
+	publicClickId := pkg.NewPublicClickID()
 	dest, _ := campaign.DetermineViewDestination(pkg.DestinationOpts{
-		R:          *r,
-		Ctx:        ctx,
-		Storer:     *tStorer,
-		SavedFlow:  savedFlow,
-		UserAgent:  userAgent,
-		IpInfoData: ipInfoData,
+		R:             *r,
+		Ctx:           ctx,
+		Storer:        *tStorer,
+		SavedFlow:     savedFlow,
+		UserAgent:     userAgent,
+		IpInfoData:    ipInfoData,
+		PublicClickId: publicClickId,
 	})
 
 	anch := make(chan pkg.AffiliateNetwork)
 	go fetchAffiliateNetwork(ctx, tStorer, dest, anch)
 
-	publicClickId := pkg.NewPublicClickID()
 	// If we are sending the visitor to a landing page,
 	// set cookies to be retrieved later at /click
 	if dest.Type == pkg.DestTypeLandingPage {
@@ -100,14 +99,14 @@ func T(w http.ResponseWriter, r *http.Request) {
 	// Save click to db
 	_, err = tStorer.CreateNewClick(ctx, pkg.ClickCreationReq{
 		PublicId:           publicClickId,
-		ExternalId:         getExternalId(*r.URL, trafficSource),
-		Cost:               getCost(*r.URL, trafficSource),
+		ExternalId:         trafficSource.GetExternalId(*r.URL),
+		Cost:               trafficSource.GetCost(*r.URL),
 		Revenue:            0,
 		ViewTime:           timestamp,
 		ClickTime:          getClicktime(dest, timestamp),
 		ViewOutputURL:      dest.URL,
 		ClickOutputURL:     getClickOutputURL(dest),
-		Tokens:             makeTokens(*r.URL, trafficSource),
+		Tokens:             trafficSource.MakeTokens(*r.URL),
 		IP:                 r.RemoteAddr,
 		Isp:                ipInfoData.Org,
 		UserAgent:          r.UserAgent(),
@@ -197,47 +196,6 @@ func setCookie(w http.ResponseWriter, name pkg.CookieName, value string) {
 		SameSite: http.SameSiteLaxMode,
 	}
 	http.SetCookie(w, cookie)
-}
-
-// Itterate over all key/value pairs in the query string,
-// creating a Token for them if they are listed as custom tokens on the traffic source
-func makeTokens(url url.URL, ts pkg.TrafficSource) []pkg.Token {
-	tokens := []pkg.Token{}
-	query := url.Query()
-	for key, val := range query {
-		for _, tstoken := range ts.CustomTokens {
-			if key == tstoken.QueryParam {
-				tokens = append(tokens, pkg.Token{
-					QueryParam: key,
-					Value:      getTokenValue(val),
-				})
-			}
-		}
-	}
-	return tokens
-}
-
-// Returns the string at index 0 in a slice of strings,
-// or an empty string if the slice is empty
-func getTokenValue(val []string) string {
-	value := ""
-	if len(val) > 0 {
-		value = val[0]
-	}
-	return value
-}
-
-func getExternalId(url url.URL, ts pkg.TrafficSource) string {
-	return url.Query().Get(ts.ExternalIDToken.QueryParam)
-}
-
-func getCost(url url.URL, ts pkg.TrafficSource) int {
-	costStr := url.Query().Get(ts.CostToken.QueryParam)
-	cost, err := strconv.Atoi(costStr)
-	if err != nil || cost < 0 {
-		return 0
-	}
-	return cost
 }
 
 func getClicktime(dest pkg.Destination, timestamp time.Time) time.Time {

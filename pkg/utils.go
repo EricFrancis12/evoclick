@@ -58,6 +58,16 @@ func FilterSlice[T any](slice []T, predicate func(T) bool) []T {
 	return result
 }
 
+// Returns the string at index 0 in a slice of strings,
+// or an empty string if the slice is empty
+func SafeFirstString(strings []string) string {
+	str := ""
+	if len(strings) > 0 {
+		str = strings[0]
+	}
+	return str
+}
+
 // Returns a random item from the provided slice.
 func RandomItem[T any](items []T) (T, error) {
 	if len(items) == 0 {

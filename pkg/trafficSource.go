@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -72,6 +73,37 @@ func (ts *TrafficSource) SendPostback(click Click, pbrch chan PostbackResult) {
 		Resp: resp,
 		Err:  err,
 	}
+}
+
+// Itterate over all key/value pairs in the query string,
+// creating a Token for them if they are listed as custom tokens on the traffic source
+func (ts *TrafficSource) MakeTokens(url url.URL) []Token {
+	tokens := []Token{}
+	query := url.Query()
+	for key, val := range query {
+		for _, tstoken := range ts.CustomTokens {
+			if key == tstoken.QueryParam {
+				tokens = append(tokens, Token{
+					QueryParam: key,
+					Value:      SafeFirstString(val),
+				})
+			}
+		}
+	}
+	return tokens
+}
+
+func (ts *TrafficSource) GetExternalId(url url.URL) string {
+	return url.Query().Get(ts.ExternalIDToken.QueryParam)
+}
+
+func (ts *TrafficSource) GetCost(url url.URL) int {
+	costStr := url.Query().Get(ts.CostToken.QueryParam)
+	cost, err := strconv.Atoi(costStr)
+	if err != nil || cost < 0 {
+		return 0
+	}
+	return cost
 }
 
 func formatTrafficSource(model *db.TrafficSourceModel) TrafficSource {
