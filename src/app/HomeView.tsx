@@ -54,7 +54,7 @@ export default function HomeView({ primaryData, clicks, timeframe }: {
                         text="Dashboard"
                         icon={faTachometerAltFast}
                         onClick={() => queryRouter.push(
-                            window.location.href,
+                            "/dashboard",
                             { timeframe: encodeTimeframe(timeframe) }
                         )}
                     />
