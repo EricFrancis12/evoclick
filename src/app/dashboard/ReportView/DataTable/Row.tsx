@@ -6,7 +6,7 @@ import {
     faChevronUp, faChevronDown, faShuffle, faPencil,
     faTrash, faCopy, faLink, faExternalLink
 } from "@fortawesome/free-solid-svg-icons";
-import { TDialogueMenuItem } from "../contexts/DialogueMenuContext";
+import { TDialogueMenuItem } from "../../../../contexts/DialogueMenuContext";
 import useNewReport from "@/hooks/useNewReport";
 import RowWrapper from "./RowWrapper";
 import CheckboxWrapper from "./CheckboxWrapper";
@@ -16,8 +16,9 @@ import PosNegIndicator from "./PosNegIndicator";
 import { makeActionMenu } from "../LowerControlPanel";
 import { TView } from "@/lib/store";
 import { DEPTH_MARGIN, safeIndexCols, TColumn, TRow } from ".";
-import { EItemName, TClick } from "@/lib/types";
-import { useReportView } from "../ReportViewContext";
+import { EItemName } from "@/lib/types";
+import { useDataContext } from "@/contexts/DataContext";
+import { useReportViewContext } from "../ReportViewContext";
 import { getPrimaryItemById, isPrimary } from "@/lib/utils";
 import { copyToClipboard } from "@/lib/utils/client";
 import columnsMap, { EColumnTitle, makeCells, TColumnsMap } from "./columnsMap";
@@ -29,7 +30,8 @@ export default function Row({ row, columns, onSelected, view, depth }: {
     view: TView;
     depth: number;
 }) {
-    const { primaryData, setActionMenu } = useReportView();
+    const { primaryData } = useDataContext();
+    const { setActionMenu } = useReportViewContext();
 
     const [open, setOpen] = useState<boolean>(false);
     const cells = makeCells(columnsMap, row.clicks, row.name);

@@ -6,12 +6,12 @@ import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faExternalLink } from "@fortawesome/free-solid-svg-icons";
 import { getOneCampaignAction } from "@/lib/actions";
+import { useDataContext } from "@/contexts/DataContext";
 import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import { getPrimaryItemById, makeCampaignUrl, makeClickUrl } from "@/lib/utils";
 import { copyToClipboard } from "@/lib/utils/client";
 import { TActionMenu, TCampaignLinksActionMenu } from "../types";
-import { EItemName, Env, TCampaign, TToken, TTrafficSource } from "@/lib/types";
-import { useReportView } from "../../ReportViewContext";
+import { EItemName, TCampaign, TToken, TTrafficSource } from "@/lib/types";
 
 export default function CampaignLinksBody({ actionMenu }: {
     actionMenu: TCampaignLinksActionMenu;
@@ -44,7 +44,7 @@ function CampaignLinksRows({ campaign }: {
 }) {
     const { protocol, hostname, port } = window.location;
 
-    const { primaryData } = useReportView();
+    const { primaryData } = useDataContext();
     const trafficSource = getPrimaryItemById(primaryData, EItemName.TRAFFIC_SOURCE, campaign.trafficSourceId);
     const tokens = trafficSource?.primaryItemName === EItemName.TRAFFIC_SOURCE ? makeTokens(trafficSource) : [];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { TDialogueMenuItem, useDialogueMenu } from "../contexts/DialogueMenuContext";
+import { TDialogueMenuItem, useDialogueMenu } from "../../../../contexts/DialogueMenuContext";
 import { ROW_HEIGHT } from ".";
 
 export default function RowWrapper({ children, value = 0, dialogueMenuItems = [], style, selected, onClick = () => { } }: {

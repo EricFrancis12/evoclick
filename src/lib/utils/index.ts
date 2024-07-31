@@ -1,5 +1,4 @@
-import { TPrimaryData } from "@/app/dashboard/ReportView/ReportViewContext";
-import { EItemName, EQueryParam, TPrimaryItemName, TToken } from "../types";
+import { TPrimaryData, EItemName, EQueryParam, TPrimaryItemName, TToken } from "../types";
 
 export * from "./maps"
 export * from "./new";

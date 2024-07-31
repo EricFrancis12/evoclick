@@ -4,7 +4,7 @@ import {
     faBullseye, faFolder, faGlobe, faGlobeEurope, faHandshake, faLaptop,
     faMobile, faSitemap, faUsers, faWifi, IconDefinition
 } from "@fortawesome/free-solid-svg-icons";
-import { useReportView } from "./ReportViewContext";
+import { useDataContext } from "@/contexts/DataContext";
 import { useRows } from "@/hooks/useRows";
 import UpperControlPanel from "./UpperControlPanel";
 import LowerControlPanel from "./LowerControlPanel";
@@ -18,7 +18,7 @@ export default function Report({ view, reportItemName }: {
     reportItemName?: EItemName;
 }) {
     const { id, itemName } = view;
-    const { clicks } = useReportView();
+    const { clicks } = useDataContext();
     const [rows, setRows] = useRows(clicks, itemName);
 
     const { updateViewItemNameById } = useViewsStore(store => store);

@@ -7,8 +7,8 @@ import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { TView } from "@/lib/store";
 import TabContainer from "./TabContainer";
 import { getPrimaryItemById, isPrimary } from "@/lib/utils";
-import { TPrimaryData, useReportView } from "../ReportViewContext";
-import { EItemName } from "@/lib/types";
+import { useDataContext } from "@/contexts/DataContext";
+import { EItemName, TPrimaryData } from "@/lib/types";
 
 export default function Tab({ view, onClick, onClose, reportItemId }: {
     view: TView;
@@ -19,7 +19,7 @@ export default function Tab({ view, onClick, onClose, reportItemId }: {
     const { type, reportItemName, icon } = view;
     const isActive = useIsTabActive(view);
 
-    const { primaryData } = useReportView();
+    const { primaryData } = useDataContext();
     const tabName = useReportTabName(primaryData, reportItemName, reportItemId ?? null);
 
     function handleClose(e: React.MouseEvent<HTMLOrSVGElement>) {

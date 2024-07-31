@@ -7,7 +7,7 @@ import {
     faCheckCircle, faCircle, faSpinner,
     faTrash, faXmarkCircle, IconDefinition
 } from "@fortawesome/free-solid-svg-icons";
-import { useReportView } from "../../ReportViewContext";
+import { useDataContext } from "@/contexts/DataContext";
 import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import Button from "@/components/Button";
 import {
@@ -31,7 +31,7 @@ export default function DeleteItemBody({ actionMenu, setActionMenu }: {
     setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 }) {
     const { primaryItemName, ids } = actionMenu;
-    const { primaryData } = useReportView();
+    const { primaryData } = useDataContext();
 
     const [deleting, setDeleting] = useState<boolean>(false);
 

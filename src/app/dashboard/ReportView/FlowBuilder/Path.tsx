@@ -2,7 +2,7 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-import { useReportView } from "../ReportViewContext";
+import { useDataContext } from "@/contexts/DataContext";
 import Section, { TSection } from "./Section";
 import { EItemName, TPath, TRoute } from "@/lib/types";
 
@@ -12,7 +12,7 @@ export default function Path({ path, route, onChange, onDelete }: {
     onChange: (p: TPath) => void;
     onDelete: () => void;
 }) {
-    const { primaryData } = useReportView();
+    const { primaryData } = useDataContext();
 
     const sections: TSection[] = [
         {

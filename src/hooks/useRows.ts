@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { itemNameToClickProp } from "@/lib/utils/maps";
-import { TPrimaryData, useReportView } from "@/app/dashboard/ReportView/ReportViewContext";
+import { useDataContext } from "@/contexts/DataContext";
 import { TRow } from "@/app/dashboard/ReportView/DataTable";
-import { EItemName, TClick, TPrimaryItemName } from "@/lib/types";
+import { EItemName, TClick, TPrimaryItemName, TPrimaryData } from "@/lib/types";
 import { getPrimaryItemById, isPrimary } from "@/lib/utils";
 
 const INCLUDE_UNKNOWN_ROWS = false;
@@ -13,7 +13,7 @@ export function useRows(
     clicks: TClick[],
     itemName: EItemName
 ): [TRow[] | null, React.Dispatch<React.SetStateAction<TRow[] | null>>] {
-    const { primaryData } = useReportView();
+    const { primaryData } = useDataContext();
 
     const [rows, setRows] = useState<TRow[] | null>(null);
 

@@ -98,6 +98,15 @@ export type UpdateRequest =
     | TTrafficSource_createRequest
     | TClick_updateRequest;
 
+export type TPrimaryData = {
+    [EItemName.AFFILIATE_NETWORK]: TAffiliateNetwork[];
+    [EItemName.CAMPAIGN]: TCampaign[];
+    [EItemName.FLOW]: TSavedFlow[];
+    [EItemName.LANDING_PAGE]: TLandingPage[];
+    [EItemName.OFFER]: TOffer[];
+    [EItemName.TRAFFIC_SOURCE]: TTrafficSource[];
+};
+
 export type TToken = {
     queryParam: string;
     value: string;
