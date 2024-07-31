@@ -33,11 +33,13 @@ export default function HomeView({ primaryData, clicks, timeframe }: {
                         { timeframe: encodeTimeframe(_timeframe) }
                     )}
                 />
-                <Chart data={chartData} />
+                <Chart data={chartData} lines={lines} />
             </main>
         </DataProvider>
     )
 }
+
+const lines: string[] = ["visits", "clicks", "conversions", "revenue", "cost", "profit"];
 
 type TChartDataPoint = {
     name: string;
@@ -49,20 +51,23 @@ type TChartDataPoint = {
     profit: number;
 };
 
-function Chart({ data }: {
+function Chart({ data, lines }: {
     data: TChartDataPoint[];
+    lines: string[];
 }) {
     return (
         <LineChart width={500} height={300} data={data}>
             {data.length < 5 && <XAxis dataKey="name" />}
             <YAxis />
             <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-            <Line type="monotone" dataKey="visits" stroke="#8884d8" />
-            <Line type="monotone" dataKey="clicks" stroke="#82ca9d" />
-            <Line type="monotone" dataKey="conversions" stroke="red" />
-            <Line type="monotone" dataKey="revenue" stroke="green" />
-            <Line type="monotone" dataKey="cost" stroke="blue" />
-            <Line type="monotone" dataKey="profit" stroke="yellow" />
+            {lines.map((line, index) => (
+                <Line
+                    key={index}
+                    type="monotone"
+                    dataKey={line}
+                    stroke={colorFromIndex(index)}
+                />
+            ))}
             <Tooltip />
             <Legend />
         </LineChart>
@@ -119,3 +124,16 @@ function makeChartData(clicks: TClick[], timeframe: [Date, Date]): TChartDataPoi
 
     return Array.from(datesMap.values());
 }
+
+function colorFromIndex(index: number): string {
+    return colors[index] ?? "black";
+}
+
+const colors: string[] = [
+    "green",
+    "red",
+    "blue",
+    "yellow",
+    "purple",
+    "orange",
+];
