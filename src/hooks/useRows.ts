@@ -27,7 +27,7 @@ type TEnrichmentItem = {
     name: string;
 };
 
-function makeRows(
+export function makeRows(
     primaryData: TPrimaryData,
     clicks: TClick[],
     itemName: EItemName,

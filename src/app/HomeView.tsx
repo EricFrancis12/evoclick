@@ -4,17 +4,19 @@ import { useState } from "react";
 import { faTachometerAltFast } from "@fortawesome/free-solid-svg-icons";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { startOfDay } from "date-fns";
-import { DataProvider } from "@/contexts/DataContext";
+import { DataProvider, useDataContext } from "@/contexts/DataContext";
 import useIsServerSide from "@/hooks/useIsServerSide";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import Button from "@/components/Button";
 import CalendarButton from "@/components/CalendarButton";
 import {
-    calcClicks, calcConversions, calcProfit,
+    calcClicks, calcConversions, calcCostPerClick, calcProfit,
     calcROI, calcTotalCost, calcTotalRevenue, calcVisits
 } from "./dashboard/ReportView/DataTable/columnsMap";
 import { encodeTimeframe, startOfDaysBetween } from "@/lib/utils";
-import { TPrimaryData, TClick } from "@/lib/types";
+import { TPrimaryData, TClick, EItemName } from "@/lib/types";
+import DropdownButton from "@/components/DropdownButton";
+import { makeRows } from "@/hooks/useRows";
 
 export default function HomeView({ primaryData, clicks, timeframe }: {
     primaryData: TPrimaryData;
@@ -25,18 +27,20 @@ export default function HomeView({ primaryData, clicks, timeframe }: {
 
     const chartData = makeChartData(clicks, timeframe);
     const cards = makeCards(clicks);
-    const statsCards = makeStateCards();
 
-    const [lines, setLines] = useState<Set<ELine>>(new Set(Object.values(ELine)));
+    const [metric, setMetric] = useState<EMetric>(EMetric.visits);
+    const statCards = makeStatCards(primaryData, clicks, metric);
 
-    function handleChange(line: ELine) {
-        const newLines = structuredClone(lines);
-        if (lines.has(line)) {
-            newLines.delete(line);
+    const [metrics, setMetrics] = useState<Set<EMetric>>(new Set(Object.values(EMetric)));
+
+    function handleChange(metric: EMetric) {
+        const newMetrics = structuredClone(metrics);
+        if (metrics.has(metric)) {
+            newMetrics.delete(metric);
         } else {
-            newLines.add(line);
+            newMetrics.add(metric);
         }
-        setLines(newLines);
+        setMetrics(newMetrics);
     }
 
     return (
@@ -70,9 +74,16 @@ export default function HomeView({ primaryData, clicks, timeframe }: {
                         </div>
                     ))}
                 </div>
-                <div className="flex justify-center w-full">
+                <div className="flex flex-col items-center w-full">
+                    <div className="flex justify-end items-center w-full p-2">
+                        <DropdownButton
+                            value={metric}
+                            options={Object.values(EMetric)}
+                            onClick={setMetric}
+                        />
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 w-[90%]">
-                        {statsCards.map((statsCard, index) => (
+                        {statCards.map((statsCard, index) => (
                             <StatsCard
                                 key={index}
                                 card={statsCard}
@@ -82,14 +93,14 @@ export default function HomeView({ primaryData, clicks, timeframe }: {
                 </div>
                 <div className="flex flex-col items-center gap-2 w-full">
                     <div className="grid grid-cols-3">
-                        {Object.values(ELine).map((line, index) => (
+                        {Object.values(EMetric).map((metric, index) => (
                             <div key={index} className="flex items-center gap-2">
                                 <input
                                     type="checkbox"
-                                    checked={lines.has(line)}
-                                    onChange={() => handleChange(line)}
+                                    checked={metrics.has(metric)}
+                                    onChange={() => handleChange(metric)}
                                 />
-                                <span>{line}</span>
+                                <span>{metric}</span>
                             </div>
                         ))}
                     </div>
@@ -98,7 +109,7 @@ export default function HomeView({ primaryData, clicks, timeframe }: {
                         width="100%"
                         className="px-4 sm:px-8 md:px-16"
                         data={chartData}
-                        lines={Array.from(lines).map(line => ({ dataKey: line, stroke: lineColor(line) }))}
+                        lines={Array.from(metrics).map(metric => ({ dataKey: metric, stroke: lineColor(metric) }))}
                     />
                 </div>
             </main>
@@ -106,54 +117,66 @@ export default function HomeView({ primaryData, clicks, timeframe }: {
     )
 }
 
-type TStatsCard = {
+type TStatCard = {
     title: string;
-    metric: string;
-    rows: { text: string, value: number }[];
+    metric: EMetric;
+    rows: TStatCardRow[];
 };
+type TStatCardRow = { name: string, value: number };
 
-function makeStateCards(): TStatsCard[] {
-    return _statsCards;
+function calcValueFromMetric(clicks: TClick[], metric: EMetric): number {
+    switch (metric) {
+        case EMetric.visits:
+            return calcVisits(clicks);
+        case EMetric.clicks:
+            return calcClicks(clicks);
+        case EMetric.conversions:
+            return calcConversions(clicks);
+        case EMetric.revenue:
+            return calcTotalRevenue(clicks);
+        case EMetric.cost:
+            return calcTotalCost(clicks);
+        case EMetric.profit:
+            return calcProfit(calcTotalRevenue(clicks), calcTotalCost(clicks));
+        default:
+            return 0;
+    }
 }
 
-const _statsCards: TStatsCard[] = [
-    {
-        title: "title",
-        metric: "metric",
-        rows: [
-            { text: "text", value: 1 },
-            { text: "text", value: 1 },
-            { text: "text", value: 1 },
-            { text: "text", value: 1 },
-            { text: "text", value: 1 },
-        ],
-    },
-    {
-        title: "title",
-        metric: "metric",
-        rows: [
-            { text: "text", value: 1 },
-            { text: "text", value: 1 },
-            { text: "text", value: 1 },
-            { text: "text", value: 1 },
-            { text: "text", value: 1 },
-        ],
-    },
-    {
-        title: "title",
-        metric: "metric",
-        rows: [
-            { text: "text", value: 1 },
-            { text: "text", value: 1 },
-            { text: "text", value: 1 },
-            { text: "text", value: 1 },
-            { text: "text", value: 1 },
-        ],
-    },
-];
+function makeStatCards(primaryData: TPrimaryData, clicks: TClick[], metric: EMetric): TStatCard[] {
+    return [
+        {
+            title: "Campaigns",
+            metric,
+            rows: makeStatCardRows(primaryData, clicks, metric, EItemName.CAMPAIGN),
+        },
+        {
+            title: "Traffic Sources",
+            metric,
+            rows: makeStatCardRows(primaryData, clicks, metric, EItemName.TRAFFIC_SOURCE),
+        },
+        {
+            title: "Offers",
+            metric,
+            rows: makeStatCardRows(primaryData, clicks, metric, EItemName.OFFER),
+        },
+        {
+            title: "Countries",
+            metric,
+            rows: makeStatCardRows(primaryData, clicks, metric, EItemName.COUNTRY),
+        },
+    ];
+}
+
+function makeStatCardRows(primaryData: TPrimaryData, clicks: TClick[], metric: EMetric, itemName: EItemName): TStatCardRow[] {
+    return makeRows(primaryData, clicks, itemName).map(({ name }) => ({
+        name,
+        value: calcValueFromMetric(clicks, metric),
+    }));
+}
 
 function StatsCard({ card }: {
-    card: TStatsCard;
+    card: TStatCard;
 }) {
     const { title, metric, rows } = card;
 
@@ -163,9 +186,9 @@ function StatsCard({ card }: {
                 <span>{title}</span>
                 <span>{metric}</span>
             </StatsCardRow>
-            {rows.map(({ text, value }, index) => (
+            {rows.map(({ name, value }, index) => (
                 <StatsCardRow key={index}>
-                    <span>{text}</span>
+                    <span>{name}</span>
                     <span>{value}</span>
                 </StatsCardRow>
             ))}
@@ -224,7 +247,7 @@ function makeCards(clicks: TClick[]): TCard[] {
     ];
 }
 
-enum ELine {
+enum EMetric {
     visits = "visits",
     clicks = "clicks",
     conversions = "conversions",
@@ -327,15 +350,15 @@ function makeChartData(clicks: TClick[], timeframe: [Date, Date]): TChartDataPoi
     return Array.from(datesMap.values());
 }
 
-function lineColor(line: ELine): string {
-    return lineColorsRecord[line];
+function lineColor(metric: EMetric): string {
+    return metricColorsRecord[metric];
 }
 
-const lineColorsRecord: Record<ELine, string> = {
-    [ELine.visits]: "blue",
-    [ELine.clicks]: "orange",
-    [ELine.conversions]: "purple",
-    [ELine.revenue]: "teal",
-    [ELine.cost]: "yellow",
-    [ELine.profit]: "green",
+const metricColorsRecord: Record<EMetric, string> = {
+    [EMetric.visits]: "blue",
+    [EMetric.clicks]: "orange",
+    [EMetric.conversions]: "purple",
+    [EMetric.revenue]: "teal",
+    [EMetric.cost]: "yellow",
+    [EMetric.profit]: "green",
 } 

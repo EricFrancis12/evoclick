@@ -5,32 +5,37 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronUp, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { BUTTON_STYLE } from "./Button";
 
-export default function DropdownButton({ options, value, disabled, onClick }: {
-    options: string[];
-    value: string;
+export default function DropdownButton<S extends string>({ options, value, disabled, onClick }: {
+    options: S[];
+    value: S;
     disabled?: boolean;
-    onClick: (newValue: string) => void;
+    onClick: (newValue: S) => void;
 }) {
-    const [active, setActive] = useState<boolean>(false);
+    const [open, setOpen] = useState<boolean>(false);
+
+    function handleClick(newValue: S) {
+        setOpen(false);
+        onClick(newValue);
+    }
 
     return (
         <div className="relative whitespace-nowrap">
             <div
                 className={(!disabled ? "hover:opacity-70" : "opacity-40")
-                    + " flex justify-between items-center min-w-[100px] px-2 py-2"}
+                    + " flex justify-between items-center min-w-[100px] px-2 py-2 cursor-pointer"}
                 style={BUTTON_STYLE}
-                onClick={() => setActive(prev => !prev)}
+                onClick={() => setOpen(prev => !prev)}
             >
                 <span className="mr-[4px]">{value}</span>
-                <FontAwesomeIcon icon={active ? faChevronUp : faChevronDown} />
+                <FontAwesomeIcon icon={open ? faChevronUp : faChevronDown} />
             </div>
-            <div className="absolute top-full left-0 h-full">
-                {(active && !disabled) && options.map((option, index) => (
+            <div className="absolute top-full left-0 h-full bg-white">
+                {(open && !disabled) && options.map((option, index) => (
                     <div
                         key={index}
-                        className="p-1 hover:bg-blue-300"
+                        className="p-1 bg-white hover:bg-blue-300 cursor-pointer"
                         style={{ outline: "solid grey 1px" }}
-                        onClick={() => onClick(option)}
+                        onClick={() => handleClick(option)}
                     >
                         {option}
                     </div>
