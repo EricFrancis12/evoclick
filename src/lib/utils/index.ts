@@ -1,3 +1,4 @@
+import { startOfDay, addDays } from "date-fns";
 import { TPrimaryData, EItemName, EQueryParam, TPrimaryItemName, TToken } from "../types";
 
 export * from "./maps"
@@ -60,6 +61,20 @@ export function decodeTimeframe(str: string): [Date, Date] | null {
     if (nums.includes(NaN)) return null;
 
     return nums.map(num => new Date(num)) as [Date, Date];
+}
+
+export function startOfDaysBetween(timeframe: [Date, Date]): Date[] {
+    const firstDay = startOfDay(timeframe[0]);
+    const lastDay = startOfDay(timeframe[1]);
+
+    const _daysBetween: Date[] = [];
+    let day = structuredClone(firstDay);
+    while (day < lastDay) {
+        _daysBetween.push(day);
+        day = addDays(day, 1);
+    }
+
+    return [firstDay, ..._daysBetween, lastDay];
 }
 
 export function getPrimaryItemById(
