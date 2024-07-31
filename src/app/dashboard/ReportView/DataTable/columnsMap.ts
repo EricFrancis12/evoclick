@@ -121,58 +121,58 @@ export function makeCells(columnsMap: TColumnsMap, clicks: TClick[], name: strin
     return Array.from(columnsMap).map(([_, { dtc }]) => dtc.calcValue(clicks, name));
 }
 
-function calcVisits(clicks: TClick[]): number {
+export function calcVisits(clicks: TClick[]): number {
     return clicks.length;
 }
 
-function calcClicks(clicks: TClick[]): number {
+export function calcClicks(clicks: TClick[]): number {
     return clicks.filter(click => !!click.clickTime).length;
 }
 
-function calcConversions(clicks: TClick[]): number {
+export function calcConversions(clicks: TClick[]): number {
     return clicks.filter(click => !!click.convTime).length;
 }
 
-function calcTotalRevenue(clicks: TClick[]): number {
+export function calcTotalRevenue(clicks: TClick[]): number {
     return clicks.reduce((total, click) => total + click.revenue, 0);
 }
 
-function calcTotalCost(clicks: TClick[]): number {
+export function calcTotalCost(clicks: TClick[]): number {
     return clicks.reduce((total, click) => total + click.cost, 0);
 }
 
-function calcProfit(revenue: number, cost: number): number {
+export function calcProfit(revenue: number, cost: number): number {
     return revenue - cost;
 }
 
-function calcCostPerVisit(cost: number, numVisits: number): number {
+export function calcCostPerVisit(cost: number, numVisits: number): number {
     return numVisits ? cost / numVisits : 0;
 }
 
-function calcCostPerClick(cost: number, numClicks: number): number {
+export function calcCostPerClick(cost: number, numClicks: number): number {
     return numClicks ? cost / numClicks : 0;
 }
 
-function calcCostPerConversion(cost: number, numConversions: number): number {
+export function calcCostPerConversion(cost: number, numConversions: number): number {
     return numConversions ? cost / numConversions : 0;
 }
 
-function calcClickThroughRate(numClicks: number, numVisits: number): number {
+export function calcClickThroughRate(numClicks: number, numVisits: number): number {
     return numVisits ? numClicks / numVisits : 0;
 }
 
-function calcConversionRate(numConversions: number, numVisits: number): number {
+export function calcConversionRate(numConversions: number, numVisits: number): number {
     return numVisits ? numConversions / numVisits : 0;
 }
 
-function calcROI(revenue: number, cost: number): number {
+export function calcROI(revenue: number, cost: number): number {
     return cost ? (revenue - cost) / cost : 0;
 }
 
-function calcEarningsPerVisit(revenue: number, numVisits: number): number {
+export function calcEarningsPerVisit(revenue: number, numVisits: number): number {
     return numVisits ? revenue / numVisits : 0;
 }
 
-function calcEarningsPerClick(revenue: number, numClicks: number): number {
+export function calcEarningsPerClick(revenue: number, numClicks: number): number {
     return numClicks ? revenue / numClicks : 0;
 }

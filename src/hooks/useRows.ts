@@ -9,10 +9,7 @@ import { getPrimaryItemById, isPrimary } from "@/lib/utils";
 
 const INCLUDE_UNKNOWN_ROWS = false;
 
-export function useRows(
-    clicks: TClick[],
-    itemName: EItemName
-): [TRow[] | null, React.Dispatch<React.SetStateAction<TRow[] | null>>] {
+export function useRows(clicks: TClick[], itemName: EItemName): [TRow[] | null, React.Dispatch<React.SetStateAction<TRow[] | null>>] {
     const { primaryData } = useDataContext();
 
     const [rows, setRows] = useState<TRow[] | null>(null);
