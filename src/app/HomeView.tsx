@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
 import { startOfDay } from "date-fns";
 import { DataProvider } from "@/contexts/DataContext";
+import useIsServerSide from "@/hooks/useIsServerSide";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import CalendarButton from "@/components/CalendarButton";
 import { encodeTimeframe, startOfDaysBetween } from "@/lib/utils";
@@ -16,8 +18,19 @@ export default function HomeView({ primaryData, clicks, timeframe }: {
 }) {
     const queryRouter = useQueryRouter();
 
-    // const [chartData, setChartData] = useState<TChartDataPoint[]>(makeChartData(clicks, timeframe));
     const chartData = makeChartData(clicks, timeframe);
+
+    const [lines, setLines] = useState<Set<ELine>>(new Set(Object.values(ELine)));
+
+    function handleChange(line: ELine) {
+        const newLines = structuredClone(lines);
+        if (lines.has(line)) {
+            newLines.delete(line);
+        } else {
+            newLines.add(line);
+        }
+        setLines(newLines);
+    }
 
     return (
         <DataProvider primaryData={primaryData} clicks={clicks}>
@@ -33,13 +46,35 @@ export default function HomeView({ primaryData, clicks, timeframe }: {
                         { timeframe: encodeTimeframe(_timeframe) }
                     )}
                 />
-                <Chart data={chartData} lines={lines} />
+                <div>
+                    {Object.values(ELine).map((line, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                checked={lines.has(line)}
+                                onChange={() => handleChange(line)}
+                            />
+                            <span>{line}</span>
+                        </div>
+                    ))}
+                </div>
+                <Chart
+                    data={chartData}
+                    lines={Array.from(lines).map(line => ({ dataKey: line, stroke: lineColor(line) }))}
+                />
             </main>
         </DataProvider>
     )
 }
 
-const lines: string[] = ["visits", "clicks", "conversions", "revenue", "cost", "profit"];
+enum ELine {
+    visits = "visits",
+    clicks = "clicks",
+    conversions = "conversions",
+    revenue = "revenue",
+    cost = "cost",
+    profit = "profit",
+};
 
 type TChartDataPoint = {
     name: string;
@@ -53,19 +88,23 @@ type TChartDataPoint = {
 
 function Chart({ data, lines }: {
     data: TChartDataPoint[];
-    lines: string[];
+    lines: { dataKey: string, stroke: string }[];
 }) {
+    const isServerSide = useIsServerSide();
+
+    if (isServerSide) return null;
+
     return (
         <LineChart width={500} height={300} data={data}>
             {data.length < 5 && <XAxis dataKey="name" />}
             <YAxis />
             <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-            {lines.map((line, index) => (
+            {lines.map(({ dataKey, stroke }, index) => (
                 <Line
                     key={index}
                     type="monotone"
-                    dataKey={line}
-                    stroke={colorFromIndex(index)}
+                    dataKey={dataKey}
+                    stroke={stroke}
                 />
             ))}
             <Tooltip />
@@ -125,15 +164,15 @@ function makeChartData(clicks: TClick[], timeframe: [Date, Date]): TChartDataPoi
     return Array.from(datesMap.values());
 }
 
-function colorFromIndex(index: number): string {
-    return colors[index] ?? "black";
+function lineColor(line: ELine): string {
+    return lineColorsRecord[line];
 }
 
-const colors: string[] = [
-    "green",
-    "red",
-    "blue",
-    "yellow",
-    "purple",
-    "orange",
-];
+const lineColorsRecord: Record<ELine, string> = {
+    [ELine.visits]: "blue",
+    [ELine.clicks]: "orange",
+    [ELine.conversions]: "purple",
+    [ELine.revenue]: "teal",
+    [ELine.cost]: "yellow",
+    [ELine.profit]: "green",
+} 
