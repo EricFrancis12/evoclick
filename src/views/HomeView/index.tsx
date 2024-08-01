@@ -14,7 +14,7 @@ import CalendarButton from "@/components/CalendarButton";
 import {
     calcClicks, calcConversions, calcProfit, calcROI,
     calcTotalCost, calcTotalRevenue, calcVisits
-} from "./dashboard/ReportView/DataTable/columnsMap";
+} from "../ReportView/DataTable/columnsMap";
 import { encodeTimeframe, startOfDaysBetween, zeroIfNeg } from "@/lib/utils";
 import { TPrimaryData, TClick, EItemName } from "@/lib/types";
 import DropdownButton from "@/components/DropdownButton";

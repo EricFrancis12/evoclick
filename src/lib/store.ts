@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { parseISO } from "date-fns";
 import { IconDefinition, faTachometerAltFast } from "@fortawesome/free-solid-svg-icons";
-import { TReportChain } from "@/app/dashboard/ReportView/ReportChain";
+import { TReportChain } from "@/views/ReportView/ReportChain";
 import { defaultTimeframe } from "./constants";
 import { EItemName } from "./types";
 

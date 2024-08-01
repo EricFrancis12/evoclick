@@ -3,7 +3,7 @@ import {
     getAllAffiliateNetworks, getAllCampaigns, getAllClicks, getAllFlows,
     getAllLandingPages, getAllOffers, getAllTrafficSources
 } from "@/data";
-import HomeView from "./HomeView";
+import HomeView from "../views/HomeView";
 import { defaultTimeframe } from "@/lib/constants";
 import { decodeSearchParams, prismaArgs } from "@/lib/utils/server";
 import { EItemName } from "@/lib/types";

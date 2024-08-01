@@ -1,6 +1,6 @@
 "use client";
 
-import { itemNameToIcon } from "@/app/dashboard/ReportView/Report";
+import { itemNameToIcon } from "@/views/ReportView/Report";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import { useViewsStore, newReportView } from "@/lib/store";
 import { encodeTimeframe } from "@/lib/utils";

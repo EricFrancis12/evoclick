@@ -1,7 +1,7 @@
 import {
     TActionMenu, TAffiliateNetworkActionMenu, TCampaignActionMenu, TLandingPageActionMenu,
     TOfferActionMenu, TSavedFlowActionMenu, TTrafficSourceActionMenu
-} from "@/app/dashboard/ReportView/ActionMenu/types";
+} from "@/views/ReportView/ActionMenu/types";
 import {
     EItemName, ELogicalRelation, ERuleName, TAffiliateNetwork, TCampaign, TLandingPage,
     TNamedToken, TOffer, TPath, TRoute, TRule, TSavedFlow, TToken, TTrafficSource

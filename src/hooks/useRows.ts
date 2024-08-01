@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { itemNameToClickProp } from "@/lib/utils/maps";
 import { useDataContext } from "@/contexts/DataContext";
-import { TRow } from "@/app/dashboard/ReportView/DataTable";
+import { TRow } from "@/views/ReportView/DataTable";
 import { EItemName, TClick, TPrimaryItemName, TPrimaryData } from "@/lib/types";
 import { getPrimaryItemById, isPrimary } from "@/lib/utils";
 

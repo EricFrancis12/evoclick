@@ -6,7 +6,7 @@ import {
     faChevronUp, faChevronDown, faShuffle, faPencil,
     faTrash, faCopy, faLink, faExternalLink
 } from "@fortawesome/free-solid-svg-icons";
-import { TDialogueMenuItem } from "../../../../contexts/DialogueMenuContext";
+import { TDialogueMenuItem } from "../../../contexts/DialogueMenuContext";
 import useNewReport from "@/hooks/useNewReport";
 import RowWrapper from "./RowWrapper";
 import CheckboxWrapper from "./CheckboxWrapper";
