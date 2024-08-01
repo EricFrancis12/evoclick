@@ -4,19 +4,20 @@ import { useState } from "react";
 import { faTachometerAltFast } from "@fortawesome/free-solid-svg-icons";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { startOfDay } from "date-fns";
-import { DataProvider, useDataContext } from "@/contexts/DataContext";
+import { DataProvider } from "@/contexts/DataContext";
 import useIsServerSide from "@/hooks/useIsServerSide";
+import usePagination from "@/hooks/usePagination";
 import useQueryRouter from "@/hooks/useQueryRouter";
+import { makeRows } from "@/hooks/useRows";
 import Button from "@/components/Button";
 import CalendarButton from "@/components/CalendarButton";
 import {
-    calcClicks, calcConversions, calcCostPerClick, calcProfit,
-    calcROI, calcTotalCost, calcTotalRevenue, calcVisits
+    calcClicks, calcConversions, calcProfit, calcROI,
+    calcTotalCost, calcTotalRevenue, calcVisits
 } from "./dashboard/ReportView/DataTable/columnsMap";
-import { encodeTimeframe, startOfDaysBetween } from "@/lib/utils";
+import { encodeTimeframe, startOfDaysBetween, zeroIfNeg } from "@/lib/utils";
 import { TPrimaryData, TClick, EItemName } from "@/lib/types";
 import DropdownButton from "@/components/DropdownButton";
-import { makeRows } from "@/hooks/useRows";
 
 export default function HomeView({ primaryData, clicks, timeframe }: {
     primaryData: TPrimaryData;
@@ -45,8 +46,8 @@ export default function HomeView({ primaryData, clicks, timeframe }: {
 
     return (
         <DataProvider primaryData={primaryData} clicks={clicks}>
-            <main className="flex flex-col items-center gap-4 h-screen w-full">
-                <div className="flex justify-end items-center gap-2 w-full p-2">
+            <main className="flex flex-col items-center gap-8 min-h-screen w-full pb-16">
+                <div className="flex justify-end items-center gap-2 w-full p-4">
                     <CalendarButton
                         timeframe={timeframe}
                         onChange={_timeframe => queryRouter.push(
@@ -63,7 +64,7 @@ export default function HomeView({ primaryData, clicks, timeframe }: {
                         )}
                     />
                 </div>
-                <div className={`grid grid-cols-1 md:grid-cols-${cards.length} gap-2 w-full p-4 md:px-2`}>
+                <div className={"grid grid-cols-1 md:grid-cols-7 gap-2 w-full px-3 md:px-6"}>
                     {cards.map((card, index) => (
                         <div
                             key={index}
@@ -73,23 +74,6 @@ export default function HomeView({ primaryData, clicks, timeframe }: {
                             <span>{card.subtext}</span>
                         </div>
                     ))}
-                </div>
-                <div className="flex flex-col items-center w-full">
-                    <div className="flex justify-end items-center w-full p-2">
-                        <DropdownButton
-                            value={metric}
-                            options={Object.values(EMetric)}
-                            onClick={setMetric}
-                        />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 w-[90%]">
-                        {statCards.map((statsCard, index) => (
-                            <StatsCard
-                                key={index}
-                                card={statsCard}
-                            />
-                        ))}
-                    </div>
                 </div>
                 <div className="flex flex-col items-center gap-2 w-full">
                     <div className="grid grid-cols-3">
@@ -111,6 +95,20 @@ export default function HomeView({ primaryData, clicks, timeframe }: {
                         data={chartData}
                         lines={Array.from(metrics).map(metric => ({ dataKey: metric, stroke: lineColor(metric) }))}
                     />
+                </div>
+                <div className="flex flex-col items-center gap-4 md:gap-8 w-[90%]">
+                    <div className="flex justify-end items-center w-full">
+                        <DropdownButton
+                            value={metric}
+                            options={Object.values(EMetric)}
+                            onClick={setMetric}
+                        />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 w-full">
+                        {statCards.map((statsCard, index) => (
+                            <StatsCard key={index} card={statsCard} />
+                        ))}
+                    </div>
                 </div>
             </main>
         </DataProvider>
@@ -175,33 +173,52 @@ function makeStatCardRows(primaryData: TPrimaryData, clicks: TClick[], metric: E
     }));
 }
 
+const ROWS_PER_PAGE = 4;
+
 function StatsCard({ card }: {
     card: TStatCard;
 }) {
     const { title, metric, rows } = card;
 
+    const { Pagination, itemsOnCurrentPage } = usePagination(rows, ROWS_PER_PAGE);
+
+    const numDummyRows = zeroIfNeg(ROWS_PER_PAGE - itemsOnCurrentPage.length);
+
     return (
         <div className="rounded-md border shadow overflow-hidden">
-            <StatsCardRow className="bg-blue-300">
-                <span>{title}</span>
-                <span>{metric}</span>
+            <StatsCardRow className="bg-[#2f918e]">
+                <span className="font-bold">{title}</span>
+                <span className="font-bold">{metric}</span>
             </StatsCardRow>
-            {rows.map(({ name, value }, index) => (
-                <StatsCardRow key={index}>
-                    <span>{name}</span>
-                    <span>{value}</span>
-                </StatsCardRow>
+            {itemsOnCurrentPage.length === 0
+                ? <div className="w-full text-center italic">no data...</div>
+                : itemsOnCurrentPage.map(({ name, value }, index) => (
+                    <StatsCardRow key={index} className="border-b">
+                        <span>{name}</span>
+                        <span>{value}</span>
+                    </StatsCardRow>
+                ))}
+            {Array.from({ length: numDummyRows }).map((_, index) => (
+                <StatsCardRow key={index} />
             ))}
+            {rows.length > ROWS_PER_PAGE &&
+                <Pagination />
+            }
         </div>
     )
 }
 
+const STATS_CARD_ROW_HEIGHT = 30; // pixels
+
 function StatsCardRow({ children, className = "" }: {
-    children: React.ReactNode;
+    children?: React.ReactNode;
     className?: string;
 }) {
     return (
-        <div className={className + " flex justify-between items-center gap-2 w-full px-2"}>
+        <div
+            className={className + " flex justify-between items-center gap-2 w-full px-2"}
+            style={{ height: `${STATS_CARD_ROW_HEIGHT}px` }}
+        >
             {children}
         </div>
     )
@@ -278,9 +295,7 @@ function Chart({ data, lines, height, width, className }: {
 
     return (
         <ResponsiveContainer height={height} width={width} className={className}>
-            <LineChart
-                data={data}
-            >
+            <LineChart data={data}>
                 {data.length < 5 && <XAxis dataKey="name" />}
                 <YAxis />
                 <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
@@ -293,7 +308,7 @@ function Chart({ data, lines, height, width, className }: {
                     />
                 ))}
                 <Tooltip />
-                <Legend />
+                <Legend wrapperStyle={{ paddingTop: "20px" }} />
             </LineChart>
         </ResponsiveContainer>
     )

@@ -13,6 +13,11 @@ export function titleCase(str: string): string {
     return str.split(" ").map(upperCaseFirstLetter).join(" ");
 }
 
+export function zeroIfNeg(n: number): number {
+    if (n > 0) return n;
+    return 0;
+}
+
 export function safeParseJson(jsonStr: string, resultIfError: unknown = {}): unknown {
     let result: unknown;
     try {
