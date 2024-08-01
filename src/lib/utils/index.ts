@@ -13,9 +13,12 @@ export function titleCase(str: string): string {
     return str.split(" ").map(upperCaseFirstLetter).join(" ");
 }
 
-export function zeroIfNeg(n: number): number {
-    if (n > 0) return n;
-    return 0;
+export function greatestAmong(...nums: number[]): number {
+    return [...nums].sort((a, b) => b - a)[0] ?? 0;
+}
+
+export function minZero(n: number): number {
+    return greatestAmong(0, n);
 }
 
 export function safeParseJson(jsonStr: string, resultIfError: unknown = {}): unknown {

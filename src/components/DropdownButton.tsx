@@ -21,7 +21,7 @@ export default function DropdownButton<S extends string>({ options, value, disab
     }
 
     return (
-        <div ref={ref} className="relative whitespace-nowrap">
+        <div ref={ref} className="relative whitespace-nowrap select-none">
             <div
                 className={(!disabled ? "hover:opacity-70" : "opacity-40")
                     + " flex justify-between items-center min-w-[100px] px-2 py-2 cursor-pointer"}
