@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronUp, faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import useClickOutsideToggle from "@/hooks/useClickOutsideToggle";
 import { BUTTON_STYLE } from "./Button";
 
 export default function DropdownButton<S extends string>({ options, value, disabled, onClick }: {
@@ -12,6 +13,7 @@ export default function DropdownButton<S extends string>({ options, value, disab
     onClick: (newValue: S) => void;
 }) {
     const [open, setOpen] = useState<boolean>(false);
+    const ref = useClickOutsideToggle(open, setOpen);
 
     function handleClick(newValue: S) {
         setOpen(false);
@@ -19,7 +21,7 @@ export default function DropdownButton<S extends string>({ options, value, disab
     }
 
     return (
-        <div className="relative whitespace-nowrap">
+        <div ref={ref} className="relative whitespace-nowrap">
             <div
                 className={(!disabled ? "hover:opacity-70" : "opacity-40")
                     + " flex justify-between items-center min-w-[100px] px-2 py-2 cursor-pointer"}

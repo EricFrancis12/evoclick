@@ -3,7 +3,8 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { traverseParentsForRef } from "@/lib/utils/client";
+import { isAncestorOfRef } from "@/lib/utils/client";
+import useClickOutsideToggle from "@/hooks/useClickOutsideToggle";
 
 const Z_INDEX = 4000;
 
@@ -37,8 +38,6 @@ export function useDialogueMenu() {
 export function DialogueViewProvider({ children }: {
     children: React.ReactNode;
 }) {
-    const ref = useRef<HTMLDivElement | null>(null);
-
     const [dialogueMenu, setDialogueMenu] = useState<TDialogueMenu>({
         top: 0,
         left: 0,
@@ -48,27 +47,7 @@ export function DialogueViewProvider({ children }: {
 
     const { top, left, open, items } = dialogueMenu;
 
-    useEffect(() => {
-        if (open) {
-            document.addEventListener("click", handleGlobalClick);
-            document.addEventListener("contextmenu", handleGlobalClick);
-        } else {
-            document.removeEventListener("click", handleGlobalClick);
-            document.removeEventListener("contextmenu", handleGlobalClick);
-        }
-
-        function handleGlobalClick(e: MouseEvent) {
-            const element = e.target as HTMLElement | null;
-            if (open && element && !traverseParentsForRef(element, ref)) {
-                setDialogueMenu({ ...dialogueMenu, open: false });
-            }
-        }
-
-        return () => {
-            document.removeEventListener("click", handleGlobalClick);
-            document.removeEventListener("contextmenu", handleGlobalClick);
-        };
-    }, [open]);
+    const ref = useClickOutsideToggle(open, () => setDialogueMenu({ ...dialogueMenu, open: false }));
 
     function handleClick(e: React.MouseEvent<HTMLDivElement>, item: TDialogueMenuItem) {
         setDialogueMenu(prev => ({ ...prev, open: false }));
