@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
-import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faExternalLink } from "@fortawesome/free-solid-svg-icons";
 import { useDataContext } from "@/contexts/DataContext";
