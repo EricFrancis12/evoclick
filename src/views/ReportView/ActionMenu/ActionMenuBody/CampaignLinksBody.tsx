@@ -5,7 +5,6 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faExternalLink } from "@fortawesome/free-solid-svg-icons";
-import { getOneCampaignAction } from "@/lib/actions";
 import { useDataContext } from "@/contexts/DataContext";
 import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import { getPrimaryItemById, makeCampaignUrl, makeClickUrl } from "@/lib/utils";
@@ -17,23 +16,18 @@ export default function CampaignLinksBody({ actionMenu }: {
     actionMenu: TCampaignLinksActionMenu;
     setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 }) {
-    const [campaign, setCampaign] = useState<TCampaign | null>(null);
-
-    const getOneCampaign = getOneCampaignAction.bind(null);
-
-    useEffect(() => {
-        getOneCampaign(actionMenu.campaignId)
-            .then(setCampaign)
-            .catch(() => toast.error("Error fetching Campaign"));
-    }, []);
+    const { primaryData } = useDataContext();
+    const c = getPrimaryItemById(primaryData, EItemName.CAMPAIGN, actionMenu.campaignId);
+    const campaign = c?.primaryItemName === EItemName.CAMPAIGN ? c : null;
 
     return (
         <ActionMenuBodyWrapper>
-            {campaign &&
-                <div className="flex flex-col gap-4 w-full p-2">
+            {campaign
+                ? <div className="flex flex-col gap-4 w-full p-2">
                     <span>Campaign Name: {campaign.name}</span>
                     <CampaignLinksRows campaign={campaign} />
                 </div>
+                : <div className="text-center w-full italic">Campaign not found...</div>
             }
         </ActionMenuBodyWrapper>
     )
