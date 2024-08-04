@@ -15,8 +15,7 @@ export default function CampaignLinksBody({ actionMenu }: {
     setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 }) {
     const { primaryData } = useDataContext();
-    const c = getPrimaryItemById(primaryData, EItemName.CAMPAIGN, actionMenu.campaignId);
-    const campaign = c?.primaryItemName === EItemName.CAMPAIGN ? c : null;
+    const campaign = primaryData[EItemName.CAMPAIGN].find(({ id }) => id === actionMenu.campaignId) ?? null;
 
     return (
         <ActionMenuBodyWrapper>
