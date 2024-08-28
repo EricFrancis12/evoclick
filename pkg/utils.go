@@ -19,9 +19,9 @@ func ParseJSON[T any](jsonStr string) (T, error) {
 }
 
 // Checks if a given value is present in the slice.
-func SliceIncludes[T string | int | bool](slice []T, val T) bool {
-	for _, item := range slice {
-		if item == val {
+func SliceIncludes[C comparable](slice []C, val C) bool {
+	for _, c := range slice {
+		if c == val {
 			return true
 		}
 	}
@@ -34,11 +34,11 @@ func SliceIncludes[T string | int | bool](slice []T, val T) bool {
 // returns false and the error.
 func matchValAgainstRegexSlice(regexSlice []string, val string) (bool, error) {
 	for _, regex := range regexSlice {
-		isMatch, err := regexp.Match(regex, []byte(val))
+		ok, err := regexp.Match(regex, []byte(val))
 		if err != nil {
 			return false, err
 		}
-		if isMatch {
+		if ok {
 			return true, nil
 		}
 	}
@@ -50,9 +50,9 @@ func matchValAgainstRegexSlice(regexSlice []string, val string) (bool, error) {
 // the predicate function.
 func FilterSlice[T any](slice []T, predicate func(T) bool) []T {
 	var result []T
-	for _, v := range slice {
-		if predicate(v) {
-			result = append(result, v)
+	for _, t := range slice {
+		if predicate(t) {
+			result = append(result, t)
 		}
 	}
 	return result
@@ -61,11 +61,10 @@ func FilterSlice[T any](slice []T, predicate func(T) bool) []T {
 // Returns the string at index 0 in a slice of strings,
 // or an empty string if the slice is empty
 func SafeFirstString(strings []string) string {
-	str := ""
 	if len(strings) > 0 {
-		str = strings[0]
+		return strings[0]
 	}
-	return str
+	return ""
 }
 
 // Returns a random item from the provided slice.
@@ -74,11 +73,11 @@ func RandomItem[T any](items []T) (T, error) {
 		var zeroValue T
 		return zeroValue, fmt.Errorf("slice is empty")
 	}
-	randomIndex := RandomIntn(len(items))
+	randomIndex := RandomInt(len(items))
 	return items[randomIndex], nil
 }
 
-func RandomIntn(n int) int {
+func RandomInt(n int) int {
 	source := rand.NewSource(time.Now().UnixNano())
 	random := rand.New(source)
 	return random.Intn(n)
