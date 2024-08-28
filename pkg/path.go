@@ -6,7 +6,7 @@ func determinePath(paths []Path) (Path, error) {
 	totalWeight := TotalWeight(paths)
 
 	// Generate a random number between 0 and totalWeight-1
-	randnum := RandomIntn(totalWeight)
+	randnum := RandomInt(totalWeight)
 
 	// Find the path corresponding to the random number
 	runningWeight := 0
