@@ -33,7 +33,7 @@ export default function FlowBuilder({ value, onChange }: {
     }
 
     return (
-        <>
+        <div className="flex flex-col gap-2">
             <Route
                 type="main"
                 route={mainRoute}
@@ -60,7 +60,7 @@ export default function FlowBuilder({ value, onChange }: {
                 icon={faPlus}
                 onClick={() => onChange({ ...value, ruleRoutes: [...value.ruleRoutes, newRoute()] })}
             />
-        </>
+        </div>
     )
 }
 

@@ -114,16 +114,16 @@ export default function Section({ section, path, onChange }: {
                                     </div>
                                 ))}
                         </div>
-                        <div className="flex justify-between items-center bg-white h-[40px] my-1 px-2">
+                        <div className="flex justify-between items-center bg-white h-[40px] my-1">
                             <div
                                 onClick={() => setOuterActionMenu(newPrimaryItemActionMenu(itemName))}
-                                className="flex justify-center items-center h-full w-[50%] cursor-pointer"
+                                className="flex justify-center items-center h-full w-[50%] px-2 cursor-pointer"
                                 style={{ borderRight: "solid 1px grey" }}
                             >
                                 <span>{"Create New " + itemName}</span>
                             </div>
                             <div
-                                className="flex justify-center items-center h-full w-[50%] cursor-pointer"
+                                className="flex justify-center items-center h-full w-[50%] px-2 cursor-pointer"
                                 style={{ borderLeft: "solid 1px grey" }}
                             >
                                 <Select value="" onChange={e => handleAddNew(Number(e.target.value))}>
