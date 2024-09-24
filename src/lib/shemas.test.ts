@@ -141,7 +141,6 @@ describe("Testing schemas", () => {
             id: 7,
             name: "My Offer",
             url: "https://example.com/offer",
-            payout: 120,
             tags: ["my", "offer"],
             createdAt: new Date(),
             updatedAt: new Date(),

@@ -89,7 +89,6 @@ export const offersSchema: z.ZodType<TOffer> = z.object({
     id: z.number(),
     name: z.string(),
     url: z.string(),
-    payout: z.number(),
     tags: z.array(z.string()),
     createdAt: z.date(),
     updatedAt: z.date(),
