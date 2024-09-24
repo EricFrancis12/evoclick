@@ -11,4 +11,4 @@ Dockerfile*
 **/evoclick
 **/bin
 **/*.exe
-**/*.mti
+**/*.msi

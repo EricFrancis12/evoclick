@@ -134,7 +134,6 @@ model Offer {
   id                 Int              @id @default(autoincrement())
   name               String
   url                String
-  payout             Int
   tags               String[]
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt

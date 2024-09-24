@@ -62,7 +62,6 @@ export type TOfferActionMenu = {
     id?: number;
     name?: string;
     url?: string;
-    payout?: number;
     tags?: string[];
     affiliateNetworkId?: number;
 };

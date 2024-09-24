@@ -24,15 +24,14 @@ export default function OfferBody({ actionMenu, setActionMenu }: {
 
     async function handleSave() {
         try {
-            const { id, name, url, payout, tags, affiliateNetworkId } = actionMenu;
+            const { id, name, url, tags, affiliateNetworkId } = actionMenu;
             if (typeof id === "number") {
-                await updateOfferAction(id, { name, url, payout, tags, affiliateNetworkId }, window.location.href);
+                await updateOfferAction(id, { name, url, tags, affiliateNetworkId }, window.location.href);
                 toast.success("Offer was updated successfully");
             } else if (affiliateNetworkId !== undefined) {
                 await createNewOfferAction({
                     name: name ?? "",
                     url: url ?? "",
-                    payout: payout ?? 0,
                     tags: tags ?? [],
                     affiliateNetworkId: affiliateNetworkId,
                 }, window.location.href);
@@ -70,11 +69,6 @@ export default function OfferBody({ actionMenu, setActionMenu }: {
                 name="URL"
                 value={actionMenu.url || ""}
                 onChange={e => setActionMenu({ ...actionMenu, url: e.target.value })}
-            />
-            <Input
-                name="Payout"
-                value={actionMenu.payout || 0}
-                onChange={e => setActionMenu({ ...actionMenu, payout: Number(e.target.value) || 0 })}
             />
             <TagsInput
                 title="Tags"

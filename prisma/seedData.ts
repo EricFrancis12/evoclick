@@ -13,7 +13,6 @@ export type TAffiliateNetworkSeedData = typeof affiliateNetworkSeedData;
 export const offerSeedData = {
     name: "My First Offer",
     url: "http://localhost:3001/public/sample-offer.html",
-    payout: 80,
     tags,
 };
 export type TOfferSeedData = typeof offerSeedData;
