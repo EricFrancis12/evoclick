@@ -14,7 +14,7 @@
         "e2e": "npx cypress run",
         "load_test": "ts-node scripts/load_test.ts",
         "vercel-install": "npm install && yum install golang -y",
-        "vercel-build": "prisma generate && make db push && next build",
+        "vercel-build": "prisma generate && prisma db push --accept-data-loss && next build",
         "prepare": "husky"
     },
     "dependencies": {
