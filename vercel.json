@@ -1,4 +1,9 @@
 {
+    "git": {
+        "deploymentEnabled": {
+            "main": false
+        }
+    },
     "installCommand": "npm run vercel-install",
     "buildCommand": "npm run vercel-build",
     "rewrites": [
