@@ -17,21 +17,21 @@ EvoClick is a self-hosted click tracking software designed for media buyers and 
 ### Steps
 1. Clone the repository:
    
-   ```bash
-    git clone https://github.com/EricFrancis12/evoclick.git
-   ```
+```bash
+git clone https://github.com/EricFrancis12/evoclick.git
+```
 
 2. Navigate to the project directory:
    
-    ```bash
-    cd evoclick
-    ```
+```bash
+cd evoclick
+```
 
 3. Start the application:
  
-   ```bash
-    docker compose up
-    ```
+```bash
+docker compose up
+```
 
 The UI will now be running at http://localhost:3000 by default. Check the `.env` file for your Root Username and Root Password.
 
