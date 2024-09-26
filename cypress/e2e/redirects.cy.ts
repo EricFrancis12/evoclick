@@ -1,11 +1,11 @@
-import { campaignSeedData, landingPageSeedData, offerSeedData } from "../../prisma/seedData";
+import { campaignSeedData, landingPageSeedData, offerSeedData, trafficSourceSeedData } from "../../prisma/seedData";
 import { makeCampaignUrl, makeClickUrl, makePostbackUrl } from "../../src/lib/utils";
 import { ECookieName, Env } from "../../src/lib/types";
 
 describe("Testing campaign redirects", () => {
     it("redirects to the correct URLs", () => {
         // Campaign URL
-        cy.visit(makeCampaignUrl("http:", "localhost", "3001", campaignSeedData.publicId, []));
+        cy.visit(makeCampaignUrl("http:", "localhost", "3001", campaignSeedData.publicId, trafficSourceSeedData.customTokens));
         cy.url().should("eq", landingPageSeedData.url);
 
         cy.getCookie(ECookieName.CLICK_PUBLIC_ID, { domain: "localhost" })

@@ -13,6 +13,8 @@ export enum Env {
     CATCH_ALL_REDIRECT_URL = "CATCH_ALL_REDIRECT_URL",
 };
 
+export type Dataset = { [key: `data-${string}`]: string };
+
 type omissions = "id" | "createdAt" | "updatedAt";
 type primaryItemName = "primaryItemName";
 type publicId = "publicId";

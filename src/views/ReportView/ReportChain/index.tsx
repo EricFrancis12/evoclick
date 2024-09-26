@@ -5,11 +5,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { Select, DummySelect } from "@/components/base";
 import { getReportChainColor } from "./colors";
-import { EItemName } from "@/lib/types";
+import { EItemName, TClick } from "@/lib/types";
+import { useDataContext } from "@/contexts/DataContext";
 
 export type TReportChain = [TReportChainLink, TReportChainLink];
+export type TReportChainValue = EItemName | string;
 export type TReportChainLink = null | {
-    itemName?: EItemName;
+    value?: TReportChainValue;
 };
 
 export default function ReportChain({ reportChain, onChange, omissions = [], itemName }: {
@@ -18,10 +20,12 @@ export default function ReportChain({ reportChain, onChange, omissions = [], ite
     omissions?: EItemName[];
     itemName?: EItemName;
 }) {
+    const { clicks } = useDataContext();
+
     function handleChange(e: React.ChangeEvent<HTMLSelectElement>, index: number) {
         let newReportChain = [...reportChain];
         if (e.target.value) {
-            newReportChain[index] = { itemName: e.target.value as EItemName };
+            newReportChain[index] = { value: e.target.value as TReportChainValue };
             if (index <= newReportChain.length - 2) newReportChain[index + 1] = {};
         } else {
             newReportChain = [{}, null];
@@ -48,12 +52,12 @@ export default function ReportChain({ reportChain, onChange, omissions = [], ite
                 <Fragment key={index}>
                     <FontAwesomeIcon
                         icon={faArrowRight}
-                        className={chainLink?.itemName === undefined ? "text-gray-300" : "text-black"}
+                        className={chainLink?.value === undefined ? "text-gray-300" : "text-black"}
                     />
                     <div>
                         <Select
                             key={index}
-                            value={chainLink?.itemName ?? ""}
+                            value={chainLink?.value ?? ""}
                             onChange={e => handleChange(e, index)}
                             disabled={chainLink === null}
                             className="rounded-lg"
@@ -61,11 +65,12 @@ export default function ReportChain({ reportChain, onChange, omissions = [], ite
                                 border: "solid 1px",
                                 borderColor: getReportChainColor(index + 1).dark,
                             }}
+                            dataset={{ ["data-cy"]: `select-chain-link-index-${index}` }}
                         >
                             <option value="">None</option>
-                            {Object.values(EItemName)
-                                .filter(itemName => !omissions.includes(itemName))
-                                .filter(itemName => reportChain?.[index - 1]?.itemName !== itemName)
+                            {[...Object.values(EItemName), ...makeTokenQueryParams(clicks)]
+                                .filter(itemName => !((omissions as string[]).includes(itemName)))
+                                .filter(itemName => reportChain?.[index - 1]?.value !== itemName)
                                 .map((itemName, _index) => (
                                     <option key={_index} value={itemName}>
                                         {itemName}
@@ -77,4 +82,38 @@ export default function ReportChain({ reportChain, onChange, omissions = [], ite
             ))}
         </div>
     )
+}
+
+function makeTokenQueryParams(clicks: TClick[]): string[] {
+    const tokenQueryParams: string[] = [];
+    for (const click of clicks) {
+        for (const { queryParam } of click.tokens) {
+            if (!tokenQueryParams.includes(queryParam)) {
+                tokenQueryParams.push(queryParam);
+            }
+        }
+    }
+    return tokenQueryParams;
+}
+
+type reportChainValueToItemNameResult = {
+    success: true;
+    itemName: EItemName;
+} | {
+    success: false;
+    itemName: null;
+};
+
+export function reportChainValueToItemName(reportChainOption: TReportChainValue): reportChainValueToItemNameResult {
+    const itemNames: string[] = Object.values(EItemName);
+    if (itemNames.includes(reportChainOption)) {
+        return {
+            success: true,
+            itemName: reportChainOption as EItemName,
+        }
+    }
+    return {
+        success: false,
+        itemName: null,
+    };
 }
