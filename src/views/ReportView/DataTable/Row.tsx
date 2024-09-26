@@ -30,6 +30,8 @@ export default function Row({ row, columns, onSelected, view, depth }: {
     view: TView;
     depth: number;
 }) {
+    console.log(row.name);
+
     const { primaryData } = useDataContext();
     const { setActionMenu } = useReportViewContext();
 
