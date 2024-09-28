@@ -1,15 +1,17 @@
 import { argv } from "process";
 import http from "http";
-import { campaignSeedData } from "../prisma/seedData";
+import seedData, { returnFirstOrThrow } from "../prisma/seedData";
 import { makeCampaignUrl } from "../src/lib/utils";
-import { dotenvConfig } from "@/lib/utils/env";
+import { dotenvConfig } from "../src/lib/utils/env";
 import { Env } from "../src/lib/types";
 
 dotenvConfig();
 
 if (!process.env[Env.API_PORT]) throw new Error(`Environment variable ${Env.API_PORT} not set.`);
 
-const URL = makeCampaignUrl("http:", "localhost", process.env[Env.API_PORT], campaignSeedData.publicId, []);
+const { publicId } = returnFirstOrThrow(seedData.campaignSeeds, "Campaign seed");
+
+const URL = makeCampaignUrl("http:", "localhost", process.env[Env.API_PORT], publicId, []);
 const DURATION = 30_000; // ms
 
 (async function () {

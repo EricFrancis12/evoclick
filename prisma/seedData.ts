@@ -1,86 +1,150 @@
 import { $Enums } from "@prisma/client";
-import { ELogicalRelation, TNamedToken, TRoute, TToken } from "../src/lib/types";
+import { ELogicalRelation, ERuleName, TNamedToken, TRoute, TToken } from "../src/lib/types";
+
+export type TAffiliateNetworkSeed = {
+    name: string;
+    defaultNewOfferString: string;
+    tags: string[];
+};
+
+export type TOfferSeed = {
+    name: string;
+    url: string;
+    tags: string[];
+};
+
+export type TLandingPageSeed = {
+    name: string;
+    url: string;
+    tags: string[];
+};
+
+export type TSavedFlowSeed = {
+    name: string;
+    mainRoute: TRoute;
+    ruleRoutes: TRoute[];
+    tags: string[];
+};
+
+export type TTrafficSourceSeed = {
+    name: string;
+    postbackUrl: string;
+    externalIdToken: TToken;
+    costToken: TToken;
+    customTokens: TNamedToken[];
+    tags: string[];
+};
+
+export type TCampaignSeed = {
+    name: string;
+    publicId: string;
+    landingPageRotationType: $Enums.RotationType;
+    offerRotationType: $Enums.RotationType;
+    geoName: $Enums.GeoName;
+    tags: string[];
+};
+
+export type TSeedData = {
+    affiliateNetworkSeeds: TAffiliateNetworkSeed[],
+    offerSeeds: TOfferSeed[],
+    landingPageSeeds: TLandingPageSeed[],
+    savedFlowSeeds: TSavedFlowSeed[],
+    trafficSourceSeeds: TTrafficSourceSeed[],
+    campaignSeeds: TCampaignSeed[],
+};
+
+export function returnAtIndexOrThrow<T>(arr: T[], index: number, name: string): T {
+    const result = arr[index];
+    if (result === undefined) {
+        throw new Error(`missing ${name} at index ${index}`);
+    }
+    return result;
+}
+
+export function returnFirstOrThrow<T>(arr: T[], name: string): T {
+    return returnAtIndexOrThrow(arr, 0, name);
+}
 
 const tags = ["placeholder", "example"];
 
-export const affiliateNetworkSeedData = {
-    name: "My First Affiliate Network",
-    defaultNewOfferString: "",
-    tags,
-};
-export type TAffiliateNetworkSeedData = typeof affiliateNetworkSeedData;
+export const testUserAgent = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
 
-export const offerSeedData = {
-    name: "My First Offer",
-    url: "http://localhost:3001/public/sample-offer.html",
-    tags,
-};
-export type TOfferSeedData = typeof offerSeedData;
-
-export const landingPageSeedData = {
-    name: "My First Landing Page",
-    url: "http://localhost:3001/public/lp/sample-landing-page.html",
-    tags,
-};
-export type TLandingPageSeedData = typeof landingPageSeedData;
-
-export const savedFlowSeedData = {
-    name: "My First Saved Flow",
-    mainRoute: <TRoute>{
-        isActive: true,
-        logicalRelation: ELogicalRelation.AND,
-        rules: [],
-        paths: [],
-    },
-    ruleRoutes: <TRoute[]>[],
-    tags,
-};
-export type TSavedFlowSeedData = typeof savedFlowSeedData;
-
-export const trafficSourceSeedData = {
-    externalIdToken: <TToken>{
-        queryParam: "external_id",
-        value: "{external_id}",
-    },
-    costToken: <TToken>{
-        queryParam: "cost",
-        value: "{cost}",
-    },
-    customTokens: <TNamedToken[]>[
+const seedData: TSeedData = {
+    affiliateNetworkSeeds: [
         {
-            name: "Zone ID",
-            queryParam: "zone_id",
-            value: "{zone_id}"
-        },
-        {
-            name: "Banner ID",
-            queryParam: "banner_id",
-            value: "{banner_id}"
+            name: "My First Affiliate Network",
+            defaultNewOfferString: "",
+            tags,
         },
     ],
-    name: "My First Traffic Source",
-    postbackUrl: "http://localhost:3001/public/sample-postback-url.html",
-    tags,
+    offerSeeds: [
+        {
+            name: "My First Offer",
+            url: "http://localhost:3001/public/sample-offer.html?src=my-first-offer",
+            tags,
+        },
+        {
+            name: "My Second Offer",
+            url: "http://localhost:3001/public/sample-offer.html?src=my-second-offer",
+            tags,
+        },
+    ],
+    landingPageSeeds: [
+        {
+            name: "My First Landing Page",
+            url: "http://localhost:3001/public/lp/sample-landing-page.html",
+            tags,
+        },
+    ],
+    savedFlowSeeds: [
+        {
+            name: "My First Saved Flow",
+            mainRoute: <TRoute>{
+                isActive: true,
+                logicalRelation: ELogicalRelation.AND,
+                rules: [],
+                paths: [],
+            },
+            ruleRoutes: <TRoute[]>[],
+            tags,
+        },
+    ],
+    trafficSourceSeeds: [
+        {
+            name: "My First Traffic Source",
+            postbackUrl: "http://localhost:3001/public/sample-postback-url.html",
+            externalIdToken: <TToken>{
+                queryParam: "external_id",
+                value: "{external_id}",
+            },
+            costToken: <TToken>{
+                queryParam: "cost",
+                value: "{cost}",
+            },
+            customTokens: <TNamedToken[]>[
+                {
+                    name: "Zone ID",
+                    queryParam: "zone_id",
+                    value: "{zone_id}",
+                },
+                {
+                    name: "Banner ID",
+                    queryParam: "banner_id",
+                    value: "{banner_id}",
+                },
+            ],
+            tags,
+        },
+    ],
+    campaignSeeds: [
+        {
+            name: "My First Campaign",
+            publicId: "1234-abcd-5678-efgh",
+            landingPageRotationType: $Enums.RotationType.RANDOM,
+            offerRotationType: $Enums.RotationType.RANDOM,
+            geoName: $Enums.GeoName.UNITED_STATES,
+            tags,
+        },
+    ],
 };
-export type TTrafficSourceSeedData = typeof trafficSourceSeedData;
-
-export const campaignSeedData = {
-    name: "My First Campaign",
-    publicId: "1234-abcd-5678-efgh",
-    landingPageRotationType: $Enums.RotationType.RANDOM,
-    offerRotationType: $Enums.RotationType.RANDOM,
-    geoName: $Enums.GeoName.UNITED_STATES,
-    tags,
-};
-export type TCampaignSeedData = typeof campaignSeedData;
-
-const seedData = {
-    affiliateNetworkSeedData,
-    campaignSeedData,
-    savedFlowSeedData,
-    landingPageSeedData,
-    offerSeedData,
-    trafficSourceSeedData,
-};
-export type TSeedData = typeof seedData;
 export default seedData;

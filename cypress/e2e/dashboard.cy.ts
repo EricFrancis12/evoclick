@@ -1,4 +1,4 @@
-import { campaignSeedData, trafficSourceSeedData } from "../../prisma/seedData";
+import seedData, { returnFirstOrThrow } from "../../prisma/seedData";
 import { Env } from "../../src/lib/types";
 
 describe("Testing dashboard functionality", () => {
@@ -14,12 +14,14 @@ describe("Testing dashboard functionality", () => {
 
         cy.url().should("eq", "http://localhost:3000/dashboard");
 
-        cy.get(`[data-cy='${campaignSeedData.name}']`).click();
+        const { name } = returnFirstOrThrow(seedData.campaignSeeds, "Campaign seed");
+        cy.get(`[data-cy='${name}']`).click();
         cy.get("[data-cy='report-button']").click();
 
         cy.wait(1000 * 20);
 
-        for (const token of trafficSourceSeedData.customTokens) {
+        const { customTokens } = returnFirstOrThrow(seedData.trafficSourceSeeds, "Traffic Source seed");
+        for (const token of customTokens) {
             cy.get("[data-cy='select-chain-link-index-0']").select(token.queryParam);
             cy.wait(1000);
         }
