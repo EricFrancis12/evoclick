@@ -10,7 +10,7 @@ describe("Testing dashboard functionality", () => {
         cy.get("[data-cy='password-input']").type(Cypress.env(Env.ROOT_PASSWORD));
         cy.get("[data-cy='submit-button']").click();
 
-        cy.wait(1000 * 20);
+        cy.wait(1000 * 10);
 
         cy.url().should("eq", "http://localhost:3000/dashboard");
 
@@ -18,7 +18,7 @@ describe("Testing dashboard functionality", () => {
         cy.get(`[data-cy='${name}']`).click();
         cy.get("[data-cy='report-button']").click();
 
-        cy.wait(1000 * 20);
+        cy.wait(1000 * 10);
 
         const { customTokens } = returnFirstOrThrow(seedData.trafficSourceSeeds, "Traffic Source seed");
         for (const token of customTokens) {

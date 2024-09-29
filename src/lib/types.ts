@@ -129,8 +129,10 @@ export enum ELogicalRelation {
     OR = "or",
 };
 
+export type TCustomRuleName = `Custom-Rule-${string}`;
+
 export type TRule = {
-    ruleName: ERuleName;
+    ruleName: ERuleName | TCustomRuleName;
     data: string[];
     includes: boolean;
 };

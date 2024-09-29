@@ -5,12 +5,22 @@ import Button from "@/components/Button";
 import { Select } from "@/components/base";
 import Rule from "./Rule";
 import { newRule } from "@/lib/utils/new";
-import { TRoute, ELogicalRelation, ERuleName } from "@/lib/types";
+import { TRoute, ELogicalRelation, ERuleName, TToken } from "@/lib/types";
+import { CUSTOM_RULE_, toCustomRuleName } from "@/lib/utils";
 
-export default function RulesMenu({ route, onChange }: {
+export default function RulesMenu({ route, onChange, tokens = [] }: {
     route: TRoute;
     onChange: (r: TRoute) => void;
+    tokens?: TToken[];
 }) {
+    function handleSelectChange(e: React.ChangeEvent<HTMLSelectElement>) {
+        const ruleName = (Object.values(ERuleName) as string[]).includes(e.target.value)
+            ? e.target.value as ERuleName
+            : toCustomRuleName(e.target.value);
+
+        onChange({ ...route, rules: [...route.rules, newRule(ruleName)] });
+    }
+
     return (
         <div
             className="flex flex-col justify-start items-between h-full w-full max-h-[90vh] max-w-[700px] bg-white"
@@ -38,11 +48,11 @@ export default function RulesMenu({ route, onChange }: {
                 <div className="flex justify-start items-center gap-2 w-full">
                     <Select
                         value=""
-                        onChange={e => onChange({ ...route, rules: [...route.rules, newRule(e.target.value as ERuleName)] })}
+                        onChange={handleSelectChange}
                     >
                         <option value="">Add New Rule</option>
-                        {Object.values(ERuleName)
-                            .filter(ruleName => !route.rules.some(rule => rule.ruleName === ruleName))
+                        {[...Object.values(ERuleName), ...tokens.map(({ queryParam }) => queryParam)]
+                            .filter(ruleName => !route.rules.some(rule => rule.ruleName === ruleName || rule.ruleName === toCustomRuleName(ruleName)))
                             .map((ruleName, index) => (
                                 <option key={index} value={ruleName}>
                                     {ruleName}

@@ -3,7 +3,7 @@ import {
     TOfferActionMenu, TSavedFlowActionMenu, TTrafficSourceActionMenu
 } from "@/views/ReportView/ActionMenu/types";
 import {
-    EItemName, ELogicalRelation, ERuleName, TAffiliateNetwork, TCampaign, TLandingPage,
+    EItemName, ELogicalRelation, ERuleName, TAffiliateNetwork, TCampaign, TCustomRuleName, TLandingPage,
     TNamedToken, TOffer, TPath, TRoute, TRule, TSavedFlow, TToken, TTrafficSource
 } from "../types";
 import { isPrimary } from ".";
@@ -27,7 +27,7 @@ export function newPath(): TPath {
     };
 }
 
-export function newRule(ruleName: ERuleName): TRule {
+export function newRule(ruleName: ERuleName | TCustomRuleName): TRule {
     return {
         ruleName,
         data: [],

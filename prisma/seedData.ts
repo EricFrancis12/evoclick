@@ -1,6 +1,14 @@
 import { $Enums } from "@prisma/client";
 import { ELogicalRelation, ERuleName, TNamedToken, TRoute, TToken } from "../src/lib/types";
 
+export const testUserAgent = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
+export const testZoneId = "87654321";
+
+export enum ECustomTokenParam {
+    BANNER_ID = "banner_id",
+    ZONE_ID = "zone_id",
+};
+
 export type TAffiliateNetworkSeed = {
     name: string;
     defaultNewOfferString: string;
@@ -67,8 +75,6 @@ export function returnFirstOrThrow<T>(arr: T[], name: string): T {
 
 const tags = ["placeholder", "example"];
 
-export const testUserAgent = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
-
 const seedData: TSeedData = {
     affiliateNetworkSeeds: [
         {
@@ -86,6 +92,11 @@ const seedData: TSeedData = {
         {
             name: "My Second Offer",
             url: "http://localhost:3001/public/sample-offer.html?src=my-second-offer",
+            tags,
+        },
+        {
+            name: "My Third Offer",
+            url: "http://localhost:3001/public/sample-offer.html?src=my-third-offer",
             tags,
         },
     ],
@@ -124,12 +135,12 @@ const seedData: TSeedData = {
             customTokens: <TNamedToken[]>[
                 {
                     name: "Zone ID",
-                    queryParam: "zone_id",
+                    queryParam: ECustomTokenParam.ZONE_ID,
                     value: "{zone_id}",
                 },
                 {
                     name: "Banner ID",
-                    queryParam: "banner_id",
+                    queryParam: ECustomTokenParam.BANNER_ID,
                     value: "{banner_id}",
                 },
             ],

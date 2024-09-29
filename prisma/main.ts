@@ -1,6 +1,6 @@
 import { $Enums } from "@prisma/client";
 import prisma from "../src/lib/db";
-import { returnAtIndexOrThrow, returnFirstOrThrow, TSeedData, testUserAgent } from "./seedData";
+import { returnAtIndexOrThrow, returnFirstOrThrow, TSeedData, testUserAgent, testZoneId, ECustomTokenParam } from "./seedData";
 import { ELogicalRelation, ERuleName, TRoute } from "../src/lib/types";
 
 export default async function main(seedData: TSeedData) {
@@ -37,6 +37,14 @@ export default async function main(seedData: TSeedData) {
     const offer2 = await prisma.offer.create({
         data: {
             ...offerSeed2,
+            affiliateNetworkId: affiliateNetwork.id,
+        },
+    });
+
+    const offerSeed3 = returnAtIndexOrThrow(offerSeeds, 2, "Offer seed");
+    const offer3 = await prisma.offer.create({
+        data: {
+            ...offerSeed3,
             affiliateNetworkId: affiliateNetwork.id,
         },
     });
@@ -100,6 +108,26 @@ export default async function main(seedData: TSeedData) {
                     weight: 100,
                     landingPageIds: [],
                     offerIds: [offer2.id],
+                    directLinkingEnabled: true,
+                },
+            ],
+        },
+        {
+            isActive: true,
+            logicalRelation: ELogicalRelation.AND,
+            rules: [
+                {
+                    ruleName: `Custom-Rule-${ECustomTokenParam.ZONE_ID}`,
+                    data: [testZoneId],
+                    includes: true,
+                },
+            ],
+            paths: [
+                {
+                    isActive: true,
+                    weight: 100,
+                    landingPageIds: [],
+                    offerIds: [offer3.id],
                     directLinkingEnabled: true,
                 },
             ],

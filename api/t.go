@@ -66,15 +66,19 @@ func T(w http.ResponseWriter, r *http.Request) {
 		ipInfoData = <-ipidch
 	}
 
+	trafficSource := <-tsch
+	tsTokens := trafficSource.MakeTokens(*r.URL)
+
 	publicClickId := pkg.NewPublicClickID()
 	dest, _ := campaign.DetermineViewDestination(pkg.DestinationOpts{
-		R:             *r,
-		Ctx:           ctx,
-		Storer:        *tStorer,
-		SavedFlow:     savedFlow,
-		UserAgent:     userAgent,
-		IpInfoData:    ipInfoData,
-		PublicClickId: publicClickId,
+		R:                   *r,
+		Ctx:                 ctx,
+		Storer:              *tStorer,
+		SavedFlow:           savedFlow,
+		UserAgent:           userAgent,
+		IpInfoData:          ipInfoData,
+		TrafficSourceTokens: tsTokens,
+		PublicClickId:       publicClickId,
 	})
 
 	anch := make(chan pkg.AffiliateNetwork)
@@ -93,7 +97,6 @@ func T(w http.ResponseWriter, r *http.Request) {
 	if !visitorNeedsIpInfoData {
 		ipInfoData = <-ipidch
 	}
-	trafficSource := <-tsch
 	affiliateNetwork := <-anch
 
 	// Save click to db
@@ -106,7 +109,7 @@ func T(w http.ResponseWriter, r *http.Request) {
 		ClickTime:          getClicktime(dest, timestamp),
 		ViewOutputURL:      dest.URL,
 		ClickOutputURL:     getClickOutputURL(dest),
-		Tokens:             trafficSource.MakeTokens(*r.URL),
+		Tokens:             tsTokens,
 		IP:                 r.RemoteAddr,
 		Isp:                ipInfoData.Org,
 		UserAgent:          r.UserAgent(),

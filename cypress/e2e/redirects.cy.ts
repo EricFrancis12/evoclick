@@ -1,6 +1,6 @@
 import { makeCampaignUrl, makeClickUrl, makePostbackUrl } from "../../src/lib/utils";
 import { ECookieName, Env } from "../../src/lib/types";
-import { returnAtIndexOrThrow, returnFirstOrThrow, testUserAgent } from "../../prisma/seedData";
+import { ECustomTokenParam, returnAtIndexOrThrow, returnFirstOrThrow, testUserAgent, testZoneId } from "../../prisma/seedData";
 import seedData from "../../prisma/seedData";
 const { campaignSeeds, landingPageSeeds, offerSeeds, trafficSourceSeeds } = seedData;
 
@@ -48,16 +48,35 @@ describe("Testing campaign redirects", () => {
         cy.url().should("eq", Cypress.env(Env.CATCH_ALL_REDIRECT_URL));
     });
 
-    it("redirects to the correct rule route", () => {
+    it("redirects to the correct rule route per user agent header", () => {
         cy.visit(
-            makeCampaignUrl("http:", "localhost", "3001", publicId, customTokens),
+            makeCampaignUrl("http:", "localhost", "3001", publicId, []),
             {
                 headers: {
-                    "user-agent": testUserAgent,
+                    "User-Agent": testUserAgent,
                 },
-            });
+            },
+        );
 
         const { url } = returnAtIndexOrThrow(offerSeeds, 1, "Offer seed");
+        cy.url().should("eq", url);
+    });
+
+    it("redirects to the correct rule route per custom traffic source token", () => {
+        const tokens = [
+            {
+                queryParam: ECustomTokenParam.ZONE_ID,
+                value: testZoneId,
+            },
+            {
+                queryParam: ECustomTokenParam.BANNER_ID,
+                value: "",
+            },
+        ];
+
+        cy.visit(makeCampaignUrl("http:", "localhost", "3001", publicId, tokens));
+
+        const { url } = returnAtIndexOrThrow(offerSeeds, 2, "Offer seed");
         cy.url().should("eq", url);
     });
 });

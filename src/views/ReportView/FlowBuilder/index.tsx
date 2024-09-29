@@ -4,16 +4,17 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import Button from "@/components/Button";
 import Route, { TReorderDirection } from "./Route";
 import { newRoute } from "@/lib/utils/new";
-import { TRoute } from "@/lib/types";
+import { TRoute, TToken } from "@/lib/types";
 
 export type TFlowBuilder = {
     mainRoute: TRoute;
     ruleRoutes: TRoute[];
 };
 
-export default function FlowBuilder({ value, onChange }: {
+export default function FlowBuilder({ value, onChange, tokens = [] }: {
     value: TFlowBuilder;
     onChange: (fb: TFlowBuilder) => void;
+    tokens?: TToken[];
 }) {
     const { mainRoute, ruleRoutes } = value;
 
@@ -53,6 +54,7 @@ export default function FlowBuilder({ value, onChange }: {
                         ruleRoutes: ruleRoutes.filter((_, i) => i !== index),
                     })}
                     onReorder={dir => handleReorder(dir, index)}
+                    tokens={tokens}
                 />
             ))}
             <Button

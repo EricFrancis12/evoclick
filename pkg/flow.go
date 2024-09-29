@@ -44,8 +44,8 @@ func (s *Storer) GetSavedFlowById(ctx context.Context, id int) (SavedFlow, error
 	return fl, nil
 }
 
-func (sf *SavedFlow) SelectViewRoute(r http.Request, userAgent useragent.UserAgent, ipInfoData IPInfoData) Route {
-	return selectViewRoute(sf.MainRoute, sf.RuleRoutes, r, userAgent, ipInfoData)
+func (sf *SavedFlow) SelectViewRoute(r http.Request, userAgent useragent.UserAgent, ipInfoData IPInfoData, tokens []Token) Route {
+	return selectViewRoute(sf.MainRoute, sf.RuleRoutes, r, userAgent, ipInfoData, tokens)
 }
 
 func (sf *SavedFlow) SelectClickRoute(click Click) Route {
