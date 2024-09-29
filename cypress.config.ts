@@ -8,6 +8,10 @@ export default defineConfig({
         setupNodeEvents(on, config) {
             // implement node event listeners here
         },
+        specPattern: [
+            "cypress/e2e/redirects.cy.ts",
+            "cypress/e2e/dashboard.cy.ts",
+        ],
     },
     env: {
         // Non-sensitive env vars hard-coded here. Example:

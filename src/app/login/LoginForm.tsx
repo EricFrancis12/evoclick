@@ -27,11 +27,12 @@ export default function LoginForm() {
             action={handleLoginAction}
             className="flex flex-col gap-1"
         >
-            <Input name="username" type="text" />
-            <Input name="password" type="password" />
+            <Input name="username" type="text" data-cy="username-input" />
+            <Input name="password" type="password" data-cy="password-input" />
             <button
                 type="submit"
                 className="mt-2 bg-blue-400 border rounded"
+                data-cy="submit-button"
             >
                 Login
             </button>
@@ -39,15 +40,11 @@ export default function LoginForm() {
     )
 }
 
-function Input({ name, type }: {
-    name: string;
-    type: string;
-}) {
+function Input(props: React.ComponentPropsWithoutRef<"input">) {
     return (
         <input
-            type={type}
-            name={name}
-            placeholder={name}
+            {...props}
+            placeholder={props?.name}
             className="border px-2 py-1"
         />
     )

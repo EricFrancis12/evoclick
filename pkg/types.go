@@ -169,10 +169,10 @@ const (
 	LogicalRelationOr  LogicalRelation = "or"
 )
 
-type RuleName string
+type RuleName = string
 
 const (
-	RuleNameIP               RuleName = "IP"
+	RuleNameIP               string   = "IP"
 	RuleNameISP              RuleName = "ISP"
 	RuleNameUserAgent        RuleName = "User Agent"
 	RuleNameLanguage         RuleName = "Language"

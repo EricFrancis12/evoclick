@@ -13,6 +13,8 @@ export enum Env {
     CATCH_ALL_REDIRECT_URL = "CATCH_ALL_REDIRECT_URL",
 };
 
+export type Dataset = { [key: `data-${string}`]: string };
+
 type omissions = "id" | "createdAt" | "updatedAt";
 type primaryItemName = "primaryItemName";
 type publicId = "publicId";
@@ -127,8 +129,10 @@ export enum ELogicalRelation {
     OR = "or",
 };
 
+export type TCustomRuleName = `Custom-Rule-${string}`;
+
 export type TRule = {
-    ruleName: ERuleName;
+    ruleName: ERuleName | TCustomRuleName;
     data: string[];
     includes: boolean;
 };

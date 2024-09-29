@@ -77,8 +77,8 @@ func (s *Storer) GetCampaignByPublicId(ctx context.Context, publicId string) (Ca
 	return c, nil
 }
 
-func (c *Campaign) SelectViewRoute(r http.Request, userAgent useragent.UserAgent, ipInfoData IPInfoData) Route {
-	return selectViewRoute(c.FlowMainRoute, c.FlowRuleRoutes, r, userAgent, ipInfoData)
+func (c *Campaign) SelectViewRoute(r http.Request, userAgent useragent.UserAgent, ipInfoData IPInfoData, tokens []Token) Route {
+	return selectViewRoute(c.FlowMainRoute, c.FlowRuleRoutes, r, userAgent, ipInfoData, tokens)
 }
 
 // Checks if the click triggered any rule routes, and if not returns the main route
@@ -99,13 +99,14 @@ func (c *Campaign) SelectOfferID(ids []int) (int, error) {
 }
 
 type DestinationOpts struct {
-	R             http.Request
-	Ctx           context.Context
-	Storer        Storer
-	SavedFlow     SavedFlow
-	UserAgent     useragent.UserAgent
-	IpInfoData    IPInfoData
-	PublicClickId string
+	R                   http.Request
+	Ctx                 context.Context
+	Storer              Storer
+	SavedFlow           SavedFlow
+	UserAgent           useragent.UserAgent
+	IpInfoData          IPInfoData
+	TrafficSourceTokens []Token
+	PublicClickId       string
 }
 
 func (do *DestinationOpts) TokenMatcherMap() URLTokenMatcherMap {
@@ -138,9 +139,9 @@ func (c *Campaign) DetermineViewDestination(opts DestinationOpts) (Destination, 
 	} else if c.FlowType == db.FlowTypeBuiltIn || c.FlowType == db.FlowTypeSaved {
 		route := Route{}
 		if c.FlowType == db.FlowTypeBuiltIn {
-			route = c.SelectViewRoute(opts.R, opts.UserAgent, opts.IpInfoData)
+			route = c.SelectViewRoute(opts.R, opts.UserAgent, opts.IpInfoData, opts.TrafficSourceTokens)
 		} else {
-			route = opts.SavedFlow.SelectViewRoute(opts.R, opts.UserAgent, opts.IpInfoData)
+			route = opts.SavedFlow.SelectViewRoute(opts.R, opts.UserAgent, opts.IpInfoData, opts.TrafficSourceTokens)
 		}
 
 		path, err := route.WeightedSelectPath()

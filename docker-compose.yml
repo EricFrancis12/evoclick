@@ -3,6 +3,9 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile
+    environment:
+      - "POSTGRES_URL=postgresql://postgres:mysecretpassword@postgres:5432/mydb?schema=public"
+      - "REDIS_URL=redis://redis:6379"
     ports:
       - "3000:3000"
     depends_on:

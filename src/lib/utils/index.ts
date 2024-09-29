@@ -1,5 +1,5 @@
 import { startOfDay, addDays } from "date-fns";
-import { TPrimaryData, EItemName, EQueryParam, TPrimaryItemName, TToken } from "../types";
+import { TPrimaryData, EItemName, EQueryParam, TPrimaryItemName, TToken, TCustomRuleName } from "../types";
 
 export * from "./maps"
 export * from "./new";
@@ -120,6 +120,35 @@ export function isPrimary(itemName: EItemName): isPrimaryResult {
         ok: false,
         primaryItemName: null,
     };
+}
+
+export const CUSTOM_RULE_ = "Custom-Rule-";
+
+export function toCustomRuleName(queryParam: string): TCustomRuleName {
+    return `${CUSTOM_RULE_}${queryParam}`;
+}
+
+type isCustomRuleNameResult = {
+    ok: true;
+    customRuleName: TCustomRuleName;
+} | {
+    ok: false;
+    customRuleName: null;
+};
+
+export function isCustomRuleName(str: string): isCustomRuleNameResult {
+    const correctPrefix = str.substring(0, CUSTOM_RULE_.length) == CUSTOM_RULE_;
+    const nonEmptyValueAfterPrefix = str.substring(CUSTOM_RULE_.length).length > 0;
+    if (correctPrefix && nonEmptyValueAfterPrefix) {
+        return {
+            ok: true,
+            customRuleName: str as TCustomRuleName,
+        };
+    }
+    return {
+        ok: false,
+        customRuleName: null,
+    }
 }
 
 export function makeCampaignUrl(

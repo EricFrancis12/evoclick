@@ -12,8 +12,21 @@ import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import ActionMenuFooter from "../ActionMenuFooter";
 import { newRoute } from "@/lib/utils/new";
 import { TActionMenu, TCampaignActionMenu } from "../types";
-import { EItemName, TSavedFlow, TTrafficSource } from "@/lib/types";
+import { TSavedFlow, TToken, TTrafficSource } from "@/lib/types";
 import { $Enums } from "@prisma/client";
+
+function useTrafficSourceTokens(trafficSources: TTrafficSource[], trafficSourceId?: number): TToken[] {
+    const [tokens, setTokens] = useState<TToken[]>([]);
+
+    useEffect(() => {
+        const trafficSource = trafficSources.find(({ id }) => id === trafficSourceId);
+        if (trafficSource) {
+            setTokens(trafficSource.customTokens);
+        }
+    }, [trafficSourceId, trafficSources, trafficSources.length]);
+
+    return tokens;
+}
 
 export default function CampaignBody({ actionMenu, setActionMenu }: {
     actionMenu: TCampaignActionMenu;
@@ -23,6 +36,8 @@ export default function CampaignBody({ actionMenu, setActionMenu }: {
     const [trafficSources, setTrafficSources] = useState<TTrafficSource[]>([]);
 
     const [flowBuilderOpen, setFlowBuilderOpen] = useState<boolean>(false);
+
+    const tokens = useTrafficSourceTokens(trafficSources, actionMenu.trafficSourceId);
 
     useEffect(() => {
         getAllTrafficSourcesAction()
@@ -180,6 +195,7 @@ export default function CampaignBody({ actionMenu, setActionMenu }: {
                                 flowMainRoute: mainRoute,
                                 flowRuleRoutes: ruleRoutes,
                             })}
+                            tokens={tokens}
                         />
                         <PopoverFooter>
                             <Button

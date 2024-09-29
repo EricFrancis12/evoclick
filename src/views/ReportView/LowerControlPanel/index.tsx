@@ -97,6 +97,7 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
                             icon={faRandom}
                             disabled={selectedRows.length < 1}
                             onClick={handleNewReport}
+                            dataset={{ ["data-cy"]: "report-button" }}
                         />
                         {isPrimary(view.itemName).ok &&
                             <>

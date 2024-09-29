@@ -58,9 +58,9 @@ func (route Route) doesTrigger(condition func(rule Rule) bool) bool {
 }
 
 // Determines if the view triggers any rules in this route
-func (route Route) ViewDoesTrigger(r http.Request, ua useragent.UserAgent, ipInfoData IPInfoData) bool {
+func (route Route) ViewDoesTrigger(r http.Request, ua useragent.UserAgent, ipInfoData IPInfoData, tokens []Token) bool {
 	return route.doesTrigger(func(rule Rule) bool {
-		return rule.ViewDoesTrigger(r, ua, ipInfoData)
+		return rule.ViewDoesTrigger(r, ua, ipInfoData, tokens)
 	})
 }
 
@@ -72,13 +72,13 @@ func (route Route) ClickDoesTrigger(click Click) bool {
 }
 
 // Checks if the click triggered any rule routes, and if not returns the main route
-func selectViewRoute(mainRoute Route, ruleRoutes []Route, r http.Request, userAgent useragent.UserAgent, ipInfoData IPInfoData) Route {
+func selectViewRoute(mainRoute Route, ruleRoutes []Route, r http.Request, userAgent useragent.UserAgent, ipInfoData IPInfoData, tokens []Token) Route {
 	route := mainRoute
 	for _, ruleRoute := range ruleRoutes {
 		if !ruleRoute.IsActive {
 			continue
 		}
-		if ruleRoute.ViewDoesTrigger(r, userAgent, ipInfoData) {
+		if ruleRoute.ViewDoesTrigger(r, userAgent, ipInfoData, tokens) {
 			route = ruleRoute
 			break
 		}

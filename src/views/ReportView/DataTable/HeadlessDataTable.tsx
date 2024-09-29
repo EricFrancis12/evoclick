@@ -7,17 +7,18 @@ import { getReportChainColor } from "../ReportChain/colors";
 import { TView } from "@/lib/store";
 import { EItemName, TClick } from "@/lib/types";
 import { BASE_Z_INDEX, DEPTH_MARGIN, ROW_HEIGHT, TColumn } from ".";
+import { TReportChainValue } from "../ReportChain";
 
-export default function HeadlessDataTable({ clicks, itemName, columns, view, depth }: {
+export default function HeadlessDataTable({ clicks, reportChainValue, columns, view, depth }: {
     clicks: TClick[];
-    itemName?: EItemName;
+    reportChainValue?: TReportChainValue;
     columns: TColumn[];
     view: TView;
     depth: number;
 }) {
     const newDepth = depth + 1;
 
-    return itemName
+    return reportChainValue
         ? <div
             className="py-4"
             style={{
@@ -27,7 +28,7 @@ export default function HeadlessDataTable({ clicks, itemName, columns, view, dep
         >
             <_Rows
                 clicks={clicks}
-                itemName={itemName}
+                reportChainValue={reportChainValue}
                 columns={columns}
                 view={view}
                 depth={newDepth}
@@ -36,14 +37,14 @@ export default function HeadlessDataTable({ clicks, itemName, columns, view, dep
         : "";
 }
 
-function _Rows({ clicks, itemName, columns, view, depth }: {
+function _Rows({ clicks, reportChainValue, columns, view, depth }: {
     clicks: TClick[];
-    itemName: EItemName;
+    reportChainValue: TReportChainValue;
     columns: TColumn[];
     view: TView;
     depth: number;
 }) {
-    const [rows, setRows] = useRows(clicks, itemName);
+    const [rows, setRows] = useRows(clicks, reportChainValue);
 
     return (
         <>
@@ -58,7 +59,7 @@ function _Rows({ clicks, itemName, columns, view, depth }: {
                     zIndex: BASE_Z_INDEX - depth,
                 }}
             >
-                {itemName}
+                {reportChainValue}
             </div>
             {rows &&
                 <>

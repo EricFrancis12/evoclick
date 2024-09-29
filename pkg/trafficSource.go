@@ -79,10 +79,9 @@ func (ts *TrafficSource) SendPostback(click Click, pbrch chan PostbackResult) {
 // creating a Token for them if they are listed as custom tokens on the traffic source
 func (ts *TrafficSource) MakeTokens(url url.URL) []Token {
 	tokens := []Token{}
-	query := url.Query()
-	for key, val := range query {
-		for _, tstoken := range ts.CustomTokens {
-			if key == tstoken.QueryParam {
+	for key, val := range url.Query() {
+		for _, namedToken := range ts.CustomTokens {
+			if key == namedToken.QueryParam {
 				tokens = append(tokens, Token{
 					QueryParam: key,
 					Value:      SafeFirstString(val),

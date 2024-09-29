@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { Prisma } from "@prisma/client";
 import db from "../src/lib/db";
 import { randomItemFromArray, randomIntInRange } from "../src/lib/utils";
-import { dotenvConfig } from "@/lib/utils/env";
+import { dotenvConfig } from "../src/lib/utils/env";
 
 dotenvConfig();
 

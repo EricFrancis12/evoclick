@@ -1,7 +1,7 @@
 import axios from "axios";
 import { IPInfoDataSchema } from "../src/lib/schemas";
 import { iPInfoEndpoint } from "../src/lib/utils";
-import { dotenvConfig } from "@/lib/utils/env";
+import { dotenvConfig } from "../src/lib/utils/env";
 import { Env } from "../src/lib/types";
 
 dotenvConfig();

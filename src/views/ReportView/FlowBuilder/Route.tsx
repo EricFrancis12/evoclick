@@ -8,16 +8,17 @@ import Button from "@/components/Button";
 import RulesMenu from "./RulesMenu";
 import Path from "./Path";
 import { newPath } from "@/lib/utils/new";
-import { TRoute } from "@/lib/types";
+import { TRoute, TToken } from "@/lib/types";
 
 export type TReorderDirection = "up" | "down";
 
-export default function Route({ type, route, onChange, onDelete, onReorder = () => { } }: {
+export default function Route({ type, route, onChange, onDelete, onReorder = () => { }, tokens = [] }: {
     type: "main" | "rule";
     route: TRoute;
     onChange: (r: TRoute) => void;
     onDelete?: () => void;
     onReorder?: (dir: TReorderDirection) => void;
+    tokens?: TToken[];
 }) {
     const [rulesMenuOpen, setRulesMenuOpen] = useState<boolean>(false);
 
@@ -82,6 +83,7 @@ export default function Route({ type, route, onChange, onDelete, onReorder = () 
                         <RulesMenu
                             route={route}
                             onChange={onChange}
+                            tokens={tokens}
                         />
                         <PopoverFooter>
                             <Button text="Done" onClick={() => setRulesMenuOpen(false)} />

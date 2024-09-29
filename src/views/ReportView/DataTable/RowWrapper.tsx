@@ -2,12 +2,14 @@
 
 import { TDialogueMenuItem, useDialogueMenu } from "../../../contexts/DialogueMenuContext";
 import { ROW_HEIGHT } from ".";
+import { Dataset } from "@/lib/types";
 
-export default function RowWrapper({ children, value = 0, dialogueMenuItems = [], style, selected, onClick = () => { } }: {
+export default function RowWrapper({ children, value = 0, dialogueMenuItems = [], style, dataset, selected, onClick = () => { } }: {
     children: React.ReactNode;
     value?: number;
     dialogueMenuItems?: TDialogueMenuItem[];
     style?: React.CSSProperties;
+    dataset?: Dataset;
     // Having a selected value of undefined disables the hover, background color change, and onClick functionalities.
     // The title row should use undefined because we do not want the title row to have this funcionality,
     // and all other rows should use a boolean.
@@ -43,6 +45,7 @@ export default function RowWrapper({ children, value = 0, dialogueMenuItems = []
             style={{ ...style, height: `${ROW_HEIGHT}px` }}
             onClick={handleClick}
             onContextMenu={handleContextMenu}
+            {...dataset}
         >
             {children}
         </div>

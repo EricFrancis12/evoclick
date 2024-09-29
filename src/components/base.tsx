@@ -1,5 +1,7 @@
 "use client";
 
+import { Dataset } from "@/lib/types";
+
 const BASE_COMPONENT_CLASSNAME = "w-full px-2 py-1";
 const BASE_COMPONENT_STYLE = {
     border: "solid 1px grey",
@@ -29,7 +31,7 @@ export function Input({ name = "", placeholder, value, onChange }: {
     )
 }
 
-export function Select({ name = "", value, onChange, children, disabled, className, style }: {
+export function Select({ name = "", value, onChange, children, disabled, className, style, dataset }: {
     name?: string;
     value: string | number | readonly string[] | undefined;
     onChange: React.ChangeEventHandler<HTMLSelectElement>;
@@ -37,6 +39,7 @@ export function Select({ name = "", value, onChange, children, disabled, classNa
     disabled?: boolean;
     className?: string;
     style?: React.CSSProperties;
+    dataset?: Dataset;
 }) {
     return (
         <BaseComponentWrapper>
@@ -49,6 +52,7 @@ export function Select({ name = "", value, onChange, children, disabled, classNa
                 style={{ ...BASE_COMPONENT_STYLE, ...style }}
                 value={value}
                 onChange={onChange}
+                {...dataset}
             >
                 {children}
             </select>

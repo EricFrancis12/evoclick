@@ -4,20 +4,24 @@ import { useState, useEffect } from "react";
 import { itemNameToClickProp } from "@/lib/utils/maps";
 import { useDataContext } from "@/contexts/DataContext";
 import { TRow } from "@/views/ReportView/DataTable";
-import { EItemName, TClick, TPrimaryItemName, TPrimaryData } from "@/lib/types";
+import { EItemName, TClick, TPrimaryItemName, TPrimaryData, TToken } from "@/lib/types";
 import { getPrimaryItemById, isPrimary } from "@/lib/utils";
+import { reportChainValueToItemName, TReportChainValue } from "@/views/ReportView/ReportChain";
 
 const INCLUDE_UNKNOWN_ROWS = false;
 
-export function useRows(clicks: TClick[], itemName: EItemName): [TRow[] | null, React.Dispatch<React.SetStateAction<TRow[] | null>>] {
+export function useRows(
+    clicks: TClick[],
+    reportChainValue: TReportChainValue,
+): [TRow[] | null, React.Dispatch<React.SetStateAction<TRow[] | null>>] {
     const { primaryData } = useDataContext();
 
     const [rows, setRows] = useState<TRow[] | null>(null);
 
     useEffect(() => {
-        const newRows = makeRows(primaryData, clicks, itemName, makeEnrichmentItems(itemName, primaryData));
+        const newRows = makeRows(primaryData, clicks, reportChainValue, makeEnrichmentItems(reportChainValue, primaryData));
         setRows(newRows);
-    }, [clicks.length, primaryData, itemName]);
+    }, [clicks.length, primaryData, reportChainValue]);
 
     return [rows, setRows];
 }
@@ -30,15 +34,27 @@ type TEnrichmentItem = {
 export function makeRows(
     primaryData: TPrimaryData,
     clicks: TClick[],
-    itemName: EItemName,
-    enrichmentItems?: TEnrichmentItem[]
+    reportChainValue: TReportChainValue,
+    enrichmentItems?: TEnrichmentItem[],
 ): TRow[] {
     const rows = new Map<number | string, TRow>();
-    const { primaryItemName } = isPrimary(itemName);
+
+    const { itemName } = reportChainValueToItemName(reportChainValue);
+
+    let primaryItemName: TPrimaryItemName | null = null;
+    if (itemName) {
+        primaryItemName = isPrimary(itemName).primaryItemName;
+    }
 
     for (const click of clicks) {
-        const clickProp = itemNameToClickProp(itemName);
-        const value = click[clickProp];
+        let value: string | number | Date | TToken[] | null;
+        if (itemName) {
+            const clickProp = itemNameToClickProp(itemName);
+            value = click[clickProp];
+        } else {
+            // Traverse click.tokens to find token that matches reportChainValue
+            value = click.tokens.find(token => token.queryParam === reportChainValue)?.value ?? null;
+        }
 
         if (typeof value === "number" || typeof value === "string") {
             if (!rows.has(value)) {
@@ -72,7 +88,11 @@ export function makeRows(
     return Array.from(rows.values());
 }
 
-function newRowName(primaryData: TPrimaryData, primaryItemName: TPrimaryItemName | null, value: string | number): string {
+function newRowName(
+    primaryData: TPrimaryData,
+    primaryItemName: TPrimaryItemName | null,
+    value: string | number,
+): string {
     if (typeof value === "number" && primaryItemName !== null) {
         const primaryItem = getPrimaryItemById(primaryData, primaryItemName, value);
         if (primaryItem) return primaryItem.name;
@@ -83,9 +103,15 @@ function newRowName(primaryData: TPrimaryData, primaryItemName: TPrimaryItemName
     return "";
 }
 
+function makeEnrichmentItems(
+    reportChainValue: TReportChainValue,
+    primaryData: TPrimaryData,
+): TEnrichmentItem[] | undefined {
+    const { itemName, success } = reportChainValueToItemName(reportChainValue);
+    if (!success) return undefined;
 
-function makeEnrichmentItems(itemName: EItemName, primaryData: TPrimaryData): TEnrichmentItem[] | undefined {
     const { primaryItemName } = isPrimary(itemName);
     if (!primaryItemName) return undefined;
+
     return primaryData[primaryItemName]?.map(({ id, name }) => ({ id, name: name || "" }));
 }

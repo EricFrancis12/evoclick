@@ -43,7 +43,7 @@ export default function Row({ row, columns, onSelected, view, depth }: {
 
     function handleSelectionChange(selected: boolean) {
         if (depth > 0) return;
-        if (view.type === "report" && view.reportChain[0]?.itemName) return;
+        if (view.type === "report" && view.reportChain[0]?.value) return;
         onSelected(selected);
     }
 
@@ -104,6 +104,7 @@ export default function Row({ row, columns, onSelected, view, depth }: {
                 selected={row.selected}
                 onClick={handleSelectionChange}
                 dialogueMenuItems={dialogueMenuItems}
+                dataset={{ ["data-cy"]: row.name }}
             >
                 <PosNegIndicator value={profit} />
                 <CheckboxWrapper>
@@ -113,7 +114,7 @@ export default function Row({ row, columns, onSelected, view, depth }: {
                             checked={row.selected}
                             onChange={() => handleSelectionChange(!row.selected)}
                         />
-                        : (view?.type === "report" && view.reportChain[depth]?.itemName) &&
+                        : (view?.type === "report" && view.reportChain[depth]?.value) &&
                         < FontAwesomeIcon
                             icon={open ? faChevronUp : faChevronDown}
                             onClick={() => setOpen(prev => !prev)}
@@ -134,7 +135,7 @@ export default function Row({ row, columns, onSelected, view, depth }: {
             {open && view?.type === "report" &&
                 <HeadlessDataTable
                     clicks={row.clicks}
-                    itemName={view?.reportChain?.[depth]?.itemName}
+                    reportChainValue={view?.reportChain?.[depth]?.value}
                     columns={columns}
                     view={view}
                     depth={depth}

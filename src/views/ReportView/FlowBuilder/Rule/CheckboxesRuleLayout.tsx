@@ -3,7 +3,7 @@
 import BooleanCheckboxesToggle from "@/components/BooleanCheckboxesToggle";
 import CheckboxesInput from "@/components/CheckboxesInput";
 import RuleLayoutWrapper from "./RuleLayoutWrapper";
-import { EBrowserName, EDeviceType, ERuleName, TRule } from "@/lib/types";
+import { EBrowserName, EDeviceType, ERuleName, TCustomRuleName, TRule } from "@/lib/types";
 
 export const checkboxesRules: ERuleName[] = [
     ERuleName.DEVICE_TYPE,
@@ -31,7 +31,7 @@ export default function CheckboxesRuleLayout({ rule, onChange }: {
     )
 }
 
-function checkboxItems(ruleName: ERuleName): string[] {
+function checkboxItems(ruleName: ERuleName | TCustomRuleName): string[] {
     switch (ruleName) {
         case ERuleName.DEVICE_TYPE:
             return Object.values(EDeviceType);
