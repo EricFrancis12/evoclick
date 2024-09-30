@@ -9,6 +9,8 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/mileusna/useragent"
 )
 
 var CustomClient = NewCustomHTTPClient()
@@ -95,6 +97,29 @@ func createJSONResp(v any) *http.Response {
 		Body:       body,
 		Header:     make(http.Header),
 	}
+}
+
+func GetDeviceType(ua useragent.UserAgent) DeviceType {
+	if ua.Desktop {
+		return DeviceTypeDesktop
+	} else if ua.Tablet {
+		return DeviceTypeTablet
+	} else if ua.Mobile {
+		return DeviceTypeMobile
+	}
+	return DeviceTypeUnknown
+}
+
+func GetLanguage(r http.Request) string {
+	langStr := r.Header.Get("Accept-Language")
+	if len(langStr) < 2 {
+		return "unknown"
+	}
+	return strings.ToLower(langStr[:2])
+}
+
+func GetScreenRes(r http.Request) string {
+	return r.Header.Get("Viewport-Width")
 }
 
 func IPInfoEndpoint(ipAddr string, ipInfoToken string) string {
