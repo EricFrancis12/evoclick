@@ -96,9 +96,9 @@ func (ts *TrafficSource) GetExternalId(url url.URL) string {
 	return url.Query().Get(ts.ExternalIDToken.QueryParam)
 }
 
-func (ts *TrafficSource) GetCost(url url.URL) int {
+func (ts *TrafficSource) GetCost(url url.URL) float64 {
 	costStr := url.Query().Get(ts.CostToken.QueryParam)
-	cost, err := strconv.Atoi(costStr)
+	cost, err := strconv.ParseFloat(costStr, 64)
 	if err != nil || cost < 0 {
 		return 0
 	}

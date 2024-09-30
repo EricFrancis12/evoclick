@@ -34,8 +34,8 @@ type Click struct {
 type ClickCreationReq struct {
 	PublicId           string
 	ExternalId         string
-	Cost               int
-	Revenue            int
+	Cost               float64
+	Revenue            float64
 	ViewTime           time.Time
 	ClickTime          time.Time
 	ConvTime           time.Time

@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"net/url"
 	"reflect"
 	"testing"
 
@@ -53,4 +54,42 @@ func isValidVercelHandler(handler http.HandlerFunc) bool {
 	}
 
 	return true
+}
+
+func TestGetRevenue(t *testing.T) {
+	t.Run("Test integer payout", func(t *testing.T) {
+		assert.Equal(t, float64(12), getRevenue(
+			url.URL{
+				RawQuery: "payout=12",
+			},
+		))
+		assert.Equal(t, float64(12), getRevenue(
+			url.URL{
+				RawQuery: "payout=12.0",
+			},
+		))
+		assert.Equal(t, float64(12), getRevenue(
+			url.URL{
+				RawQuery: "payout=12.00000",
+			},
+		))
+	})
+
+	t.Run("Test decimal payout", func(t *testing.T) {
+		assert.Equal(t, float64(12.56789), getRevenue(
+			url.URL{
+				RawQuery: "payout=12.56789",
+			},
+		))
+		assert.Equal(t, float64(12.56789), getRevenue(
+			url.URL{
+				RawQuery: "payout=12.567890",
+			},
+		))
+		assert.Equal(t, float64(12.56789), getRevenue(
+			url.URL{
+				RawQuery: "payout=12.5678900000",
+			},
+		))
+	})
 }

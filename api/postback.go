@@ -58,7 +58,7 @@ func Postback(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func convertClick(click pkg.Click, convTime time.Time, revenue int) pkg.Click {
+func convertClick(click pkg.Click, convTime time.Time, revenue float64) pkg.Click {
 	click.ConvTime = convTime
 	click.Revenue += revenue
 	return click
@@ -68,9 +68,9 @@ func getPid(url url.URL) string {
 	return url.Query().Get(string(pkg.QueryParamPid))
 }
 
-func getRevenue(url url.URL) int {
+func getRevenue(url url.URL) float64 {
 	payoutStr := url.Query().Get(string(pkg.QueryParamPayout))
-	revenue, err := strconv.Atoi(payoutStr)
+	revenue, err := strconv.ParseFloat(payoutStr, 64)
 	if err != nil || revenue < 0 {
 		return 0
 	}

@@ -29,8 +29,8 @@ model Click {
   id                 Int       @id @default(autoincrement())
   publicId           String    @unique
   externalId         String
-  cost               Int
-  revenue            Int
+  cost               Float
+  revenue            Float
   viewTime           DateTime
   clickTime          DateTime?
   convTime           DateTime?
