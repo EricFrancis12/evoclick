@@ -48,11 +48,7 @@ Instructions coming soon.
 
 
 ## Find a bug?
-If you found an issue or would like to submit an improvement to this project, please submit an issue using the issues tab above. If you would like to submit a PR with a fix, reference the issue you created!
-
-
-Thank you for using EvoClick! I hope it helps you optimize your marketing campaigns effectively.
-
+This project is a work in progress, and some features may not be currently available. If you found an issue or would like to submit an improvement to this project, please submit an issue using the issues tab above. If you would like to submit a PR with a fix, reference the issue you created.
 
 ## Inspiration
 Inspired by click trackers such as [Voluum](https://voluum.com), [Bemob](https://bemob.com), and [Binom](https://binom.org)
