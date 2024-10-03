@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -49,4 +50,49 @@ func TestGetLanguage(t *testing.T) {
 			},
 		}))
 	}
+}
+
+func TestGetPid(t *testing.T) {
+	url := url.URL{
+		RawQuery: string(QueryParamPid) + "=" + "1234",
+	}
+	assert.Equal(t, "1234", GetPid(url))
+}
+
+func TestGetRevenue(t *testing.T) {
+	t.Run("Test integer payout", func(t *testing.T) {
+		assert.Equal(t, float64(12), GetRevenue(
+			url.URL{
+				RawQuery: "payout=12",
+			},
+		))
+		assert.Equal(t, float64(12), GetRevenue(
+			url.URL{
+				RawQuery: "payout=12.0",
+			},
+		))
+		assert.Equal(t, float64(12), GetRevenue(
+			url.URL{
+				RawQuery: "payout=12.00000",
+			},
+		))
+	})
+
+	t.Run("Test decimal payout", func(t *testing.T) {
+		assert.Equal(t, float64(12.56789), GetRevenue(
+			url.URL{
+				RawQuery: "payout=12.56789",
+			},
+		))
+		assert.Equal(t, float64(12.56789), GetRevenue(
+			url.URL{
+				RawQuery: "payout=12.567890",
+			},
+		))
+		assert.Equal(t, float64(12.56789), GetRevenue(
+			url.URL{
+				RawQuery: "payout=12.5678900000",
+			},
+		))
+	})
 }

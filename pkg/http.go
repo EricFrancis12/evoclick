@@ -6,8 +6,10 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/mileusna/useragent"
@@ -120,6 +122,19 @@ func GetLanguage(r http.Request) string {
 
 func GetScreenRes(r http.Request) string {
 	return r.Header.Get("Viewport-Width")
+}
+
+func GetPid(url url.URL) string {
+	return url.Query().Get(string(QueryParamPid))
+}
+
+func GetRevenue(url url.URL) float64 {
+	payoutStr := url.Query().Get(string(QueryParamPayout))
+	revenue, err := strconv.ParseFloat(payoutStr, 64)
+	if err != nil || revenue < 0 {
+		return 0
+	}
+	return revenue
 }
 
 func IPInfoEndpoint(ipAddr string, ipInfoToken string) string {
