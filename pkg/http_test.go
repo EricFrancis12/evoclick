@@ -53,13 +53,92 @@ func TestGetLanguage(t *testing.T) {
 }
 
 func TestGetPid(t *testing.T) {
-	url := url.URL{
-		RawQuery: string(QueryParamPid) + "=" + "1234",
-	}
-	assert.Equal(t, "1234", GetPid(url))
+	t.Run("Test missing or empty pid", func(t *testing.T) {
+		assert.Equal(t, "", GetPid(url.URL{}))
+		assert.Equal(t, "", GetPid(url.URL{
+			RawQuery: string(QueryParamPid) + "=",
+		}))
+	})
+
+	t.Run("Test correct usage of pid", func(t *testing.T) {
+		assert.Equal(t, "1234", GetPid(url.URL{
+			RawQuery: string(QueryParamPid) + "=" + "1234",
+		}))
+		assert.Equal(t, "1234-5678-90", GetPid(url.URL{
+			RawQuery: string(QueryParamPid) + "=" + "1234-5678-90",
+		}))
+		assert.Equal(t, "1234_5678_90", GetPid(url.URL{
+			RawQuery: string(QueryParamPid) + "=" + "1234_5678_90",
+		}))
+		assert.Equal(t, "1234-5678_90", GetPid(url.URL{
+			RawQuery: string(QueryParamPid) + "=" + "1234-5678_90",
+		}))
+	})
 }
 
 func TestGetRevenue(t *testing.T) {
+	t.Run("Test missing or empty payout", func(t *testing.T) {
+		assert.Equal(t, float64(0), GetRevenue(
+			url.URL{},
+		))
+		assert.Equal(t, float64(0), GetRevenue(
+			url.URL{
+				RawQuery: "",
+			},
+		))
+		assert.Equal(t, float64(0), GetRevenue(
+			url.URL{
+				RawQuery: "payout=",
+			},
+		))
+	})
+
+	t.Run("Test invalid payout", func(t *testing.T) {
+		assert.Equal(t, float64(0), GetRevenue(
+			url.URL{
+				RawQuery: "payout=INVALID",
+			},
+		))
+		assert.Equal(t, float64(0), GetRevenue(
+			url.URL{
+				RawQuery: "payout=NOT_A_NUMBER",
+			},
+		))
+		assert.Equal(t, float64(0), GetRevenue(
+			url.URL{
+				RawQuery: "payout=-",
+			},
+		))
+	})
+
+	t.Run("Test negative payout", func(t *testing.T) {
+		assert.Equal(t, float64(0), GetRevenue(
+			url.URL{
+				RawQuery: "payout=-0",
+			},
+		))
+		assert.Equal(t, float64(0), GetRevenue(
+			url.URL{
+				RawQuery: "payout=-12",
+			},
+		))
+		assert.Equal(t, float64(0), GetRevenue(
+			url.URL{
+				RawQuery: "payout=-12.5",
+			},
+		))
+		assert.Equal(t, float64(0), GetRevenue(
+			url.URL{
+				RawQuery: "payout=-12.56789",
+			},
+		))
+		assert.Equal(t, float64(0), GetRevenue(
+			url.URL{
+				RawQuery: "payout=-12.50000",
+			},
+		))
+	})
+
 	t.Run("Test integer payout", func(t *testing.T) {
 		assert.Equal(t, float64(12), GetRevenue(
 			url.URL{
