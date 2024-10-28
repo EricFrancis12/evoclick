@@ -31,8 +31,21 @@ type UpdateInput =
     | Prisma.XOR<Prisma.OfferUpdateInput, Prisma.OfferUncheckedUpdateInput>
     | Prisma.XOR<Prisma.TrafficSourceUpdateInput, Prisma.TrafficSourceUncheckedUpdateInput>;
 
-interface IStorer<M extends PrismaModel, CI extends CreateInput, UI extends UpdateInput> {
-    findMany: () => Promise<M[]>;
+type FindManyArg = {
+    where?: {
+        id?: {
+            in?: number[];
+        };
+        NOT?: {
+            id?: {
+                in?: number[];
+            };
+        };
+    };
+};
+
+interface IStorer<M extends PrismaModel, CI extends CreateInput, UI extends UpdateInput,> {
+    findMany: (arg: FindManyArg) => Promise<M[]>;
     findUnique: (arg: { where: { id: number } }) => Promise<M | null>;
     create: (arg: { data: CI }) => Promise<M>;
     update: (arg: { where: { id: number }, data: UI }) => Promise<M>;
@@ -58,7 +71,7 @@ export function makeStorerFuncs<
     makeClient: MakeClientFunc<PI, M>,
     schema: PISchema<PI>
 ): {
-    getAllFunc: () => Promise<PI[]>;
+    getAllFunc: (arg?: FindManyArg) => Promise<PI[]>; // Accept args
     getByIdFunc: (id: number) => Promise<PI | null>;
     createNewFunc: (ci: CI) => Promise<PI>;
     updateByIdFunc: (id: number, ui: UI) => Promise<PI>;
@@ -86,9 +99,9 @@ function makeGetAllFunc<
     CI extends CreateInput,
     UI extends UpdateInput,
     PI extends TPrimaryItem
->(storer: IStorer<M, CI, UI>, makeClient: MakeClientFunc<PI, M>): () => Promise<PI[]> {
-    return async function () {
-        const models: M[] = await storer.findMany();
+>(storer: IStorer<M, CI, UI>, makeClient: MakeClientFunc<PI, M>): (arg?: FindManyArg) => Promise<PI[]> {
+    return async function (arg = {}) {
+        const models: M[] = await storer.findMany(arg);
         const proms: Promise<PI>[] = models.map(makeClient);
         return Promise.all(proms);
     }

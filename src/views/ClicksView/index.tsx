@@ -1,6 +1,10 @@
+"use client";
+
+import { useState } from "react";
 import { TClick, TPrimaryData } from "@/lib/types";
 import ControlPanel from "./ControlPanel";
 import ClicksTable from "./ClicksTable";
+import { ReportViewProvider } from "../ReportView/ReportViewContext";
 
 export default function ClicksView({ primaryData, clicks, timeframe, currentPage, totalPages }: {
     primaryData: TPrimaryData;
@@ -9,18 +13,26 @@ export default function ClicksView({ primaryData, clicks, timeframe, currentPage
     currentPage: number;
     totalPages: number;
 }) {
+    const [selectedClickIds, setSelectedClickIds] = useState<Set<number>>(new Set());
+
     return (
-        <main className="flex flex-col items-center gap-8 min-h-screen w-full pb-16">
-            <ControlPanel
-                primaryData={primaryData}
-                timeframe={timeframe}
-                currentPage={currentPage}
-            />
-            <ClicksTable
-                clicks={clicks}
-                currentPage={currentPage}
-                totalPages={totalPages}
-            />
-        </main>
+        <ReportViewProvider>
+            <main className="flex flex-col items-center gap-8 min-h-screen w-full pb-16">
+                <ControlPanel
+                    primaryData={primaryData}
+                    timeframe={timeframe}
+                    currentPage={currentPage}
+                    selectedClickIds={selectedClickIds}
+                    setSelectedClickIds={setSelectedClickIds}
+                />
+                <ClicksTable
+                    clicks={clicks}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    selectedClickIds={selectedClickIds}
+                    setSelectedClickIds={setSelectedClickIds}
+                />
+            </main>
+        </ReportViewProvider>
     )
 }

@@ -5,6 +5,8 @@ import { PopoverLayer } from "@/components/popover";
 import ActionMenu from "./ActionMenu";
 import { TActionMenu } from "./ActionMenu/types";
 
+// TODO: rename this file and all methods within to ActionMenuContext
+
 export type TReportViewContext = {
     actionMenu: TActionMenu | null;
     setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;

@@ -9,7 +9,8 @@ export type TActionMenu =
     | TOfferActionMenu
     | TTrafficSourceActionMenu
     | TCampaignLinksActionMenu
-    | TDeleteItemsActionMenu;
+    | TDeleteItemsActionMenu
+    | TDeleteClicksActionMenu;
 
 export type TAffiliateNetworkActionMenu = {
     type: EItemName.AFFILIATE_NETWORK;
@@ -87,4 +88,10 @@ export type TDeleteItemsActionMenu = {
     type: "Delete Items",
     primaryItemName: TPrimaryItemName;
     ids: number[];
+};
+
+export type TDeleteClicksActionMenu = {
+    type: "Delete Clicks",
+    clickIds: number[];
+    deleteAll?: boolean;
 };

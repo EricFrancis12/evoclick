@@ -71,6 +71,18 @@ export async function getClicksAction(args: Prisma.ClickFindManyArgs = {}, pathn
     return prom;
 }
 
+export async function deleteAllClicksAction(args: Prisma.ClickDeleteManyArgs = {}, pathname?: string): Promise<number> {
+    const prom = data.deleteAllClicks(args);
+    refreshUrl(prom, pathname);
+    return prom;
+}
+
+export async function deleteClicksByIdsAction(ids: number[], pathname?: string): Promise<number> {
+    const prom = data.deleteClicksByIds(ids);
+    refreshUrl(prom, pathname);
+    return prom;
+}
+
 type CRUDOperations<CreationRequest, UpdateRequest, Result> = {
     readAll: () => Promise<Result[]>;
     readOne: (id: number) => Promise<Result | null>;

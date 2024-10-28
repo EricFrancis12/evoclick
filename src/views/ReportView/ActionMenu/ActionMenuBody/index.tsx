@@ -10,6 +10,7 @@ import CampaignLinksBody from "./CampaignLinksBody";
 import DeleteItemBody from "./DeleteItemBody";
 import { EItemName } from "@/lib/types";
 import { TActionMenu } from "../types";
+import DeleteClicksBody from "./DeleteClicksBody";
 
 export default function ActionMenuBody({ actionMenu, setActionMenu }: {
     actionMenu: TActionMenu;
@@ -29,9 +30,11 @@ export default function ActionMenuBody({ actionMenu, setActionMenu }: {
         case EItemName.TRAFFIC_SOURCE:
             return <TrafficSourceBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
         case "Campaign Links":
-            return <CampaignLinksBody actionMenu={actionMenu} setActionMenu={setActionMenu} />
+            return <CampaignLinksBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
         case "Delete Items":
-            return <DeleteItemBody actionMenu={actionMenu} setActionMenu={setActionMenu} />
+            return <DeleteItemBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
+        case "Delete Clicks":
+            return <DeleteClicksBody actionMenu={actionMenu} setActionMenu={setActionMenu} />;
         default:
             return "";
     }

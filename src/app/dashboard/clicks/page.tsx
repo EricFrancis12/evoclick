@@ -4,7 +4,6 @@ import {
 } from "@/data";
 import { useProtectedRoute } from "@/lib/auth";
 import { defaultTimeframe } from "@/lib/constants";
-import db from "@/lib/db";
 import { EItemName, TAffiliateNetwork } from "@/lib/types";
 import { decodeSearchParams, timeframeFilter } from "@/lib/utils/server";
 import ClicksView from "@/views/ClicksView";
@@ -17,6 +16,16 @@ export default async function ClicksPage({ searchParams }: {
         timeframe?: string;
         affiliateNetworkIncl?: string | string[];
         affiliateNetworkExcl?: string | string[];
+        campaignIncl?: string | string[];
+        campaignExcl?: string | string[];
+        flowIncl?: string | string[];
+        flowExcl?: string | string[];
+        landingPageIncl?: string | string[];
+        landingPageExcl?: string | string[];
+        offerIncl?: string | string[];
+        offerExcl?: string | string[];
+        trafficSourceIncl?: string | string[];
+        trafficSourceExcl?: string | string[];
     };
 }) {
     await useProtectedRoute();
@@ -41,46 +50,41 @@ export default async function ClicksPage({ searchParams }: {
     } = formatFilterActionParams(searchParams);
 
     try {
-        // TODO: clean up the below fetch method, and above code, and impliment the same idea fo the other primary items
-        const affilaiteNetworksProm = db.affiliateNetwork.findMany({
-            where: {
-                id: {
-                    in: affiliateNetworkIncl,
-                },
-                NOT: {
-                    id: {
-                        in: affiliateNetworkExcl,
-                    },
-                },
-            },
-        });
-
+        const affilaiteNetworksProm = getAllAffiliateNetworks();
         const campaignsProm = getAllCampaigns();
         const flowsProm = getAllFlows();
         const landingPagesProm = getAllLandingPages();
         const offersProm = getAllOffers();
         const trafficSourcesProm = getAllTrafficSources();
 
+        const clicksWhere = {
+            ...timeframeFilter(timeframe),
+            AND: {
+                affiliateNetworkId: { in: affiliateNetworkIncl },
+                campaignId: { in: campaignIncl },
+                savedFlowId: { in: flowIncl },
+                landingPageId: { in: landingPageIncl },
+                offerId: { in: offerIncl },
+                trafficSourceId: { in: trafficSourceIncl },
+            },
+            NOT: {
+                affiliateNetworkId: { in: affiliateNetworkExcl },
+                campaignId: { in: campaignExcl },
+                savedFlowId: { in: flowExcl },
+                landingPageId: { in: landingPageExcl },
+                offerId: { in: offerExcl },
+                trafficSourceId: { in: trafficSourceExcl },
+            },
+        };
+
         const clicksProm = getAllClicks({
             skip: currentPage * itemsPerPage,
             take: itemsPerPage,
-            where: {
-                ...timeframeFilter(timeframe),
-                AND: {
-                    affiliateNetworkId: {
-                        in: affiliateNetworkIncl,
-                    },
-                },
-                NOT: {
-                    affiliateNetworkId: {
-                        in: affiliateNetworkExcl,
-                    },
-                },
-            },
+            where: clicksWhere,
         });
 
         const numClicksProm = countAllClicks({
-            where: timeframeFilter(timeframe),
+            where: clicksWhere,
         });
 
         const primaryData = {
@@ -126,7 +130,7 @@ function formatFilterActionParams(searchParams: { [key: string]: string | string
                     result[name] = [id];
                 }
             } else if (Array.isArray(val)) {
-                const ids = val.filter(v => !isNaN(parseInt(v))).map(parseInt);
+                const ids = val.map(parseInt).filter(id => !isNaN(id));
                 result[name] = ids;
             }
         }
