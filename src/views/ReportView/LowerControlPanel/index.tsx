@@ -103,7 +103,7 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
                     timeframe={view.timeframe}
                     onChange={timeframe => queryRouter.push(
                         window.location.href,
-                        { timeframe: encodeTimeframe(timeframe) }
+                        { timeframe: encodeTimeframe(timeframe) },
                     )}
                 />
                 <RefreshButton />

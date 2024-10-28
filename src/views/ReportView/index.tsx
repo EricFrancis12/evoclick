@@ -40,7 +40,7 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
         if (!view.reportItemName) return;
         queryRouter.push(
             `/dashboard/report/${encodeURIComponent(view.reportItemName)}/${encodeURIComponent(view.id)}`,
-            { timeframe: encodeTimeframe(view.timeframe) }
+            { timeframe: encodeTimeframe(view.timeframe) },
         );
     }
 

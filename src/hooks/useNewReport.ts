@@ -24,7 +24,7 @@ export default function useNewReport() {
         if (newView.reportItemName) {
             queryRouter.push(
                 `/dashboard/report/${encodeURIComponent(newView.reportItemName)}/${encodeURIComponent(newView.id)}`,
-                { timeframe: encodeTimeframe(timeframe) }
+                { timeframe: encodeTimeframe(timeframe) },
             );
         }
     }

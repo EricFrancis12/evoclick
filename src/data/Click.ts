@@ -9,6 +9,10 @@ export async function getAllClicks(args: Prisma.ClickFindManyArgs = {}): Promise
     return Promise.all(proms);
 }
 
+export async function countAllClicks(args: Prisma.ClickCountArgs = {}): Promise<number> {
+    return db.click.count(args);
+}
+
 async function makeClientClick(dbModel: Click): Promise<TClick> {
     return {
         ...dbModel,
