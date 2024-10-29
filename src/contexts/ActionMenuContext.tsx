@@ -2,27 +2,25 @@
 
 import React, { useState, useContext } from "react";
 import { PopoverLayer } from "@/components/popover";
-import ActionMenu from "./ActionMenu";
-import { TActionMenu } from "./ActionMenu/types";
+import ActionMenu from "@/components/ActionMenu";
+import { TActionMenu } from "@/components/ActionMenu/types";
 
-// TODO: rename this file and all methods within to ActionMenuContext
-
-export type TReportViewContext = {
+type TActionMenuContext = {
     actionMenu: TActionMenu | null;
     setActionMenu: React.Dispatch<React.SetStateAction<TActionMenu | null>>;
 };
 
-const ReportViewContext = React.createContext<TReportViewContext | null>(null);
+const ActionMenuContext = React.createContext<TActionMenuContext | null>(null);
 
-export function useReportViewContext() {
-    const context = useContext(ReportViewContext);
+export function useActionMenuContext() {
+    const context = useContext(ActionMenuContext);
     if (!context) {
-        throw new Error("useReportViewContext must be used within a ReportViewContext provider");
+        throw new Error("useActionMenuContext must be used within a ActionMenuContext provider");
     }
     return context;
 }
 
-export function ReportViewProvider({ children }: {
+export function ActionMenuProvider({ children }: {
     children: React.ReactNode;
 }) {
     const [actionMenu, setActionMenu] = useState<TActionMenu | null>(null);
@@ -33,13 +31,13 @@ export function ReportViewProvider({ children }: {
     };
 
     return (
-        <ReportViewContext.Provider value={value}>
+        <ActionMenuContext.Provider value={value}>
             {actionMenu &&
                 <PopoverLayer layer={1}>
                     <ActionMenu actionMenu={actionMenu} setActionMenu={setActionMenu} />
                 </PopoverLayer>
             }
             {children}
-        </ReportViewContext.Provider >
+        </ActionMenuContext.Provider>
     )
 }

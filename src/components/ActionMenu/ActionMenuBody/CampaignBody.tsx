@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { createNewCampaignAction, getAllFlowsAction, getAllTrafficSourcesAction, updateCampaignAction } from "@/lib/actions";
 import { PopoverContainer, PopoverFooter, PopoverLayer } from "@/components/popover";
-import FlowBuilder from "../../FlowBuilder";
+import FlowBuilder from "../../../views/ReportView/FlowBuilder";
 import Button from "@/components/Button";
 import TagsInput from "@/components/TagsInput";
 import { Input, Select, SelectionButtons } from "@/components/base";

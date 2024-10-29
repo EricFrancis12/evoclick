@@ -4,7 +4,7 @@ import { useState } from "react";
 import { TClick, TPrimaryData } from "@/lib/types";
 import ControlPanel from "./ControlPanel";
 import ClicksTable from "./ClicksTable";
-import { ReportViewProvider } from "../ReportView/ReportViewContext";
+import { ActionMenuProvider } from "../../contexts/ActionMenuContext";
 
 export default function ClicksView({ primaryData, clicks, timeframe, currentPage, totalPages }: {
     primaryData: TPrimaryData;
@@ -16,7 +16,7 @@ export default function ClicksView({ primaryData, clicks, timeframe, currentPage
     const [selectedClickIds, setSelectedClickIds] = useState<Set<number>>(new Set());
 
     return (
-        <ReportViewProvider>
+        <ActionMenuProvider>
             <main className="flex flex-col items-center gap-8 min-h-screen w-full pb-16">
                 <ControlPanel
                     primaryData={primaryData}
@@ -33,6 +33,6 @@ export default function ClicksView({ primaryData, clicks, timeframe, currentPage
                     setSelectedClickIds={setSelectedClickIds}
                 />
             </main>
-        </ReportViewProvider>
+        </ActionMenuProvider>
     )
 }

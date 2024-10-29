@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import logo from "@/assets/images/logo-no-bg.png";
 import { DialogueViewProvider } from "../../contexts/DialogueMenuContext";
-import { ReportViewProvider } from "./ReportViewContext";
+import { ActionMenuProvider } from "../../contexts/ActionMenuContext";
 import useActiveView from "@/hooks/useActiveView";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import Report from "./Report";
@@ -54,7 +54,7 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
 
     return (
         <DataProvider primaryData={primaryData} clicks={clicks}>
-            <ReportViewProvider>
+            <ActionMenuProvider>
                 <DialogueViewProvider>
                     <main className="flex flex-col h-screen w-full">
                         <div className="flex gap-2 h-[40px] w-[100vw] bg-[#2f918e]">
@@ -98,7 +98,7 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
                         </div>
                     </main>
                 </DialogueViewProvider>
-            </ReportViewProvider>
+            </ActionMenuProvider>
         </DataProvider>
     )
 }

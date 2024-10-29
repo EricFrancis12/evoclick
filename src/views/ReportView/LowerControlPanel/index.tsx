@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { faCopy, faLink, faPencil, faPlus, faRandom, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useDataContext } from "@/contexts/DataContext";
-import { useReportViewContext } from "../ReportViewContext";
+import { useActionMenuContext } from "../../../contexts/ActionMenuContext";
 import useNewReport from "@/hooks/useNewReport";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import CalendarButton from "@/components/CalendarButton";
@@ -13,7 +13,7 @@ import LowerCPWrapper from "./LowerCPWrapper";
 import LowerCPRow from "./LowerCPRow";
 import { TView, useViewsStore } from "@/lib/store";
 import Button from "@/components/Button";
-import { TActionMenu } from "../ActionMenu/types";
+import { TActionMenu } from "../../../components/ActionMenu/types";
 import {
     encodeTimeframe, getPrimaryItemById, isPrimary, newPrimaryItemActionMenu,
     newAffiliateNetworkActionMenu, newCampaignActionMenu, newSavedFlowActionMenu,
@@ -29,7 +29,7 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
     setRows: (newRows: TRow[]) => void;
 }) {
     const { primaryData } = useDataContext();
-    const { setActionMenu } = useReportViewContext();
+    const { setActionMenu } = useActionMenuContext();
     const queryRouter = useQueryRouter();
     const selectedRows = rows.filter(row => row.selected === true);
 

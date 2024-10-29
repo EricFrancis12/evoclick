@@ -5,13 +5,12 @@ import { useSearchParams } from "next/navigation";
 import { Select } from "@/components/base";
 import CalendarButton from "@/components/CalendarButton";
 import useQueryRouter from "@/hooks/useQueryRouter";
-import { encodeTimeframe, getAllFilterActionParams, getFilterActionNames, upperCaseFirstLetter } from "@/lib/utils";
+import { encodeTimeframe, getAllFilterActionParams, getFilterActionNames } from "@/lib/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircle, faCircleCheck, faCircleXmark, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { EItemName, TPrimaryData, TPrimaryItemName } from "@/lib/types";
+import { TPrimaryData, TPrimaryItemName } from "@/lib/types";
 import Button from "@/components/Button";
-import { deleteAllClicksAction, deleteClicksByIdsAction, revalidatePathAction } from "@/lib/actions";
-import { useReportViewContext } from "../ReportView/ReportViewContext";
+import { useActionMenuContext } from "../../contexts/ActionMenuContext";
 
 export enum EFilterAction {
     INCLUDE = "Include",
@@ -31,7 +30,7 @@ export default function ControlPanel({ primaryData, timeframe, currentPage, sele
     selectedClickIds: Set<number>;
     setSelectedClickIds: (newSelectedClickIds: Set<number>) => void;
 }) {
-    const { setActionMenu } = useReportViewContext();
+    const { setActionMenu } = useActionMenuContext();
 
     const searchParams = useSearchParams();
     const queryRouter = useQueryRouter();

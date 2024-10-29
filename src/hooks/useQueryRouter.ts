@@ -9,11 +9,13 @@ export default function useQueryRouter() {
         push: (pathname: string, query: Record<string, string | string[]> = {}, preserveKeys?: string[]) => {
             const url = new URL(pathname, window.location.origin);
 
-            const existingQuery: Record<string, string> = preserveKeys
-                ? new URL(window.location.href).searchParams
-                    .entries()
-                    .reduce((acc, [key, val]) => (preserveKeys.includes(key) ? { ...acc, [key]: val } : acc), {})
-                : {};
+            const entries = new URL(window.location.href).searchParams.entries();
+            const existingQuery: Record<string, string> = {};
+            if (preserveKeys) {
+                for (const [key, val] of entries) {
+                    if (preserveKeys.includes(key)) existingQuery[key] = val;
+                }
+            }
 
             const queryParams = new URLSearchParams(existingQuery);
 
