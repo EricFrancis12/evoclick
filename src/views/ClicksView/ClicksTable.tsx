@@ -30,6 +30,7 @@ export default function ClicksTable({ clicks, currentPage, totalPages, selectedC
     return (
         <div className="w-full border border-black">
             <TitleRow
+                title="Click IDs"
                 checked={titleRowChecked}
                 onChecked={() => setSelectedClickIds(
                     titleRowChecked
@@ -37,14 +38,18 @@ export default function ClicksTable({ clicks, currentPage, totalPages, selectedC
                         : new Set(clicks.map(({ id }) => id))
                 )}
             />
-            {clicks.map(click => (
-                <ClickRow
-                    key={click.id}
-                    click={click}
-                    checked={selectedClickIds.has(click.id)}
-                    onChecked={ch => handleClickRowChecked(ch, click.id)}
-                />
-            ))}
+            {clicks.length === 0
+                ? <div className="p-2 font-bold italic border-b border-black">
+                    No clicks...
+                </div>
+                : clicks.map(click => (
+                    <ClickRow
+                        key={click.id}
+                        click={click}
+                        checked={selectedClickIds.has(click.id)}
+                        onChecked={ch => handleClickRowChecked(ch, click.id)}
+                    />
+                ))}
             <ClicksTablePagination currentPage={currentPage} totalPages={totalPages} />
         </div>
     )
@@ -60,11 +65,11 @@ function RowWrapper({ children }: {
     )
 }
 
-function TitleRow({ checked, onChecked }: {
+function TitleRow({ title, checked, onChecked }: {
+    title: string;
     checked: boolean;
     onChecked: (newChecked: boolean) => void;
 }) {
-    // TODO: ...
     return (
         <RowWrapper>
             <input
@@ -72,7 +77,7 @@ function TitleRow({ checked, onChecked }: {
                 checked={checked}
                 onChange={() => onChecked(!checked)}
             />
-            <span>TitleRow</span>
+            <span>{title}</span>
         </RowWrapper>
     )
 }
@@ -82,7 +87,6 @@ function ClickRow({ click, checked, onChecked }: {
     checked: boolean;
     onChecked: (newChecked: boolean) => void;
 }) {
-    // TODO: ...
     return (
         <RowWrapper>
             <input

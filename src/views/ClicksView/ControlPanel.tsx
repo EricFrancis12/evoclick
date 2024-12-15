@@ -11,6 +11,11 @@ import { faCircle, faCircleCheck, faCircleXmark, faTrash } from "@fortawesome/fr
 import { TPrimaryData, TPrimaryItemName } from "@/lib/types";
 import Button from "@/components/Button";
 import { useActionMenuContext } from "../../contexts/ActionMenuContext";
+import UpperCPWrapper from "../ReportView/UpperControlPanel/UpperCPWrapper";
+import UpperCPRow from "../ReportView/UpperControlPanel/UpperCPRow";
+import ContentToggler from "@/components/ContentToggler";
+import LowerCPWrapper from "../ReportView/LowerControlPanel/LowerCPWrapper";
+import LowerCPRow from "../ReportView/LowerControlPanel/LowerCPRow";
 
 export enum EFilterAction {
     INCLUDE = "Include",
@@ -80,39 +85,51 @@ export default function ControlPanel({ primaryData, timeframe, currentPage, sele
         });
     }
 
-
     return (
-        <div className="flex gap-2 w-full">
-            <Button
-                text={`Delete (${selectedClickIds.size}) Clicks`}
-                disabled={selectedClickIds.size === 0}
-                icon={faTrash}
-                onClick={handleDelete}
-            />
-            <Button
-                text={"Delete All Clicks"}
-                icon={faTrash}
-                onClick={handleDeleteAll}
-            />
-            <CalendarButton
-                timeframe={timeframe}
-                onChange={tf => queryRouter.push(
-                    window.location.href,
-                    {
-                        timeframe: encodeTimeframe(tf),
-                        page: currentPage.toString(),
-                        ...getAllFilterActionParams(searchParams),
-                    },
-                )}
-            />
-            {Object.keys(primaryData).map(primaryItemName => (
-                <IncludeExcludeListSelect
-                    key={primaryItemName}
-                    values={primaryData[primaryItemName as TPrimaryItemName].map(({ id, name }) => ({ id, name }))}
-                    primaryItemName={primaryItemName as TPrimaryItemName}
-                    onChange={handleChange}
-                />
-            ))}
+        <div className="w-full">
+            <UpperCPWrapper>
+                <UpperCPRow>
+                    <CalendarButton
+                        timeframe={timeframe}
+                        onChange={tf => queryRouter.push(
+                            window.location.href,
+                            {
+                                timeframe: encodeTimeframe(tf),
+                                page: currentPage.toString(),
+                                ...getAllFilterActionParams(searchParams),
+                            },
+                        )}
+                    />
+                    <Button
+                        text={`Delete (${selectedClickIds.size}) Clicks`}
+                        disabled={selectedClickIds.size === 0}
+                        icon={faTrash}
+                        onClick={handleDelete}
+                    />
+                    <Button
+                        text={"Delete All Clicks"}
+                        icon={faTrash}
+                        onClick={handleDeleteAll}
+                    />
+                </UpperCPRow>
+            </UpperCPWrapper>
+            <LowerCPWrapper>
+                <div className="w-full">
+                    {Object.keys(primaryData).map(primaryItemName => (
+                        <div
+                            key={primaryItemName}
+                            className="inline-flex flex-col m-3 p-1 rounded-md border border-black select-none"
+                        >
+                            <p className="font-bold">{primaryItemName}</p>
+                            <IncludeExcludeListSelect
+                                values={primaryData[primaryItemName as TPrimaryItemName].map(({ id, name }) => ({ id, name }))}
+                                primaryItemName={primaryItemName as TPrimaryItemName}
+                                onChange={handleChange}
+                            />
+                        </div>
+                    ))}
+                </div>
+            </LowerCPWrapper>
         </div>
     )
 }
@@ -176,15 +193,16 @@ function IncludeExcludeListRow({ value, primaryItemName, onChange }: {
         });
     }
     return (
-        <div className="flex justify-between items-center gap-2">
+        <div
+            className="flex items-center gap-2 cursor-pointer hover:opacity-70"
+            onClick={handleClick}
+        >
             <FontAwesomeIcon
                 icon={filterAction === EFilterAction.INCLUDE ? faCircleCheck : filterAction === EFilterAction.EXCLUDE ? faCircleXmark : faCircle}
                 className={
                     (filterAction === EFilterAction.INCLUDE ? "text-green-300 hover:text-green-400" : "")
                     + (filterAction === EFilterAction.EXCLUDE ? " text-red-300 hover:text-red-400" : "")
-                    + " cursor-pointer"
                 }
-                onClick={handleClick}
             />
             <span>{name}</span>
         </div>
