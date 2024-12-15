@@ -15,9 +15,9 @@ export default function HeaderSection({ timeframe }: {
         <div className="flex justify-end items-center gap-2 w-full p-4">
             <CalendarButton
                 timeframe={timeframe}
-                onChange={_timeframe => queryRouter.push(
+                onChange={tf => queryRouter.push(
                     window.location.href,
-                    { timeframe: encodeTimeframe(_timeframe) }
+                    { timeframe: encodeTimeframe(tf) },
                 )}
             />
             <Button

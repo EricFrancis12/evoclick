@@ -6,7 +6,7 @@ import { createNewFlowAction, updateFlowAction } from "@/lib/actions";
 import { PopoverContainer, PopoverFooter, PopoverLayer } from "@/components/popover";
 import Button from "@/components/Button";
 import TagsInput from "@/components/TagsInput";
-import FlowBuilder from "../../FlowBuilder";
+import FlowBuilder from "../../../views/ReportView/FlowBuilder";
 import { Input } from "@/components/base";
 import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import ActionMenuFooter from "../ActionMenuFooter";

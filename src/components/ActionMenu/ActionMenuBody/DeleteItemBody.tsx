@@ -19,7 +19,7 @@ import { getPrimaryItemById } from "@/lib/utils";
 import { TActionMenu, TDeleteItemsActionMenu } from "../types";
 import { EItemName, TPrimaryItemName, TPrimaryItem } from "@/lib/types";
 
-type TDeletionStatus = "idle" | "pending" | "success" | "failed";
+export type TDeletionStatus = "idle" | "pending" | "success" | "failed";
 
 type TDeletionItem = {
     data: TPrimaryItem;
@@ -80,7 +80,7 @@ export default function DeleteItemBody({ actionMenu, setActionMenu }: {
                 <span>Are you sure you want to delete these items?</span>
                 {deletionItems.map(({ data, status }, index) => (
                     <div key={index} className="flex items-center gap-2">
-                        <FontAwesomeIcon icon={statusToIcon(status)} />
+                        <FontAwesomeIcon icon={deletionStatusToIcon(status)} />
                         <span>{data.name}</span>
                     </div>
                 ))}
@@ -95,18 +95,7 @@ export default function DeleteItemBody({ actionMenu, setActionMenu }: {
     )
 }
 
-type TDeleteItemFunc = (id: number, pathname?: string) => Promise<Object>;
-
-const deleteItemMap: Record<TPrimaryItemName, TDeleteItemFunc> = {
-    [EItemName.AFFILIATE_NETWORK]: deleteAffiliateNetworkAction,
-    [EItemName.CAMPAIGN]: deleteCampaignAction,
-    [EItemName.FLOW]: deleteFlowAction,
-    [EItemName.LANDING_PAGE]: deleteLandingPageAction,
-    [EItemName.OFFER]: deleteOfferAction,
-    [EItemName.TRAFFIC_SOURCE]: deleteTrafficSourceAction,
-};
-
-function statusToIcon(status: TDeletionStatus): IconDefinition {
+export function deletionStatusToIcon(status: TDeletionStatus): IconDefinition {
     switch (status) {
         case "pending":
             return faSpinner;
@@ -118,3 +107,14 @@ function statusToIcon(status: TDeletionStatus): IconDefinition {
             return faCircle;
     }
 }
+
+type TDeleteItemFunc = (id: number, pathname?: string) => Promise<Object>;
+
+const deleteItemMap: Record<TPrimaryItemName, TDeleteItemFunc> = {
+    [EItemName.AFFILIATE_NETWORK]: deleteAffiliateNetworkAction,
+    [EItemName.CAMPAIGN]: deleteCampaignAction,
+    [EItemName.FLOW]: deleteFlowAction,
+    [EItemName.LANDING_PAGE]: deleteLandingPageAction,
+    [EItemName.OFFER]: deleteOfferAction,
+    [EItemName.TRAFFIC_SOURCE]: deleteTrafficSourceAction,
+};

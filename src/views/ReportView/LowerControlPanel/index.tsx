@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { faLink, faPencil, faPlus, faRandom, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faLink, faPencil, faPlus, faRandom, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useDataContext } from "@/contexts/DataContext";
-import { useReportViewContext } from "../ReportViewContext";
+import { useActionMenuContext } from "../../../contexts/ActionMenuContext";
 import useNewReport from "@/hooks/useNewReport";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import CalendarButton from "@/components/CalendarButton";
@@ -13,7 +13,7 @@ import LowerCPWrapper from "./LowerCPWrapper";
 import LowerCPRow from "./LowerCPRow";
 import { TView, useViewsStore } from "@/lib/store";
 import Button from "@/components/Button";
-import { TActionMenu } from "../ActionMenu/types";
+import { TActionMenu } from "../../../components/ActionMenu/types";
 import {
     encodeTimeframe, getPrimaryItemById, isPrimary, newPrimaryItemActionMenu,
     newAffiliateNetworkActionMenu, newCampaignActionMenu, newSavedFlowActionMenu,
@@ -29,7 +29,7 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
     setRows: (newRows: TRow[]) => void;
 }) {
     const { primaryData } = useDataContext();
-    const { setActionMenu } = useReportViewContext();
+    const { setActionMenu } = useActionMenuContext();
     const queryRouter = useQueryRouter();
     const selectedRows = rows.filter(row => row.selected === true);
 
@@ -66,6 +66,23 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
         });
     }
 
+    function handleDuplicateItem() {
+        const { ok, primaryItemName } = isPrimary(view.itemName);
+        if (!ok || typeof selectedRows?.[0]?.id !== "number") return;
+
+        let actionMenu = makeActionMenu(primaryData, primaryItemName, selectedRows[0].id);
+        if (!actionMenu) return;
+
+        if ("id" in actionMenu) {
+            actionMenu.id = undefined;
+        }
+        if ("name" in actionMenu) {
+            actionMenu.name += " Copy";
+        }
+
+        setActionMenu(actionMenu);
+    }
+
     function handleReportChainChange(reportChain: TReportChain) {
         setRows(rows.map(row => ({ ...row, selected: false }))); // Deselect all rows on report chain change
         updateViewReportChainById(view.id, reportChain)
@@ -86,7 +103,7 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
                     timeframe={view.timeframe}
                     onChange={timeframe => queryRouter.push(
                         window.location.href,
-                        { timeframe: encodeTimeframe(timeframe) }
+                        { timeframe: encodeTimeframe(timeframe) },
                     )}
                 />
                 <RefreshButton />
@@ -112,6 +129,12 @@ export default function LowerControlPanel({ view, reportItemName, rows, setRows 
                                     icon={faTrash}
                                     disabled={selectedRows.length === 0}
                                     onClick={handleDeleteItem}
+                                />
+                                <Button
+                                    text={`Duplicate ${view.itemName}${selectedRows.length > 1 ? "s" : ""}`}
+                                    icon={faCopy}
+                                    disabled={selectedRows.length !== 1}
+                                    onClick={handleDuplicateItem}
                                 />
                             </>
                         }

@@ -18,7 +18,7 @@ import { TView } from "@/lib/store";
 import { DEPTH_MARGIN, safeIndexCols, TColumn, TRow } from ".";
 import { EItemName } from "@/lib/types";
 import { useDataContext } from "@/contexts/DataContext";
-import { useReportViewContext } from "../ReportViewContext";
+import { useActionMenuContext } from "../../../contexts/ActionMenuContext";
 import { getPrimaryItemById, isPrimary } from "@/lib/utils";
 import { copyToClipboard } from "@/lib/utils/client";
 import columnsMap, { EColumnTitle, makeCells, TColumnsMap } from "./columnsMap";
@@ -31,7 +31,7 @@ export default function Row({ row, columns, onSelected, view, depth }: {
     depth: number;
 }) {
     const { primaryData } = useDataContext();
-    const { setActionMenu } = useReportViewContext();
+    const { setActionMenu } = useActionMenuContext();
 
     const [open, setOpen] = useState<boolean>(false);
     const cells = makeCells(columnsMap, row.clicks, row.name);

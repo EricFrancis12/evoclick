@@ -5,8 +5,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExternalLink, faPencilAlt, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { PopoverLayer } from "@/components/popover";
 import { Select } from "@/components/base";
-import ActionMenu from "../ActionMenu";
-import { TActionMenu } from "../ActionMenu/types";
+import ActionMenu from "@/components/ActionMenu";
+import { TActionMenu } from "@/components/ActionMenu/types";
 import { newPrimaryItemActionMenu } from "@/lib/utils/new";
 import { EItemName, TLandingPage, TOffer, TPath } from "@/lib/types";
 

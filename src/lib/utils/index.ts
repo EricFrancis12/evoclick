@@ -1,12 +1,13 @@
 import { startOfDay, addDays } from "date-fns";
 import { TPrimaryData, EItemName, EQueryParam, TPrimaryItemName, TToken, TCustomRuleName } from "../types";
+import { ReadonlyURLSearchParams } from "next/navigation";
 
 export * from "./maps"
 export * from "./new";
 
 export function upperCaseFirstLetter(str: string): string {
     if (str === "") return "";
-    return str.charAt(0).toUpperCase() + str.slice(1);
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
 export function titleCase(str: string): string {
@@ -150,6 +151,75 @@ export function isCustomRuleName(str: string): isCustomRuleNameResult {
         customRuleName: null,
     }
 }
+
+
+export function getFilterActionNames(primaryItemName: TPrimaryItemName): [string, string] {
+    switch (primaryItemName) {
+        case EItemName.AFFILIATE_NETWORK: return ["affiliateNetworkIncl", "affiliateNetworkExcl"];
+        case EItemName.CAMPAIGN: return ["campaignIncl", "campaignExcl"];
+        case EItemName.FLOW: return ["flowIncl", "flowExcl"];
+        case EItemName.LANDING_PAGE: return ["landingPageIncl", "landingPageExcl"];
+        case EItemName.OFFER: return ["offerIncl", "offerExcl"];
+        case EItemName.TRAFFIC_SOURCE: return ["trafficSourceIncl", "trafficSourceExcl"];
+    }
+}
+
+export function getAllFilterActionNames() {
+    const [affiliateNetworkIncl, affiliateNetworkExcl] = getFilterActionNames(EItemName.AFFILIATE_NETWORK);
+    const [campaignIncl, campaignExcl] = getFilterActionNames(EItemName.CAMPAIGN);
+    const [flowIncl, flowExcl] = getFilterActionNames(EItemName.FLOW);
+    const [landingPageIncl, landingPageExcl] = getFilterActionNames(EItemName.LANDING_PAGE);
+    const [offerIncl, offerExcl] = getFilterActionNames(EItemName.OFFER);
+    const [trafficSourceIncl, trafficSourceExcl] = getFilterActionNames(EItemName.TRAFFIC_SOURCE);
+
+    return {
+        affiliateNetworkIncl,
+        affiliateNetworkExcl,
+        campaignIncl,
+        campaignExcl,
+        flowIncl,
+        flowExcl,
+        landingPageIncl,
+        landingPageExcl,
+        offerIncl,
+        offerExcl,
+        trafficSourceIncl,
+        trafficSourceExcl,
+    };
+}
+
+export function getAllFilterActionParams(searchParams: ReadonlyURLSearchParams) {
+    const {
+        affiliateNetworkIncl,
+        affiliateNetworkExcl,
+        campaignIncl,
+        campaignExcl,
+        flowIncl,
+        flowExcl,
+        landingPageIncl,
+        landingPageExcl,
+        offerIncl,
+        offerExcl,
+        trafficSourceIncl,
+        trafficSourceExcl,
+    } = getAllFilterActionNames();
+
+    return {
+        affiliateNetworkIncl: searchParams.getAll(affiliateNetworkIncl),
+        affiliateNetworkExcl: searchParams.getAll(affiliateNetworkExcl),
+        campaignIncl: searchParams.getAll(campaignIncl),
+        campaignExcl: searchParams.getAll(campaignExcl),
+        flowIncl: searchParams.getAll(flowIncl),
+        flowExcl: searchParams.getAll(flowExcl),
+        landingPageIncl: searchParams.getAll(landingPageIncl),
+        landingPageExcl: searchParams.getAll(landingPageExcl),
+        offerIncl: searchParams.getAll(offerIncl),
+        offerExcl: searchParams.getAll(offerExcl),
+        trafficSourceIncl: searchParams.getAll(trafficSourceIncl),
+        trafficSourceExcl: searchParams.getAll(trafficSourceExcl),
+    };
+}
+
 
 export function makeCampaignUrl(
     protocol: string,
