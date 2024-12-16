@@ -1,7 +1,7 @@
 import { Prisma, Offer } from "@prisma/client";
 import db from "../lib/db";
 import { offersSchema } from "../lib/schemas";
-import { EItemName, TOffer, TOffer_createRequest } from "../lib/types";
+import { EItemName, TOffer } from "../lib/types";
 import { makeStorerFuncs } from ".";
 
 const {

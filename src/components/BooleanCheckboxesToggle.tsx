@@ -3,7 +3,7 @@
 export default function BooleanCheckboxesToggle({ textValues, value, onChange }: {
     textValues: [trueText: string, falseText: string];
     value: boolean;
-    onChange: (bool: boolean) => void;
+    onChange: (_: boolean) => void;
 }) {
     return (
         <div className="flex flex-col justify-center h-full p-2">

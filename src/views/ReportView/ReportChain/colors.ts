@@ -1,5 +1,3 @@
-
-
 type TColorPair = { light: string, dark: string };
 
 const defaultColorPair = { light: "#696969", dark: "#d3d3d3" }; // grey

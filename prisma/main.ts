@@ -1,7 +1,8 @@
 import { $Enums } from "@prisma/client";
 import prisma from "../src/lib/db";
-import { returnAtIndexOrThrow, returnFirstOrThrow, TSeedData, testUserAgent, testZoneId, ECustomTokenParam } from "./seedData";
+import { TSeedData, testUserAgent, testZoneId, ECustomTokenParam } from "./seedData";
 import { ELogicalRelation, ERuleName, TRoute } from "../src/lib/types";
+import { returnAtIndexOrThrow, returnFirstOrThrow } from "@/lib/utils";
 
 export default async function main(seedData: TSeedData) {
     const {

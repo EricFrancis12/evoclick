@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { faFolder, faGlobeEurope, faLaptop, faMobile, faWifi } from "@fortawesome/free-solid-svg-icons";
 import UpperCPWrapper from "./UpperCPWrapper";
 import UpperCPRow from "./UpperCPRow";
