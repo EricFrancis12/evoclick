@@ -1,5 +1,5 @@
 import { startOfDay, addDays } from "date-fns";
-import { TPrimaryData, EItemName, EQueryParam, TPrimaryItemName, TToken, TCustomRuleName } from "../types";
+import { TPrimaryData, EItemName, EQueryParam, TPrimaryItemName, TToken, TCustomRuleName, Env } from "../types";
 import { ReadonlyURLSearchParams } from "next/navigation";
 
 export * from "./maps"
@@ -56,6 +56,18 @@ export function safeJoin(strings: string[], separator: string): string {
     const nonEmptyStrings = strings.filter(str => str);
     if (nonEmptyStrings.length === 0) return "";
     return nonEmptyStrings.join(separator);
+}
+
+export function returnAtIndexOrThrow<T>(arr: T[], index: number, name: string): T {
+    const result = arr[index];
+    if (result === undefined) {
+        throw new Error(`missing ${name} at index ${index}`);
+    }
+    return result;
+}
+
+export function returnFirstOrThrow<T>(arr: T[], name: string): T {
+    return returnAtIndexOrThrow(arr, 0, name);
 }
 
 export function encodeTimeframe(timeframe: [Date, Date]): string {
@@ -220,7 +232,6 @@ export function getAllFilterActionParams(searchParams: ReadonlyURLSearchParams) 
     };
 }
 
-
 export function makeCampaignUrl(
     protocol: string,
     hostname: string,
@@ -252,4 +263,8 @@ export function flattenTokens(tokens: TToken[]): string {
 
 export function origin(protocol: string, hostname: string, port: string): string {
     return `${protocol}//${hostname}${port ? ":" + port : ""}`;
+}
+
+export function inDemoMode(): boolean {
+    return process.env[Env.DEMO_MODE] === "1" || process.env[Env.DEMO_MODE]?.toLowerCase() === "true";
 }

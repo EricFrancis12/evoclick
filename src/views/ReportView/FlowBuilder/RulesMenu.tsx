@@ -6,7 +6,7 @@ import { Select } from "@/components/base";
 import Rule from "./Rule";
 import { newRule } from "@/lib/utils/new";
 import { TRoute, ELogicalRelation, ERuleName, TToken } from "@/lib/types";
-import { CUSTOM_RULE_, toCustomRuleName } from "@/lib/utils";
+import { toCustomRuleName } from "@/lib/utils";
 
 export default function RulesMenu({ route, onChange, tokens = [] }: {
     route: TRoute;

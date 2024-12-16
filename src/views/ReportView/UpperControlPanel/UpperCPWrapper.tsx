@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMinus, faTableList } from "@fortawesome/free-solid-svg-icons";
 import ContentToggler from "@/components/ContentToggler";
 
 export default function UpperCPWrapper({ children }: {

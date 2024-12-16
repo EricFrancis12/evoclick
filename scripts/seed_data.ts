@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import main from "../prisma/main";
-import seedData, { returnFirstOrThrow } from "../prisma/seedData";
+import { returnFirstOrThrow } from "../src/lib/utils";
+import seedData from "../prisma/seedData";
 
 (async function () {
     try {

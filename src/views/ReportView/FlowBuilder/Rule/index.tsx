@@ -2,7 +2,7 @@
 
 import UserInputRuleLayout, { userInputRules } from "./UserInputRuleLayout";
 import CheckboxesRuleLayout, { checkboxesRules } from "./CheckboxesRuleLayout";
-import { ERuleName, TRule } from "@/lib/types";
+import { TRule } from "@/lib/types";
 import { isCustomRuleName } from "@/lib/utils";
 
 export default function Rule(props: {
