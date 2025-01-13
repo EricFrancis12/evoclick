@@ -79,5 +79,7 @@ export function isActiveMainTab(view: TView, params: Params): boolean {
 export function isActiveReportTab(view: TView, params: Params): boolean {
     return view.type === "report"
         && typeof params.id === "string"
-        && decodeURIComponent(params.id) === view.id;
+        && typeof params.itemName === "string"
+        && decodeURIComponent(params.id) === view.id
+        && decodeURIComponent(params.itemName) === view.reportItemName;
 }

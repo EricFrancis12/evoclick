@@ -24,7 +24,7 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
     timeframe: [Date, Date];
     reportItemName?: EItemName;
 }) {
-    const { mainView, reportViews, updateViewOnPageLoad, removeReportViewById } = useViewsStore(store => store);
+    const { mainView, reportViews, updateViewOnPageLoad, removeReportView } = useViewsStore(store => store);
 
     const activeView = useActiveView();
     useEffect(() => {
@@ -45,8 +45,15 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
 
     // Delete view, then if the deleted view was the current one redirect to /dashboard
     function handleReportTabClose(view: TView) {
-        removeReportViewById(view.id);
-        if (typeof params.id === "string" && view.id === decodeURIComponent(params.id)) {
+        if (view.reportItemName) {
+            removeReportView(view.id, view.reportItemName);
+        }
+
+        if (typeof params.id === "string"
+            && typeof params.itemName === "string"
+            && view.id === decodeURIComponent(params.id)
+            && view.reportItemName === decodeURIComponent(params.itemName)
+        ) {
             queryRouter.push("/dashboard", { timeframe: encodeTimeframe(mainView.timeframe) });
         }
     }
@@ -73,9 +80,9 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
                                         view={mainView}
                                         onClick={() => queryRouter.push("/dashboard", { timeframe: encodeTimeframe(mainView.timeframe) })}
                                     />
-                                    {reportViews.map(view => (
+                                    {reportViews.map((view, index) => (
                                         <Tab
-                                            key={view.id}
+                                            key={index}
                                             view={view}
                                             onClick={handleReportTabClick}
                                             onClose={handleReportTabClose}
