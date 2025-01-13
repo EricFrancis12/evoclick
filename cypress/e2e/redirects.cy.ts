@@ -1,12 +1,10 @@
-import { makeCampaignUrl, makeClickUrl, makePostbackUrl } from "../../src/lib/utils";
+import { makeCampaignUrl, makeClickUrl, makePostbackUrl, returnAtIndexOrThrow, returnFirstOrThrow } from "../../src/lib/utils";
 import { ECookieName, Env } from "../../src/lib/types";
-import { ECustomTokenParam, returnAtIndexOrThrow, returnFirstOrThrow, testUserAgent, testZoneId } from "../../prisma/seedData";
-import seedData from "../../prisma/seedData";
-const { campaignSeeds, landingPageSeeds, offerSeeds, trafficSourceSeeds } = seedData;
+import seedData, { ECustomTokenParam, testUserAgent, testZoneId } from "../../prisma/seedData"
+const { campaignSeeds, landingPageSeeds, offerSeeds } = seedData;
 
 describe("Testing campaign redirects", () => {
     const { publicId } = returnFirstOrThrow(campaignSeeds, "Campaign seed");
-    const { customTokens } = returnFirstOrThrow(trafficSourceSeeds, "Traffic Source seed");
 
     it("redirects to the correct URLs", () => {
         // Campaign URL

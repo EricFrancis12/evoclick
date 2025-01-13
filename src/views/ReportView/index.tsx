@@ -18,12 +18,11 @@ import { encodeTimeframe } from "@/lib/utils";
 import { EItemName, TPrimaryData, TClick } from "@/lib/types";
 import { DataProvider } from "@/contexts/DataContext";
 
-export default function ReportView({ primaryData, clicks, timeframe, reportItemName, reportItemId }: {
+export default function ReportView({ primaryData, clicks, timeframe, reportItemName }: {
     primaryData: TPrimaryData;
     clicks: TClick[];
     timeframe: [Date, Date];
     reportItemName?: EItemName;
-    reportItemId?: string;
 }) {
     const { mainView, reportViews, updateViewOnPageLoad, removeReportViewById } = useViewsStore(store => store);
 
@@ -78,7 +77,6 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
                                         <Tab
                                             key={view.id}
                                             view={view}
-                                            reportItemId={reportItemId}
                                             onClick={handleReportTabClick}
                                             onClose={handleReportTabClose}
                                         />

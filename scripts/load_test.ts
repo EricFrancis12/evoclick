@@ -1,7 +1,7 @@
 import { argv } from "process";
 import http from "http";
-import seedData, { returnFirstOrThrow } from "../prisma/seedData";
-import { makeCampaignUrl } from "../src/lib/utils";
+import seedData from "../prisma/seedData";
+import { makeCampaignUrl, returnFirstOrThrow } from "../src/lib/utils";
 import { dotenvConfig } from "../src/lib/utils/env";
 import { Env } from "../src/lib/types";
 

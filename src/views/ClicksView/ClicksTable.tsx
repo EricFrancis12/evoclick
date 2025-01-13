@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { TClick } from "@/lib/types";
 import ClicksTablePagination from "./ClicksTablePagination";
 

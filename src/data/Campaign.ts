@@ -1,12 +1,10 @@
 import crypto from "crypto";
 import { Prisma, Campaign } from "@prisma/client";
-import cache, { makeRedisKeyFunc } from "../lib/cache";
 import db from "../lib/db";
 import { makeStorerFuncs, parseRoute, parseRoutes } from ".";
 import { campaignSchema } from "../lib/schemas";
-import { safeParseJson, newRoute } from "../lib/utils";
-import { REDIS_EXPIRY } from "../lib/constants";
-import { EItemName, ELogicalRelation, TCampaign, TCampaign_createRequest, TCampaign_updateRequest, TRoute } from "../lib/types";
+import { newRoute } from "../lib/utils";
+import { EItemName, TCampaign, TCampaign_createRequest, TCampaign_updateRequest } from "../lib/types";
 
 const {
     getAllFunc: getAllCampaigns,

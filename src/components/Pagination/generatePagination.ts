@@ -1,5 +1,3 @@
-
-
 export type TPagination = '<<' | '<' | number | '...' | '>' | '>>';
 
 export default function generatePagination({ currentPage, totalPages }: {

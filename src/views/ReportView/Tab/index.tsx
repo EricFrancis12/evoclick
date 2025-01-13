@@ -10,17 +10,16 @@ import { getPrimaryItemById, isPrimary } from "@/lib/utils";
 import { useDataContext } from "@/contexts/DataContext";
 import { EItemName, TPrimaryData } from "@/lib/types";
 
-export default function Tab({ view, onClick, onClose, reportItemId }: {
+export default function Tab({ view, onClick, onClose }: {
     view: TView;
     onClick: (view: TView) => void;
     onClose?: (view: TView) => void;
-    reportItemId?: string;
 }) {
     const { type, reportItemName, icon } = view;
     const isActive = useIsTabActive(view);
 
     const { primaryData } = useDataContext();
-    const tabName = useReportTabName(primaryData, reportItemName, reportItemId ?? null);
+    const tabName = useReportTabName(primaryData, reportItemName, view.id);
 
     function handleClose(e: React.MouseEvent<HTMLOrSVGElement>) {
         e.stopPropagation();
@@ -54,7 +53,7 @@ export default function Tab({ view, onClick, onClose, reportItemId }: {
     )
 }
 
-function useReportTabName(primaryData: TPrimaryData, reportItemName: EItemName | null, reportItemId: string | null): string {
+function useReportTabName(primaryData: TPrimaryData, reportItemName: EItemName | null, reportItemId: string): string {
     if (!reportItemName || !reportItemId) return "";
 
     const { primaryItemName } = isPrimary(reportItemName);

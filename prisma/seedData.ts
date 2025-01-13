@@ -1,5 +1,5 @@
 import { $Enums } from "@prisma/client";
-import { ELogicalRelation, ERuleName, TNamedToken, TRoute, TToken } from "../src/lib/types";
+import { ELogicalRelation, TNamedToken, TRoute, TToken } from "../src/lib/types";
 
 export const testUserAgent = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
 export const testZoneId = "87654321";
@@ -60,18 +60,6 @@ export type TSeedData = {
     trafficSourceSeeds: TTrafficSourceSeed[],
     campaignSeeds: TCampaignSeed[],
 };
-
-export function returnAtIndexOrThrow<T>(arr: T[], index: number, name: string): T {
-    const result = arr[index];
-    if (result === undefined) {
-        throw new Error(`missing ${name} at index ${index}`);
-    }
-    return result;
-}
-
-export function returnFirstOrThrow<T>(arr: T[], name: string): T {
-    return returnAtIndexOrThrow(arr, 0, name);
-}
 
 const tags = ["placeholder", "example"];
 

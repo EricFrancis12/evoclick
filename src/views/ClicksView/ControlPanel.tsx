@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Select } from "@/components/base";
 import CalendarButton from "@/components/CalendarButton";
 import useQueryRouter from "@/hooks/useQueryRouter";
 import { encodeTimeframe, getAllFilterActionParams, getFilterActionNames } from "@/lib/utils";
@@ -13,9 +11,7 @@ import Button from "@/components/Button";
 import { useActionMenuContext } from "../../contexts/ActionMenuContext";
 import UpperCPWrapper from "../ReportView/UpperControlPanel/UpperCPWrapper";
 import UpperCPRow from "../ReportView/UpperControlPanel/UpperCPRow";
-import ContentToggler from "@/components/ContentToggler";
 import LowerCPWrapper from "../ReportView/LowerControlPanel/LowerCPWrapper";
-import LowerCPRow from "../ReportView/LowerControlPanel/LowerCPRow";
 
 export enum EFilterAction {
     INCLUDE = "Include",
