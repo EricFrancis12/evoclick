@@ -37,7 +37,6 @@ export default async function DashboardPage({ params, searchParams }: {
             clicks={demoClicks}
             timeframe={timeframe}
             reportItemName={reportItemName ?? undefined}
-            reportItemId={reportItemId ?? undefined}
         />
     )
 }
