@@ -24,12 +24,13 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
     timeframe: [Date, Date];
     reportItemName?: EItemName;
 }) {
-    const { mainView, reportViews, updateViewOnPageLoad, removeReportView } = useViewsStore(store => store);
+    const { mainView, reportViews, updateViewOnPageLoad, removeReportViewById } = useViewsStore(store => store);
 
     const activeView = useActiveView();
     useEffect(() => {
-        if (!activeView?.id) return;
-        updateViewOnPageLoad(activeView.id, { timeframe });
+        if (activeView?.id) {
+            updateViewOnPageLoad(activeView.id, { timeframe });
+        }
     }, [timeframe]);
 
     const params = useParams();
@@ -46,7 +47,7 @@ export default function ReportView({ primaryData, clicks, timeframe, reportItemN
     // Delete view, then if the deleted view was the current one redirect to /dashboard
     function handleReportTabClose(view: TView) {
         if (view.reportItemName) {
-            removeReportView(view.id, view.reportItemName);
+            removeReportViewById(view.id, view.reportItemName);
         }
 
         if (typeof params.id === "string"

@@ -57,7 +57,7 @@ interface IViewsState {
     updateViewOnPageLoad: (id: string, opts: { timeframe: [Date, Date] }) => void;
     updateViewItemNameById: (id: string, itemName: EItemName) => void;
     updateViewReportChainById: (id: string, reportChain: TReportChain) => void;
-    removeReportView: (id: string, reportItemName: EItemName) => void;
+    removeReportViewById: (id: string, reportItemName: EItemName) => void;
     removeAllReportViews: () => void;
 }
 
@@ -90,7 +90,7 @@ export const useViewsStore = create<IViewsState>()(
                     ? { ...view, reportChain }
                     : view),
             })),
-            removeReportView: (id, reportItemName) => set((state) => ({
+            removeReportViewById: (id, reportItemName) => set((state) => ({
                 reportViews: state.reportViews.filter(view => !(view.id === id && view.reportItemName === reportItemName)),
             })),
             removeAllReportViews: () => set({ reportViews: [] }),
