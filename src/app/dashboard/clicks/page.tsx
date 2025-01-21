@@ -1,5 +1,5 @@
 import {
-    countAllClicks, getAllAffiliateNetworks, getAllCampaigns, getAllClicks,
+    countClicks, getAllAffiliateNetworks, getAllCampaigns, getAllClicks,
     getAllFlows, getAllLandingPages, getAllOffers, getAllTrafficSources,
 } from "@/data";
 import { useProtectedRoute } from "@/lib/auth";
@@ -83,7 +83,7 @@ export default async function ClicksPage({ searchParams }: {
             where: clicksWhere,
         });
 
-        const numClicksProm = countAllClicks({
+        const numClicksProm = countClicks({
             where: clicksWhere,
         });
 

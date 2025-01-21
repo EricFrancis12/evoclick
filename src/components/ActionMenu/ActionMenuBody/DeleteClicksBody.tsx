@@ -5,8 +5,9 @@ import toast from "react-hot-toast";
 import { faSpinner, faTrash } from "@fortawesome/free-solid-svg-icons";
 import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import Button from "@/components/Button";
-import { deleteAllClicksAction, deleteClicksByIdsAction, revalidatePathAction } from "@/lib/actions";
+import { deleteManyClicksAction, revalidatePathAction } from "@/lib/actions";
 import { TActionMenu, TDeleteClicksActionMenu } from "../types";
+import { ManyArg } from "@/data";
 
 export default function DeleteClicksBody({ actionMenu, setActionMenu }: {
     actionMenu: TDeleteClicksActionMenu;
@@ -20,9 +21,17 @@ export default function DeleteClicksBody({ actionMenu, setActionMenu }: {
         if (deleting) return;
         setDeleting(true);
 
-        const count = deleteAll
-            ? await deleteAllClicksAction()
-            : await deleteClicksByIdsAction(clickIds);
+        const arg: ManyArg | undefined = deleteAll
+            ? undefined
+            : {
+                where: {
+                    id: {
+                        in: clickIds,
+                    },
+                },
+            };
+
+        const { count } = await deleteManyClicksAction(arg);
 
         setDeleting(false);
         revalidatePathAction(window.location.href);

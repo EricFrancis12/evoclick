@@ -4,7 +4,7 @@ import { useState } from "react";
 import Rows from "./Rows";
 import TitleRow from "./TitleRow";
 import TotalRow from "./TotalRow";
-import columnsMap, { TDataTableColumn, TColumnsMapValue, TColumnsMap } from "./columnsMap";
+import columnsMap, { TDataTableColumn, TColumnsMap } from "./columnsMap";
 import { TView } from "@/lib/store";
 import { TClick } from "@/lib/types";
 

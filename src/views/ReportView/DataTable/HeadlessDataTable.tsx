@@ -5,7 +5,7 @@ import Rows from "./Rows";
 import TotalRow from "./TotalRow";
 import { getReportChainColor } from "../ReportChain/colors";
 import { TView } from "@/lib/store";
-import { EItemName, TClick } from "@/lib/types";
+import { TClick } from "@/lib/types";
 import { BASE_Z_INDEX, DEPTH_MARGIN, ROW_HEIGHT, TColumn } from ".";
 import { TReportChainValue } from "../ReportChain";
 

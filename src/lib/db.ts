@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Env } from "./types";
+import { inDemoMode } from "./utils";
+import { DemoDB } from "@/data";
 
 const prismaClientSingleton = () => {
     const prisma = new PrismaClient({
@@ -34,9 +36,12 @@ declare global {
     var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>;
 }
 
-const db = globalThis.prismaGlobal ?? prismaClientSingleton();
+const db = inDemoMode()
+    ? new DemoDB()
+    : (globalThis.prismaGlobal ?? prismaClientSingleton());
+
 export default db;
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env[Env.NODE_ENV] !== "production" && db instanceof PrismaClient) {
     globalThis.prismaGlobal = db;
 }

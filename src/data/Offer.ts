@@ -10,7 +10,9 @@ const {
     createNewFunc: createNewOffer,
     updateByIdFunc: updateOfferById,
     deleteByIdFunc: deleteOfferById,
-} = makeStorerFuncs<Offer, TOffer, Prisma.OfferUncheckedCreateInput, Prisma.OfferUpdateInput>(
+    deleteManyFunc: deleteManyOffers,
+    countFunc: countOffers,
+} = makeStorerFuncs<Offer, TOffer, Prisma.OfferUncheckedCreateInput, Prisma.OfferUpdateInput, Prisma.OfferCountArgs>(
     EItemName.OFFER,
     db.offer,
     makeClientOffer,
@@ -23,6 +25,8 @@ export {
     createNewOffer,
     updateOfferById,
     deleteOfferById,
+    deleteManyOffers,
+    countOffers,
 };
 
 async function makeClientOffer(dbModel: Offer): Promise<TOffer> {

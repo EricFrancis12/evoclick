@@ -15,7 +15,9 @@ import {
     TSavedFlow, TSavedFlow_createRequest, TSavedFlow_updateRequest,
     TLandingPage, TLandingPage_createRequest, TLandingPage_updateRequest,
     TOffer, TOffer_createRequest, TOffer_updateRequest,
-    TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest
+    TTrafficSource, TTrafficSource_createRequest, TTrafficSource_updateRequest,
+    TClick_createRequest,
+    TClick_updateRequest
 } from "./types";
 
 export async function loginAction(formData: FormData): Promise<TUser | null> {
@@ -65,34 +67,18 @@ export async function revalidatePathAction(url: string) {
     revalidatePath(url);
 }
 
-export async function getClicksAction(args: Prisma.ClickFindManyArgs = {}, pathname?: string): Promise<TClick[]> {
-    const prom = data.getAllClicks(args);
-    refreshUrl(prom, pathname);
-    return prom;
-}
-
-export async function deleteAllClicksAction(args: Prisma.ClickDeleteManyArgs = {}, pathname?: string): Promise<number> {
-    const prom = data.deleteAllClicks(args);
-    refreshUrl(prom, pathname);
-    return prom;
-}
-
-export async function deleteClicksByIdsAction(ids: number[], pathname?: string): Promise<number> {
-    const prom = data.deleteClicksByIds(ids);
-    refreshUrl(prom, pathname);
-    return prom;
-}
-
-type CRUDOperations<CreationRequest, UpdateRequest, Result> = {
+type CRUDOperations<CreationRequest, UpdateRequest, CA extends data.CountArg, Result> = {
     readAll: () => Promise<Result[]>;
     readOne: (id: number) => Promise<Result | null>;
     create: (request: CreationRequest) => Promise<Result>;
     update: (id: number, request: UpdateRequest) => Promise<Result>;
     delete: (id: number) => Promise<Result>;
+    deleteMany: (arg: data.ManyArg) => Promise<Prisma.BatchPayload>;
+    count: (arg?: CA) => Promise<number>;
 };
 
-function createCRUDActions<CreationRequest, UpdateRequest, Result>(
-    operations: CRUDOperations<CreationRequest, UpdateRequest, Result>
+function createCRUDActions<CreationRequest, UpdateRequest, CA extends data.CountArg, Result>(
+    operations: CRUDOperations<CreationRequest, UpdateRequest, CA, Result>
 ) {
     return {
         readAllAction: async (pathname?: string): Promise<Result[]> => {
@@ -119,16 +105,28 @@ function createCRUDActions<CreationRequest, UpdateRequest, Result>(
             const prom = operations.delete(id);
             refreshUrl(prom, pathname);
             return prom;
-        }
+        },
+        deleteManyAction: async (arg: data.ManyArg = {}, pathname?: string): Promise<Prisma.BatchPayload> => {
+            const prom = operations.deleteMany(arg);
+            refreshUrl(prom, pathname);
+            return prom;
+        },
+        countAction: async (arg: CA, pathname?: string): Promise<number> => {
+            const prom = operations.count();
+            refreshUrl(prom, pathname);
+            return prom;
+        },
     };
 }
 
-const affiliateNetworkOperations: CRUDOperations<TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest, TAffiliateNetwork> = {
+const affiliateNetworkOperations: CRUDOperations<TAffiliateNetwork_createRequest, TAffiliateNetwork_updateRequest, Prisma.AffiliateNetworkCountArgs, TAffiliateNetwork> = {
     readAll: data.getAllAffiliateNetworks,
     readOne: data.getAffiliateNetworkById,
     create: data.createNewAffiliateNetwork,
     update: data.updateAffiliateNetworkById,
     delete: data.deleteAffiliateNetworkById,
+    deleteMany: data.deleteManyAffiliateNetworks,
+    count: data.countAffiliateNetworks,
 };
 
 const affiliateNetworkActions = createCRUDActions(affiliateNetworkOperations);
@@ -138,12 +136,14 @@ export const createNewAffiliateNetworkAction = affiliateNetworkActions.createAct
 export const updateAffiliateNetworkAction = affiliateNetworkActions.updateAction;
 export const deleteAffiliateNetworkAction = affiliateNetworkActions.deleteAction;
 
-const campaignOperations: CRUDOperations<TCampaign_createRequest, TCampaign_updateRequest, TCampaign> = {
+const campaignOperations: CRUDOperations<TCampaign_createRequest, TCampaign_updateRequest, Prisma.CampaignCountArgs, TCampaign> = {
     readAll: data.getAllCampaigns,
     readOne: data.getCampaignById,
     create: data.createNewCampaign,
     update: data.updateCampaignById,
     delete: data.deleteCampaignById,
+    deleteMany: data.deleteManyCampaigns,
+    count: data.countCampaigns,
 };
 
 const campaignActions = createCRUDActions(campaignOperations);
@@ -153,12 +153,14 @@ export const createNewCampaignAction = campaignActions.createAction;
 export const updateCampaignAction = campaignActions.updateAction;
 export const deleteCampaignAction = campaignActions.deleteAction;
 
-const flowOperations: CRUDOperations<TSavedFlow_createRequest, TSavedFlow_updateRequest, TSavedFlow> = {
+const flowOperations: CRUDOperations<TSavedFlow_createRequest, TSavedFlow_updateRequest, Prisma.SavedFlowCountArgs, TSavedFlow> = {
     readAll: data.getAllFlows,
     readOne: data.getFlowById,
     create: data.createNewFlow,
     update: data.updateFlowById,
     delete: data.deleteFlowById,
+    deleteMany: data.deleteManyFlows,
+    count: data.countFlows,
 };
 
 const flowActions = createCRUDActions(flowOperations);
@@ -168,12 +170,14 @@ export const createNewFlowAction = flowActions.createAction;
 export const updateFlowAction = flowActions.updateAction;
 export const deleteFlowAction = flowActions.deleteAction;
 
-const landingPageOperations: CRUDOperations<TLandingPage_createRequest, TLandingPage_updateRequest, TLandingPage> = {
+const landingPageOperations: CRUDOperations<TLandingPage_createRequest, TLandingPage_updateRequest, Prisma.LandingPageCountArgs, TLandingPage> = {
     readAll: data.getAllLandingPages,
     readOne: data.getLandingPageById,
     create: data.createNewLandingPage,
     update: data.updateLandingPageById,
     delete: data.deleteLandingPageById,
+    deleteMany: data.deleteManyLandingPages,
+    count: data.countLandingPages,
 };
 
 const landingPageActions = createCRUDActions(landingPageOperations);
@@ -183,12 +187,14 @@ export const createNewLandingPageAction = landingPageActions.createAction;
 export const updateLandingPageAction = landingPageActions.updateAction;
 export const deleteLandingPageAction = landingPageActions.deleteAction;
 
-const offerOperations: CRUDOperations<TOffer_createRequest, TOffer_updateRequest, TOffer> = {
+const offerOperations: CRUDOperations<TOffer_createRequest, TOffer_updateRequest, Prisma.OfferCountArgs, TOffer> = {
     readAll: data.getAllOffers,
     readOne: data.getOfferById,
     create: data.createNewOffer,
     update: data.updateOfferById,
     delete: data.deleteOfferById,
+    deleteMany: data.deleteManyOffers,
+    count: data.countOffers,
 };
 
 const offerActions = createCRUDActions(offerOperations);
@@ -198,12 +204,14 @@ export const createNewOfferAction = offerActions.createAction;
 export const updateOfferAction = offerActions.updateAction;
 export const deleteOfferAction = offerActions.deleteAction;
 
-const trafficSourceOperations: CRUDOperations<TTrafficSource_createRequest, TTrafficSource_updateRequest, TTrafficSource> = {
+const trafficSourceOperations: CRUDOperations<TTrafficSource_createRequest, TTrafficSource_updateRequest, Prisma.TrafficSourceCountArgs, TTrafficSource> = {
     readAll: data.getAllTrafficSources,
     readOne: data.getTrafficSourceById,
     create: data.createNewTrafficSource,
     update: data.updateTrafficSourceById,
     delete: data.deleteTrafficSourceById,
+    deleteMany: data.deleteManyTrafficSources,
+    count: data.countTrafficSources,
 };
 
 const trafficSourceActions = createCRUDActions(trafficSourceOperations);
@@ -212,6 +220,43 @@ export const getOneTrafficSourceAction = trafficSourceActions.readOneAction;
 export const createNewTrafficSourceAction = trafficSourceActions.createAction;
 export const updateTrafficSourceAction = trafficSourceActions.updateAction;
 export const deleteTrafficSourceAction = trafficSourceActions.deleteAction;
+
+const ClickOperations: CRUDOperations<TClick_createRequest, TClick_updateRequest, Prisma.ClickCountArgs, TClick> = {
+    readAll: data.getAllClicks,
+    readOne: data.getClickById,
+    create: data.createNewClick,
+    update: data.updateClickById,
+    delete: data.deleteClickById,
+    deleteMany: data.deleteManyClicks,
+    count: data.countClicks,
+};
+
+const clickActions = createCRUDActions(ClickOperations);
+export const getAllClicksAction = clickActions.readAllAction;
+export const getOneClickAction = clickActions.readOneAction;
+export const createNewClickAction = clickActions.createAction;
+export const updateClickAction = clickActions.updateAction;
+export const deleteClickAction = clickActions.deleteAction;
+export const deleteManyClicksAction = clickActions.deleteManyAction;
+export const countClicksAction = clickActions.countAction;
+
+// export async function getClicksAction(args: Prisma.ClickFindManyArgs = {}, pathname?: string): Promise<TClick[]> {
+//     const prom = data.getAllClicks(args);
+//     refreshUrl(prom, pathname);
+//     return prom;
+// }
+
+// export async function deleteManyClicksAction(args: Prisma.ClickDeleteManyArgs = {}, pathname?: string): Promise<Prisma.BatchPayload> {
+//     const prom = data.deleteManyClicks(args);
+//     refreshUrl(prom, pathname);
+//     return prom;
+// }
+
+// export async function deleteClicksByIdsAction(ids: number[], pathname?: string): Promise<Prisma.BatchPayload> {
+//     const prom = data.deleteClicksByIds(ids);
+//     refreshUrl(prom, pathname);
+//     return prom;
+// }
 
 function refreshUrl(prom: Promise<unknown>, pathname?: string): void {
     if (pathname) prom.then(() => revalidatePath(pathname));

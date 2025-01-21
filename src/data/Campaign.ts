@@ -12,7 +12,9 @@ const {
     createNewFunc,
     updateByIdFunc,
     deleteByIdFunc: deleteCampaignById,
-} = makeStorerFuncs<Campaign, TCampaign, Prisma.CampaignUncheckedCreateInput, Prisma.CampaignUpdateInput>(
+    deleteManyFunc: deleteManyCampaigns,
+    countFunc: countCampaigns,
+} = makeStorerFuncs<Campaign, TCampaign, Prisma.CampaignUncheckedCreateInput, Prisma.CampaignUpdateInput, Prisma.CampaignCountArgs>(
     EItemName.TRAFFIC_SOURCE,
     db.campaign,
     makeClientCampaign,
@@ -34,6 +36,8 @@ export {
     createNewCampaign,
     updateCampaignById,
     deleteCampaignById,
+    deleteManyCampaigns,
+    countCampaigns,
 };
 
 

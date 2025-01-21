@@ -2,7 +2,8 @@ import { $Enums } from "@prisma/client";
 import { z } from "zod";
 import {
     TUser, TAffiliateNetwork, TCampaign, TSavedFlow, TLandingPage, TOffer, TTrafficSource, TToken, TNamedToken,
-    TPath, TRoute, TRule, ERuleName, ELogicalRelation, IPInfoData, EItemName
+    TPath, TRoute, TRule, ERuleName, ELogicalRelation, IPInfoData, EItemName,
+    TClick
 } from "./types";
 
 export const userSchema: z.ZodType<TUser> = z.object({
@@ -117,6 +118,43 @@ export const trafficSourceSchema: z.ZodType<TTrafficSource> = z.object({
     tags: z.array(z.string()),
     createdAt: z.date(),
     updatedAt: z.date(),
+});
+
+export const clickSchema: z.ZodType<TClick> = z.object({
+    id: z.number(),
+    publicId: z.string(),
+    externalId: z.string(),
+    cost: z.number(),
+    revenue: z.number(),
+    viewTime: z.date(),
+    clickTime: z.nullable(z.date()),
+    convTime: z.nullable(z.date()),
+    viewOutputUrl: z.string(),
+    clickOutputUrl: z.string(),
+    tokens: z.array(tokenSchema),
+    ip: z.string(),
+    isp: z.nullable(z.string()),
+    userAgent: z.string(),
+    language: z.string(),
+    country: z.nullable(z.string()),
+    region: z.nullable(z.string()),
+    city: z.nullable(z.string()),
+    deviceType: z.string(),
+    device: z.string(),
+    screenResolution: z.string(),
+    os: z.string(),
+    osVersion: z.string(),
+    browserName: z.string(),
+    browserVersion: z.string(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
+    affiliateNetworkId: z.number(),
+    campaignId: z.number(),
+    savedFlowId: z.number(),
+    landingPageId: z.number(),
+    offerId: z.number(),
+    trafficSourceId: z.number(),
+
 });
 
 export const IPInfoDataSchema: z.ZodType<IPInfoData> = z.object({

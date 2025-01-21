@@ -9,7 +9,7 @@ import {
     demoOffers, demoTrafficSources, demoClicks,
 } from "./data";
 
-export default async function DashboardPage({ params, searchParams }: {
+export default async function DemoDashboardPage({ params, searchParams }: {
     params: { itemName?: string, id?: string };
     searchParams: { timeframe?: string };
 }) {
@@ -18,7 +18,7 @@ export default async function DashboardPage({ params, searchParams }: {
     }
 
     const timeframe = decodeSearchParams(searchParams).timeframe ?? defaultTimeframe;
-    const { reportItemName, reportItemId } = decodeParams(params);
+    const { reportItemName } = decodeParams(params);
 
     const primaryData = {
         [EItemName.AFFILIATE_NETWORK]: demoAffiliateNetworks,

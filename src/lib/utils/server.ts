@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { decodeTimeframe, isPrimary } from "@/lib/utils";
 import { clickPropsMap } from "@/lib/utils/maps";
 import { EItemName } from "@/lib/types";
+import { ManyArg } from "@/data";
 
 export function decodeParams(params: {
     itemName?: string;
@@ -23,7 +24,7 @@ export function decodeSearchParams(searchParams: {
     };
 }
 
-export function prismaArgs(timeframe: [Date, Date], reportItemName: EItemName | null, reportItemId: string | null): Prisma.ClickFindManyArgs {
+export function prismaArgs(timeframe: [Date, Date], reportItemName: EItemName | null, reportItemId: string | null): ManyArg {
     return {
         where: {
             AND: [

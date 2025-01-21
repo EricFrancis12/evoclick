@@ -10,7 +10,9 @@ const {
     createNewFunc: createNewAffiliateNetwork,
     updateByIdFunc: updateAffiliateNetworkById,
     deleteByIdFunc: deleteAffiliateNetworkById,
-} = makeStorerFuncs<AffiliateNetwork, TAffiliateNetwork, Prisma.AffiliateNetworkUncheckedCreateInput, Prisma.AffiliateNetworkUpdateInput>(
+    deleteManyFunc: deleteManyAffiliateNetworks,
+    countFunc: countAffiliateNetworks,
+} = makeStorerFuncs<AffiliateNetwork, TAffiliateNetwork, Prisma.AffiliateNetworkUncheckedCreateInput, Prisma.AffiliateNetworkUpdateInput, Prisma.AffiliateNetworkCountArgs>(
     EItemName.AFFILIATE_NETWORK,
     db.affiliateNetwork,
     makeClientAffiliateNetwork,
@@ -23,6 +25,8 @@ export {
     createNewAffiliateNetwork,
     updateAffiliateNetworkById,
     deleteAffiliateNetworkById,
+    deleteManyAffiliateNetworks,
+    countAffiliateNetworks,
 };
 
 async function makeClientAffiliateNetwork(dbModel: AffiliateNetwork): Promise<TAffiliateNetwork> {
