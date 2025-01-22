@@ -73,7 +73,7 @@ type CRUDOperations<CreationRequest, UpdateRequest, CA extends data.CountArg, Re
     create: (request: CreationRequest) => Promise<Result>;
     update: (id: number, request: UpdateRequest) => Promise<Result>;
     delete: (id: number) => Promise<Result>;
-    deleteMany: (arg: data.ManyArg) => Promise<Prisma.BatchPayload>;
+    deleteMany: (arg: data.DeleteManyArg) => Promise<Prisma.BatchPayload>;
     count: (arg?: CA) => Promise<number>;
 };
 
@@ -106,7 +106,7 @@ function createCRUDActions<CreationRequest, UpdateRequest, CA extends data.Count
             refreshUrl(prom, pathname);
             return prom;
         },
-        deleteManyAction: async (arg: data.ManyArg = {}, pathname?: string): Promise<Prisma.BatchPayload> => {
+        deleteManyAction: async (arg: data.DeleteManyArg = {}, pathname?: string): Promise<Prisma.BatchPayload> => {
             const prom = operations.deleteMany(arg);
             refreshUrl(prom, pathname);
             return prom;

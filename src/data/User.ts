@@ -2,7 +2,7 @@ import db from "../lib/db";
 import { TUser, TUser_createRequest, TUser_updateRequest } from "../lib/types";
 
 export async function getAllUsers(): Promise<TUser[]> {
-    return db.user.findMany();
+    return db.user.findMany({});
 }
 
 export async function getUserById(id: number): Promise<TUser | null> {
@@ -12,7 +12,7 @@ export async function getUserById(id: number): Promise<TUser | null> {
 }
 
 export async function getUserByName(name: string): Promise<TUser | null> {
-    return db.user.findUnique({
+    return db.user.findFirst({
         where: { name },
     });
 }

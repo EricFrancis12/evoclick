@@ -146,4 +146,5 @@ const seedData: TSeedData = {
         },
     ],
 };
+
 export default seedData;

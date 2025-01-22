@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Prisma, AffiliateNetwork, Campaign, SavedFlow, LandingPage, Offer, TrafficSource, Click } from "@prisma/client";
+import { Prisma, AffiliateNetwork, Campaign, SavedFlow, LandingPage, Offer, TrafficSource, Click, User } from "@prisma/client";
 import cache, { makeRedisKeyFunc, RedisKeyFunc } from "../lib/cache";
 import { tokenSchema, namedTokenSchema, routeSchema } from "../lib/schemas";
 import { safeParseJson, newRoute, newToken } from "@/lib/utils";
@@ -15,23 +15,25 @@ export * from "./LandingPage";
 export * from "./Offer";
 export * from "./TrafficSource";
 
-type CreateInput =
+export type CreateInput =
     Prisma.XOR<Prisma.AffiliateNetworkCreateInput, Prisma.AffiliateNetworkUncheckedCreateInput>
     | Prisma.XOR<Prisma.CampaignCreateInput, Prisma.CampaignUncheckedCreateInput>
     | Prisma.XOR<Prisma.SavedFlowCreateInput, Prisma.SavedFlowUncheckedCreateInput>
     | Prisma.XOR<Prisma.LandingPageCreateInput, Prisma.LandingPageUncheckedCreateInput>
     | Prisma.XOR<Prisma.OfferCreateInput, Prisma.OfferUncheckedCreateInput>
     | Prisma.XOR<Prisma.TrafficSourceCreateInput, Prisma.TrafficSourceUncheckedCreateInput>
-    | Prisma.XOR<Prisma.ClickCreateInput, Prisma.ClickUncheckedCreateInput>;
+    | Prisma.XOR<Prisma.ClickCreateInput, Prisma.ClickUncheckedCreateInput>
+    | Prisma.XOR<Prisma.UserCreateInput, Prisma.UserUncheckedCreateInput>;
 
-type UpdateInput =
+export type UpdateInput =
     Prisma.XOR<Prisma.AffiliateNetworkUpdateInput, Prisma.AffiliateNetworkUncheckedUpdateInput>
     | Prisma.XOR<Prisma.CampaignUpdateInput, Prisma.CampaignUncheckedUpdateInput>
     | Prisma.XOR<Prisma.SavedFlowUpdateInput, Prisma.SavedFlowUncheckedUpdateInput>
     | Prisma.XOR<Prisma.LandingPageUpdateInput, Prisma.LandingPageUncheckedUpdateInput>
     | Prisma.XOR<Prisma.OfferUpdateInput, Prisma.OfferUncheckedUpdateInput>
     | Prisma.XOR<Prisma.TrafficSourceUpdateInput, Prisma.TrafficSourceUncheckedUpdateInput>
-    | Prisma.XOR<Prisma.ClickUpdateInput, Prisma.ClickUncheckedUpdateInput>;
+    | Prisma.XOR<Prisma.ClickUpdateInput, Prisma.ClickUncheckedUpdateInput>
+    | Prisma.XOR<Prisma.UserUpdateInput, Prisma.UserUncheckedUpdateInput>;
 
 type NOT_AND_Input = {
     id?: {
@@ -47,6 +49,8 @@ type NOT_AND_Input = {
     landingPageId?: { in?: number[]; };
     offerId?: { in?: number[]; };
     trafficSourceId?: { in?: number[]; };
+    clickId?: { in?: number[]; };
+    userId?: { in?: number[]; };
 };
 
 export type DeleteManyArg = {
@@ -71,60 +75,12 @@ export type CountArg =
     | Prisma.LandingPageCountArgs
     | Prisma.OfferCountArgs
     | Prisma.TrafficSourceCountArgs
-    | Prisma.ClickCountArgs;
+    | Prisma.ClickCountArgs
+    | Prisma.UserCountArgs;
 
-class DemoStorer<M extends PrismaModel, CI extends CreateInput, UI extends UpdateInput, CA extends CountArg> {
-    async findMany(arg: FindManyArg): Promise<M[]> {
-        // TODO: ...
-    }
-
-    async findUnique(arg: { where: { id: number } }): Promise<M | null> {
-        // TODO: ...
-    }
-
-    async create(arg: { data: CI }): Promise<M> {
-        // TODO: ...
-    }
-
-    async update(arg: { where: { id: number }, data: UI }): Promise<M> {
-        // TODO: ...
-    }
-
-    async delete(arg: { where: { id: number } }): Promise<M> {
-        // TODO: ...
-    }
-
-    async deleteMany(arg: DeleteManyArg): Promise<Prisma.BatchPayload> {
-        // TODO: ...
-    }
-
-    async count(arg?: CA): Promise<number> {
-        // TODO: ...
-    }
-}
-
-export class DemoDB {
-    affiliateNetwork: IStorer<AffiliateNetwork, Prisma.AffiliateNetworkUncheckedCreateInput, Prisma.AffiliateNetworkUpdateInput, Prisma.AffiliateNetworkCountArgs>;
-    campaign: IStorer<Campaign, Prisma.CampaignUncheckedCreateInput, Prisma.CampaignUpdateInput, Prisma.CampaignCountArgs>;
-    savedFlow: IStorer<SavedFlow, Prisma.SavedFlowUncheckedCreateInput, Prisma.SavedFlowUpdateInput, Prisma.SavedFlowCountArgs>;
-    landingPage: IStorer<LandingPage, Prisma.LandingPageUncheckedCreateInput, Prisma.LandingPageUpdateInput, Prisma.LandingPageCountArgs>;
-    offer: IStorer<Offer, Prisma.OfferUncheckedCreateInput, Prisma.OfferUpdateInput, Prisma.OfferCountArgs>;
-    trafficSource: IStorer<TrafficSource, Prisma.TrafficSourceUncheckedCreateInput, Prisma.TrafficSourceUpdateInput, Prisma.TrafficSourceCountArgs>;
-    click: IStorer<Click, Prisma.ClickUncheckedCreateInput, Prisma.ClickUpdateInput, Prisma.ClickCountArgs>;
-
-    constructor() {
-        this.affiliateNetwork = new DemoStorer<AffiliateNetwork, Prisma.AffiliateNetworkUncheckedCreateInput, Prisma.AffiliateNetworkUpdateInput, Prisma.AffiliateNetworkCountArgs>();
-        this.campaign = new DemoStorer<Campaign, Prisma.CampaignUncheckedCreateInput, Prisma.CampaignUpdateInput, Prisma.CampaignCountArgs>();
-        this.savedFlow = new DemoStorer<SavedFlow, Prisma.SavedFlowUncheckedCreateInput, Prisma.SavedFlowUpdateInput, Prisma.SavedFlowCountArgs>();
-        this.landingPage = new DemoStorer<LandingPage, Prisma.LandingPageUncheckedCreateInput, Prisma.LandingPageUpdateInput, Prisma.LandingPageCountArgs>();
-        this.offer = new DemoStorer<Offer, Prisma.OfferUncheckedCreateInput, Prisma.OfferUpdateInput, Prisma.OfferCountArgs>();
-        this.trafficSource = new DemoStorer<TrafficSource, Prisma.TrafficSourceUncheckedCreateInput, Prisma.TrafficSourceUpdateInput, Prisma.TrafficSourceCountArgs>();
-        this.click = new DemoStorer<Click, Prisma.ClickUncheckedCreateInput, Prisma.ClickUpdateInput, Prisma.ClickCountArgs>();
-    }
-}
-
-interface IStorer<M extends PrismaModel, CI extends CreateInput, UI extends UpdateInput, CA extends CountArg> {
+export interface IStorer<M extends PrismaModel, CI extends CreateInput, UI extends UpdateInput, CA extends CountArg> {
     findMany: (arg: FindManyArg) => Promise<M[]>;
+    findFirst: (arg: { where: { id?: number, name?: string } }) => Promise<M | null>;
     findUnique: (arg: { where: { id: number } }) => Promise<M | null>;
     create: (arg: { data: CI }) => Promise<M>;
     update: (arg: { where: { id: number }, data: UI }) => Promise<M>;
@@ -137,7 +93,7 @@ interface PISchema<PI extends (TPrimaryItem | TClick)> {
     spa: (data: unknown, params?: Partial<Zod.ParseParams> | undefined) => Promise<Zod.SafeParseReturnType<PI, PI>>;
 }
 
-type PrismaModel = AffiliateNetwork | Campaign | SavedFlow | LandingPage | Offer | TrafficSource | Click;
+export type PrismaModel = AffiliateNetwork | Campaign | SavedFlow | LandingPage | Offer | TrafficSource | Click | User;
 
 type MakeClientFunc<PI extends (TPrimaryItem | TClick), M extends PrismaModel> = (m: M) => Promise<PI>;
 
