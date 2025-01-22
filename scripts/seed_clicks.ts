@@ -1,6 +1,6 @@
 import { argv } from "process";
 import crypto from "crypto";
-import { Prisma } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import db from "../src/lib/db";
 import { randomItemFromArray, randomIntInRange } from "../src/lib/utils";
 import { dotenvConfig } from "../src/lib/utils/env";
@@ -8,6 +8,11 @@ import { dotenvConfig } from "../src/lib/utils/env";
 dotenvConfig();
 
 (async function () {
+    if (!(db instanceof PrismaClient)) {
+        console.error("Expected db to be of type PrismaClient");
+        return;
+    }
+
     if (!argv?.[2]) {
         console.error("Please provide the number of clicks as an argument");
         return;

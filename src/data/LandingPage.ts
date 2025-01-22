@@ -10,7 +10,9 @@ const {
     createNewFunc: createNewLandingPage,
     updateByIdFunc: updateLandingPageById,
     deleteByIdFunc: deleteLandingPageById,
-} = makeStorerFuncs<LandingPage, TLandingPage, Prisma.LandingPageUncheckedCreateInput, Prisma.LandingPageUpdateInput>(
+    deleteManyFunc: deleteManyLandingPages,
+    countFunc: countLandingPages,
+} = makeStorerFuncs<LandingPage, TLandingPage, Prisma.LandingPageUncheckedCreateInput, Prisma.LandingPageUpdateInput, Prisma.LandingPageCountArgs>(
     EItemName.LANDING_PAGE,
     db.landingPage,
     makeClientLandingPage,
@@ -23,6 +25,8 @@ export {
     createNewLandingPage,
     updateLandingPageById,
     deleteLandingPageById,
+    deleteManyLandingPages,
+    countLandingPages,
 };
 
 async function makeClientLandingPage(dbModel: LandingPage): Promise<TLandingPage> {

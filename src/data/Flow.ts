@@ -10,7 +10,9 @@ const {
     createNewFunc,
     updateByIdFunc,
     deleteByIdFunc: deleteFlowById,
-} = makeStorerFuncs<SavedFlow, TSavedFlow, Prisma.SavedFlowUncheckedCreateInput, Prisma.SavedFlowUpdateInput>(
+    deleteManyFunc: deleteManyFlows,
+    countFunc: countFlows,
+} = makeStorerFuncs<SavedFlow, TSavedFlow, Prisma.SavedFlowUncheckedCreateInput, Prisma.SavedFlowUpdateInput, Prisma.SavedFlowCountArgs>(
     EItemName.FLOW,
     db.savedFlow,
     makeClientFlow,
@@ -32,6 +34,8 @@ export {
     createNewFlow,
     updateFlowById,
     deleteFlowById,
+    deleteManyFlows,
+    countFlows,
 };
 
 async function makeClientFlow(dbModel: SavedFlow): Promise<TSavedFlow> {

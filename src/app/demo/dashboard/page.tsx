@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import ReportView from "@/views/ReportView";
 import { defaultTimeframe } from "@/lib/constants";
 import { decodeParams, decodeSearchParams } from "@/lib/utils/server";
@@ -9,7 +11,7 @@ import {
     demoOffers, demoTrafficSources, demoClicks,
 } from "./data";
 
-export default async function DashboardPage({ params, searchParams }: {
+export default async function DemoDashboardPage({ params, searchParams }: {
     params: { itemName?: string, id?: string };
     searchParams: { timeframe?: string };
 }) {
@@ -18,7 +20,7 @@ export default async function DashboardPage({ params, searchParams }: {
     }
 
     const timeframe = decodeSearchParams(searchParams).timeframe ?? defaultTimeframe;
-    const { reportItemName, reportItemId } = decodeParams(params);
+    const { reportItemName } = decodeParams(params);
 
     const primaryData = {
         [EItemName.AFFILIATE_NETWORK]: demoAffiliateNetworks,
@@ -30,13 +32,17 @@ export default async function DashboardPage({ params, searchParams }: {
     };
 
     return (
-        // TODO: Decouple CRUD operations from view components,
-        // and impliment persist data to local storage for demo mode.
-        <ReportView
-            primaryData={primaryData}
-            clicks={demoClicks}
-            timeframe={timeframe}
-            reportItemName={reportItemName ?? undefined}
-        />
+        <>
+            <div className="flex items-center gap-2 w-full px-2 py-1 text-xs">
+                <FontAwesomeIcon icon={faInfoCircle} />
+                <span>While running in Demo Mode, write operations are disabled.</span>
+            </div>
+            <ReportView
+                primaryData={primaryData}
+                clicks={demoClicks}
+                timeframe={timeframe}
+                reportItemName={reportItemName ?? undefined}
+            />
+        </>
     )
 }

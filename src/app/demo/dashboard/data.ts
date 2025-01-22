@@ -1,10 +1,10 @@
 import { FlowType, GeoName } from "@prisma/client";
 import { ECustomTokenParam } from "../../../../prisma/seedData";
-import { returnAtIndexOrThrow } from "@/lib/utils";
+import { returnAtIndexOrThrow } from "../../../lib/utils";
 import {
     EItemName, ELogicalRelation, ERuleName, TAffiliateNetwork, TCampaign,
     TClick, TLandingPage, TOffer, TSavedFlow, TTrafficSource
-} from "@/lib/types";
+} from "../../../lib/types";
 
 const date = new Date();
 
@@ -190,7 +190,6 @@ export const demoLandingPages: TLandingPage[] = [
 ];
 
 export const demoSavedFlows: TSavedFlow[] = [
-    // TODO: ...
     {
         id: 0,
         name: "Saved Flow 1",

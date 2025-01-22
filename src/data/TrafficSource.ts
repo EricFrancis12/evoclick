@@ -10,7 +10,9 @@ const {
     createNewFunc,
     updateByIdFunc,
     deleteByIdFunc: deleteTrafficSourceById,
-} = makeStorerFuncs<TrafficSource, TTrafficSource, Prisma.TrafficSourceUncheckedCreateInput, Prisma.TrafficSourceUpdateInput>(
+    deleteManyFunc: deleteManyTrafficSources,
+    countFunc: countTrafficSources,
+} = makeStorerFuncs<TrafficSource, TTrafficSource, Prisma.TrafficSourceUncheckedCreateInput, Prisma.TrafficSourceUpdateInput, Prisma.TrafficSourceCountArgs>(
     EItemName.TRAFFIC_SOURCE,
     db.trafficSource,
     makeClientTrafficSource,
@@ -32,6 +34,8 @@ export {
     createNewTrafficSource,
     updateTrafficSourceById,
     deleteTrafficSourceById,
+    deleteManyTrafficSources,
+    countTrafficSources,
 };
 
 async function makeClientTrafficSource(dbModel: TrafficSource): Promise<TTrafficSource> {
