@@ -4,31 +4,6 @@ import { clickSchema } from "../lib/schemas";
 import { TClick, TClick_createRequest, TClick_updateRequest } from "../lib/types";
 import { parseTokens, makeStorerFuncs } from ".";
 
-// export async function getAllClicks(args: Prisma.ClickFindManyArgs = {}): Promise<TClick[]> {
-//     const clicks: Click[] = await db.click.findMany(args);
-//     const proms: Promise<TClick>[] = clicks.map(makeClientClick);
-//     return Promise.all(proms);
-// }
-
-// export async function countAllClicks(args: Prisma.ClickCountArgs = {}): Promise<number> {
-//     return db.click.count(args);
-// }
-
-// export async function deleteManyClicks(args: Prisma.ClickDeleteManyArgs = {}): Promise<number> {
-//     const { count } = await db.click.deleteMany(args);
-//     return count;
-// }
-
-// export async function deleteClicksByIds(ids: number[]): Promise<number> {
-//     return deleteManyClicks({
-//         where: {
-//             id: {
-//                 in: ids,
-//             },
-//         },
-//     });
-// }
-
 const {
     getAllFunc: getAllClicks,
     getByIdFunc: getClickById,

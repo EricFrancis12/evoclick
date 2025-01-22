@@ -240,24 +240,6 @@ export const deleteClickAction = clickActions.deleteAction;
 export const deleteManyClicksAction = clickActions.deleteManyAction;
 export const countClicksAction = clickActions.countAction;
 
-// export async function getClicksAction(args: Prisma.ClickFindManyArgs = {}, pathname?: string): Promise<TClick[]> {
-//     const prom = data.getAllClicks(args);
-//     refreshUrl(prom, pathname);
-//     return prom;
-// }
-
-// export async function deleteManyClicksAction(args: Prisma.ClickDeleteManyArgs = {}, pathname?: string): Promise<Prisma.BatchPayload> {
-//     const prom = data.deleteManyClicks(args);
-//     refreshUrl(prom, pathname);
-//     return prom;
-// }
-
-// export async function deleteClicksByIdsAction(ids: number[], pathname?: string): Promise<Prisma.BatchPayload> {
-//     const prom = data.deleteClicksByIds(ids);
-//     refreshUrl(prom, pathname);
-//     return prom;
-// }
-
 function refreshUrl(prom: Promise<unknown>, pathname?: string): void {
     if (pathname) prom.then(() => revalidatePath(pathname));
 }

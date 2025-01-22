@@ -2,7 +2,8 @@
 // because the seed command that runs this file "npx prisma db seed"
 // uses ts-node under the hood,
 // and it's not able to recognize that syntax in the current tsconfig.
-import prisma from "../src/lib/db";
+import { PrismaClient } from "@prisma/client";
+import db from "../src/lib/db";
 import main from "./main";
 import seedData from "./seedData";
 
@@ -12,5 +13,7 @@ main(seedData)
         process.exit(1);
     })
     .finally(async () => {
-        await prisma.$disconnect();
+        if (db instanceof PrismaClient) {
+            await db.$disconnect();
+        }
     });

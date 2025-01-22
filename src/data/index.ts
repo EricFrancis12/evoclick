@@ -33,25 +33,35 @@ type UpdateInput =
     | Prisma.XOR<Prisma.TrafficSourceUpdateInput, Prisma.TrafficSourceUncheckedUpdateInput>
     | Prisma.XOR<Prisma.ClickUpdateInput, Prisma.ClickUncheckedUpdateInput>;
 
-type WhereInput =
-    Prisma.AffiliateNetworkWhereInput
-    | Prisma.CampaignWhereInput
-    | Prisma.SavedFlowWhereInput
-    | Prisma.LandingPageWhereInput
-    | Prisma.OfferWhereInput
-    | Prisma.TrafficSourceWhereInput
-    | Prisma.ClickWhereInput;
+type NOT_AND_Input = {
+    id?: {
+        in?: number[];
+    };
+    viewTime?: {
+        gte?: Date;
+        lte?: Date;
+    };
+    affiliateNetworkId?: { in?: number[]; };
+    campaignId?: { in?: number[]; };
+    savedFlowId?: { in?: number[]; };
+    landingPageId?: { in?: number[]; };
+    offerId?: { in?: number[]; };
+    trafficSourceId?: { in?: number[]; };
+};
 
-export type ManyArg = {
-    skip?: number;
-    take?: number;
+export type DeleteManyArg = {
     where?: {
         id?: {
             in?: number[];
         };
-        NOT?: WhereInput;
-        AND?: WhereInput[];
-    } | WhereInput;
+        NOT?: NOT_AND_Input;
+        AND?: NOT_AND_Input | NOT_AND_Input[];
+    };
+};
+
+export type FindManyArg = DeleteManyArg & {
+    skip?: number;
+    take?: number;
 };
 
 export type CountArg =
@@ -64,7 +74,7 @@ export type CountArg =
     | Prisma.ClickCountArgs;
 
 class DemoStorer<M extends PrismaModel, CI extends CreateInput, UI extends UpdateInput, CA extends CountArg> {
-    async findMany(arg: ManyArg): Promise<M[]> {
+    async findMany(arg: FindManyArg): Promise<M[]> {
         // TODO: ...
     }
 
@@ -84,7 +94,7 @@ class DemoStorer<M extends PrismaModel, CI extends CreateInput, UI extends Updat
         // TODO: ...
     }
 
-    async deleteMany(arg: ManyArg): Promise<Prisma.BatchPayload> {
+    async deleteMany(arg: DeleteManyArg): Promise<Prisma.BatchPayload> {
         // TODO: ...
     }
 
@@ -114,12 +124,12 @@ export class DemoDB {
 }
 
 interface IStorer<M extends PrismaModel, CI extends CreateInput, UI extends UpdateInput, CA extends CountArg> {
-    findMany: (arg: ManyArg) => Promise<M[]>;
+    findMany: (arg: FindManyArg) => Promise<M[]>;
     findUnique: (arg: { where: { id: number } }) => Promise<M | null>;
     create: (arg: { data: CI }) => Promise<M>;
     update: (arg: { where: { id: number }, data: UI }) => Promise<M>;
     delete: (arg: { where: { id: number } }) => Promise<M>;
-    deleteMany: (arg: ManyArg) => Promise<Prisma.BatchPayload>;
+    deleteMany: (arg: DeleteManyArg) => Promise<Prisma.BatchPayload>;
     count: (arg?: CA) => Promise<number>;
 }
 
@@ -143,12 +153,12 @@ export function makeStorerFuncs<
     makeClient: MakeClientFunc<PI, M>,
     schema: PISchema<PI>
 ): {
-    getAllFunc: (arg?: ManyArg) => Promise<PI[]>;
+    getAllFunc: (arg?: FindManyArg) => Promise<PI[]>;
     getByIdFunc: (id: number) => Promise<PI | null>;
     createNewFunc: (ci: CI) => Promise<PI>;
     updateByIdFunc: (id: number, ui: UI) => Promise<PI>;
     deleteByIdFunc: (id: number) => Promise<PI>;
-    deleteManyFunc: (arg?: ManyArg) => Promise<Prisma.BatchPayload>;
+    deleteManyFunc: (arg?: DeleteManyArg) => Promise<Prisma.BatchPayload>;
     countFunc: (arg?: CA) => Promise<number>;
 } {
     const makeKey = makeRedisKeyFunc(name);
@@ -178,7 +188,7 @@ function makeGetAllFunc<
     UI extends UpdateInput,
     PI extends (TPrimaryItem | TClick),
     CA extends CountArg
->(storer: IStorer<M, CI, UI, CA>, makeClient: MakeClientFunc<PI, M>): (arg?: ManyArg) => Promise<PI[]> {
+>(storer: IStorer<M, CI, UI, CA>, makeClient: MakeClientFunc<PI, M>): (arg?: FindManyArg) => Promise<PI[]> {
     return async function (arg = {}) {
         const models: M[] = await storer.findMany(arg);
         const proms: Promise<PI>[] = models.map(makeClient);
@@ -305,7 +315,7 @@ function makeDeleteManyFunc<
     CI extends CreateInput,
     UI extends UpdateInput,
     CA extends CountArg
->(storer: IStorer<M, CI, UI, CA>, makeKey: RedisKeyFunc): (arg?: ManyArg) => Promise<Prisma.BatchPayload> {
+>(storer: IStorer<M, CI, UI, CA>, makeKey: RedisKeyFunc): (arg?: DeleteManyArg) => Promise<Prisma.BatchPayload> {
     return async function (arg = {}) {
         // Delete all matching keys for this item in the cache
         if (cache && typeof arg?.where?.id === "object" && Array.isArray(arg?.where?.id?.in)) {

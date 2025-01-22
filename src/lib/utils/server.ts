@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { decodeTimeframe, isPrimary } from "@/lib/utils";
 import { clickPropsMap } from "@/lib/utils/maps";
 import { EItemName } from "@/lib/types";
-import { ManyArg } from "@/data";
+import { FindManyArg } from "@/data";
 
 export function decodeParams(params: {
     itemName?: string;
@@ -24,7 +24,7 @@ export function decodeSearchParams(searchParams: {
     };
 }
 
-export function prismaArgs(timeframe: [Date, Date], reportItemName: EItemName | null, reportItemId: string | null): ManyArg {
+export function prismaArgs(timeframe: [Date, Date], reportItemName: EItemName | null, reportItemId: string | null): FindManyArg {
     return {
         where: {
             AND: [
@@ -35,7 +35,7 @@ export function prismaArgs(timeframe: [Date, Date], reportItemName: EItemName | 
     };
 }
 
-export function timeframeFilter([start, end]: [Date, Date]): Prisma.ClickWhereInput {
+export function timeframeFilter([start, end]: [Date, Date]) {
     return {
         viewTime: {
             gte: start,
@@ -44,7 +44,7 @@ export function timeframeFilter([start, end]: [Date, Date]): Prisma.ClickWhereIn
     };
 }
 
-export function reportItemFilter(reportItemName: EItemName | null, reportItemId: string | null): Prisma.ClickWhereInput {
+export function reportItemFilter(reportItemName: EItemName | null, reportItemId: string | null) {
     if (reportItemName === null || reportItemId === null) return {};
 
     if (isPrimary(reportItemName).ok) {

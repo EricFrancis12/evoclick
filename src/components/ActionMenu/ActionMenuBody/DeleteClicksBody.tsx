@@ -7,7 +7,7 @@ import ActionMenuBodyWrapper from "../ActionMenuBodyWrapper";
 import Button from "@/components/Button";
 import { deleteManyClicksAction, revalidatePathAction } from "@/lib/actions";
 import { TActionMenu, TDeleteClicksActionMenu } from "../types";
-import { ManyArg } from "@/data";
+import { DeleteManyArg } from "@/data";
 
 export default function DeleteClicksBody({ actionMenu, setActionMenu }: {
     actionMenu: TDeleteClicksActionMenu;
@@ -21,7 +21,7 @@ export default function DeleteClicksBody({ actionMenu, setActionMenu }: {
         if (deleting) return;
         setDeleting(true);
 
-        const arg: ManyArg | undefined = deleteAll
+        const arg: DeleteManyArg | undefined = deleteAll
             ? undefined
             : {
                 where: {
