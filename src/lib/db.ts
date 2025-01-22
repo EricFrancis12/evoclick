@@ -1,9 +1,9 @@
 import { AffiliateNetwork, Campaign, Click, LandingPage, Offer, Prisma, PrismaClient, SavedFlow, TrafficSource, User } from "@prisma/client";
 import { EItemName, Env, TPrimaryItemName } from "./types";
 import { inDemoMode, returnFirstOrThrow } from "./utils";
-import { toPrismaAffiliateNetwork, toPrismaCampaign, toPrismaClick, toPrismaLandingPage, toPrismaOffer, toPrismaSavedFlow, toPrismaTrafficSource } from "@/lib/utils/conv";
-import { demoAffiliateNetworks, demoCampaigns, demoClicks, demoLandingPages, demoOffers, demoSavedFlows, demoTrafficSources } from "@/app/demo/dashboard/data";
-import { CountArg, CreateInput, DeleteManyArg, FindManyArg, IStorer, PrismaModel, UpdateInput } from "@/data";
+import { toPrismaAffiliateNetwork, toPrismaCampaign, toPrismaClick, toPrismaLandingPage, toPrismaOffer, toPrismaSavedFlow, toPrismaTrafficSource } from "../lib/utils/conv";
+import { demoAffiliateNetworks, demoCampaigns, demoClicks, demoLandingPages, demoOffers, demoSavedFlows, demoTrafficSources } from "../app/demo/dashboard/data";
+import { CountArg, CreateInput, DeleteManyArg, FindManyArg, IStorer, PrismaModel, UpdateInput } from "../data";
 
 class DemoStorer<M extends PrismaModel, CI extends CreateInput, UI extends UpdateInput, CA extends CountArg> {
     kind: TPrimaryItemName | "Click";
