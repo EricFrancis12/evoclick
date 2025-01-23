@@ -2,6 +2,8 @@
 
 EvoClick is a self-hosted click tracking software designed for media buyers and affiliate marketers. It helps you track, analyze, and optimize your marketing campaigns to ensure maximum ROI.
 
+View Demo: https://evoclick-demo.vercel.app/demo/dashboard
+
 
 ## Features
 - Real-time Tracking: Monitor clicks, conversions, and other key metrics as they happen.
