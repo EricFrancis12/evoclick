@@ -16,7 +16,8 @@ type PostbackResp struct{}
 
 func Postback(w http.ResponseWriter, r *http.Request) {
 	timestamp, ctx := postbackStorer.InitVisit(r)
-	pbrch := make(chan pkg.PostbackResult)
+
+	var pbr pkg.PostbackResult
 
 	if clickPublicId := pkg.GetPid(*r.URL); clickPublicId != "" {
 		// Get click from db
@@ -36,14 +37,13 @@ func Postback(w http.ResponseWriter, r *http.Request) {
 				fmt.Println("error fetching traffic source: " + err.Error())
 			}
 
-			go trafficSource.SendPostback(click, pbrch)
+			pbr = trafficSource.SendPostback(click)
 		}
 	}
 
 	if os.Getenv(pkg.EnvNodeEnv) == "development" {
-		postbackResult := <-pbrch
-		if postbackResult.Err != nil {
-			fmt.Println(postbackResult.Err.Error())
+		if pbr.Err != nil {
+			fmt.Println(pbr.Err.Error())
 			w.Header().Set("cypress-redirect-test-result", "fail")
 		} else {
 			w.Header().Set("cypress-redirect-test-result", "pass")

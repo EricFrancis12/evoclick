@@ -59,17 +59,17 @@ type PostbackResult struct {
 	Err  error
 }
 
-func (ts *TrafficSource) SendPostback(click Click, pbrch chan PostbackResult) {
+func (ts *TrafficSource) SendPostback(click Click) PostbackResult {
 	url := ts.FillPostbackURL(click.TokenMatcherMap())
 	if url == "" {
-		pbrch <- PostbackResult{
+		return PostbackResult{
 			Resp: &http.Response{},
 			Err:  fmt.Errorf("reqest was not made because postback url is an empty string"),
 		}
 	}
 
 	resp, err := http.Get(url)
-	pbrch <- PostbackResult{
+	return PostbackResult{
 		Resp: resp,
 		Err:  err,
 	}

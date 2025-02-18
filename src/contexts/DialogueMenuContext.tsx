@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useContext, useState, useRef, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { isAncestorOfRef } from "@/lib/utils/client";
 import useClickOutsideToggle from "@/hooks/useClickOutsideToggle";
 
 const Z_INDEX = 4000;
@@ -35,6 +34,7 @@ export function useDialogueMenu() {
     }
     return context;
 }
+
 export function DialogueViewProvider({ children }: {
     children: React.ReactNode;
 }) {
